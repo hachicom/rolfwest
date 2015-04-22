@@ -1,5 +1,5 @@
 var keeploop = true;
-var hiscore = 1000;
+var hiscore = 10000;
 var paused = false;
 var oldTime = new Date();
 var fpscount = 0;
@@ -10,7 +10,7 @@ var soundOn = true;
 var language = 'en_US'; //ou en_US
 var playerData = {
   scoretable: {
-		hiscore: 1000
+		hiscore: 10000
 	},
   settings: {
 		sound: true,
@@ -68,7 +68,7 @@ window.onload = function() {
   // 3 - Starting point
 	var game = new Core(320, gameheight);
 	// 4 - Preload resources
-	game.preload('res/penguinSheet.png',
+	game.preload('res/rolfSheet.png',
                'res/Ice.png',
                'res/IceFrag.png',
                'res/heart.png',
@@ -268,12 +268,12 @@ window.onload = function() {
       label6.y = 0;
       this.hiscoreLabel = label6;
       
-      label5 = new FontSprite('score', 96, 32, 'SNOW_ 3');
+      label5 = new FontSprite('score', 96, 32, 'ROLF_ 3');
       label5.x = 100;
       label5.y = 24;
       this.livesLabel = label5;
       
-      label3 = new FontSprite('score', 96, 32, 'FISH_0');
+      label3 = new FontSprite('score', 96, 32, 'COIN_0');
       label3.x = 177;
       label3.y = 24;
       this.coinsLabel = label3;
@@ -283,7 +283,7 @@ window.onload = function() {
       label2.y = 24;
       this.levelLabel = label2;
       
-      label4 = new FontSprite('score', 256, 32, 'COLETE 4 PEIXES!');
+      label4 = new FontSprite('score', 256, 32, 'SHOOT ALL BANDITS!');
       label4.x = 32;
       label4.y = 140;
       this.msgLabel = label4;
@@ -309,13 +309,23 @@ window.onload = function() {
       bracket4.x = 314;
       bracket4.y = 24;
       
-      dpad = new Sprite(320,156);
+      dpad = new Sprite(210,156);
       dpad.x = 0;
       dpad.y = game.height - 156;
       dpad.opacity = 0.5;
       dpad.image = game.assets['res/dpad.png'];       
-      //dpad.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      dpad.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      dpad.addEventListener(Event.TOUCH_MOVE,this.handleTouchControl);
+      dpad.addEventListener(Event.TOUCH_END,this.handleTouchControlOff);
       this.dpad = dpad;
+      
+      actBtn = new Sprite(100,156);
+      actBtn.x = 220;
+      actBtn.y = game.height - 156;
+      actBtn.opacity = 0.5;
+      actBtn.image = game.assets['res/dpad.png'];       
+      actBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
+      this.actBtn = actBtn;
       
       labelPause = new Sprite(64, 64);
       labelPause.image = game.assets['res/pause.png'];
@@ -330,14 +340,14 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       
       // Penguin
-      penguin = new Penguin(145,288);
-      this.penguin = penguin;
+      rolf = new Rolf(145,320);
+      this.rolf = rolf;
       
       // Igloo & Yuki
-      igloo = new Igloo(282,208,levelUpAt);
+      /* igloo = new Igloo(282,208,levelUpAt);
       this.igloo = igloo;
       yuki = new Yuki(272,288,levelUpAt);
-      this.yuki = yuki;
+      this.yuki = yuki; */
       
       // Ice group
       iceGroup = new Group();
@@ -396,10 +406,10 @@ window.onload = function() {
       this.addChild(iceGroup);
       this.addChild(gui);
       //this.addChild(bg);
-      this.addChild(map);
-      this.addChild(igloo);
-      this.addChild(penguin);
-      this.addChild(yuki);
+      // this.addChild(map);
+      // this.addChild(igloo);
+      this.addChild(rolf);
+      // this.addChild(yuki);
       this.addChild(fishGroup);
       this.addChild(heartGroup);
       this.addChild(label3);
@@ -413,10 +423,11 @@ window.onload = function() {
       this.addChild(bracket3);
       this.addChild(bracket4);
       this.addChild(dpad);
+      this.addChild(actBtn);
       this.addChild(labelPause);
-      //this.addChild(fpslabel);
+      this.addChild(fpslabel);
             
-      this.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      //this.addEventListener(Event.TOUCH_START,this.handleTouchControl);
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
     },
@@ -443,32 +454,46 @@ window.onload = function() {
     
     handleTouchControl: function (evt) {
       var playSnd, lane;
-      if(!this.paused && evt.y>=288){
-        if(this.gotHit!=true && this.buying!=true && this.startLevelMsg<=0){
-          if(evt.x > game.width/2) lane=1;
-          else lane=-1;
+      //this.parentNode.score = evt.x+','+evt.y;
+      if(!this.parentNode.paused){
+        if(this.parentNode.startLevelMsg<=0){
+          this.parentNode.score = evt.x+','+evt.y;
+          this.parentNode.lives = 'tch';
+          if(evt.x > this.width/2) this.parentNode.rolf.move(1);//lane=1;
+          else this.parentNode.rolf.move(-1);//lane=-1;
           
           //Verifica a posição do pinguim e dependendo do caso dispara um som
-          playSnd = this.penguin.switchToLaneNumber(lane,this.igloo.isLit,this.yuki.isThere);
-          if (playSnd=='jump') { //apenas moveu o pinguim
-            // if( isAndroid ){
-              // if(soundOn) {
-                // jumpSnd.seekTo(1);
-                // jumpSnd.play();
-              // }
-            // }
-          }else if(playSnd=='powerup') { //dispara o modo de entrega dos peixes
-            if( isAndroid ) {
-              if(soundOn) //powerup.play();
-                window.plugins.LowLatencyAudio.play('powerup');
-            }/* else{
-              if(soundOn) game.assets['res/powerup.wav'].play();
-            } */
-            this.buying=true;
-            this.setCoins(this.levelUpAt*(-1));
-          }
+          // playSnd = this.penguin.switchToLaneNumber(lane,this.igloo.isLit,this.yuki.isThere);
+          // if (playSnd=='jump') { //apenas moveu o pinguim
+          // }else if(playSnd=='powerup') { //dispara o modo de entrega dos peixes
+            // if( isAndroid ) {
+              // if(soundOn) //powerup.play();
+                // window.plugins.LowLatencyAudio.play('powerup');
+            // }/* else{
+              // if(soundOn) game.assets['res/powerup.wav'].play();
+            // } */
+            // this.buying=true;
+            // this.setCoins(this.levelUpAt*(-1));
+          // }
         }
       }
+      evt.stopPropagation();
+      evt.preventDefault();
+    },
+    
+    handleTouchShootControl: function (evt) {
+      var playSnd, lane;
+      this.parentNode.coins = evt.x+','+evt.y;
+      this.parentNode.rolf.stopMove();
+      
+      evt.stopPropagation();
+      evt.preventDefault();
+    },
+    
+    handleTouchControlOff: function (evt) {
+      this.parentNode.score = 0;
+      this.parentNode.rolf.stopMove();
+      
       evt.stopPropagation();
       evt.preventDefault();
     },
@@ -558,9 +583,9 @@ window.onload = function() {
         if(this.levelUpAt < 10) levelupstr = '0';
         
         this.scoreLabel.text = 'SC ' + this.score;// + '_x' + this.multiplier;
-        this.coinsLabel.text = glossary.text.peixe[language]+'_' + coinstr + this.coins + '/' + levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
+        this.coinsLabel.text = glossary.text.peixe[language]+'_' + coinstr + this.coins + '/' //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
         this.levelLabel.text = 'LVL_ ' + this.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
-        this.livesLabel.text = 'SNOW_ ' + this.lives;
+        this.livesLabel.text = 'ROLF_ ' + this.lives;
         this.hiscoreLabel.text = 'TOP '+hiscore;
         if(this.bonusMode == true) this.coinsLabel.text = 'BONUS_STAGE';
         
@@ -568,323 +593,33 @@ window.onload = function() {
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
-            this.msgLabel.text = '    ROUND '+ this.level +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            this.msgLabel.text = '    ROUND '+ this.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
           }
-          else if(this.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
+          //else if(this.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
           else this.msgLabel.text = '';
         
-          // Check if it's time to create a new set of obstacles
+          // Check if it's time to create enemies
           if(this.startLevelMsg<=0) {
-            this.levelcalc = this.level - (this.sabbath * 7);
-            
-            this.generateIceTimer += 2 + (this.levelcalc/2) + this.sabbath;
-            if (this.generateIceTimer >= this.iceTimer) {
-              var ice, icelimit;
-              this.generateIceTimer = 0;
-              
-              //limit to 4 ice cubes at the screen
-              icelimit = 3;
-              if(this.sabbath>3) icelimit = 4;
-              if(this.iceGroup.childNodes.length<icelimit){
-                ice = new Ice(Math.floor(Math.random()*3),this.levelcalc);
-                this.iceGroup.addChild(ice);
-              }
-            }
-            
-            // Check if it's time to make fish jump
-            if(this.coins != this.levelUpAt){
-              this.generateFishTimer += 1;
-              if (this.generateFishTimer >= this.fishTimer) {
-                var fish, isPiranha, levellimit;
-                this.generateFishTimer = 0;
-                isPiranha = false;
-                levellimit = 3;
-                if(this.sabbath==2) levellimit = 2;
-                else if(this.sabbath>=4) levellimit = 1;
-                this.fishCount++;
-                if(this.fishCount==this.createPiranha) {
-                  if(this.levelcalc>=levellimit) isPiranha = true;
-                  this.fishCount = 0;
-                  this.createPiranha = getRandom(4,6);
-                }
-                fish = new Fish(Math.floor(Math.random()*3),this.levelcalc, isPiranha);
-                this.fishGroup.addChild(fish);
-                this.fishTimer = getRandom(3,6)*this.fishTimerExp;
-              }
-            }
+            //TODO: Enemy creation code
           }
         
           // Check collision
-          // Ice collision
-          for (var i = this.iceGroup.childNodes.length - 1; i >= 0; i--) {
-            var ice;
-            ice = this.iceGroup.childNodes[i];
-            if(ice.y<=260){
-              if (ice.intersect(this.penguin) && this.penguin.isVulnerable()){
-                if( isAndroid ) {
-                  if(soundOn) //hit.play();
-                    window.plugins.LowLatencyAudio.play('hit');
-                }/* else{
-                  if(soundOn) game.assets['res/hit.wav'].play();
-                } */
-                //console.log(ice.y);
-                ice.crashToPieces();
-                this.gotHit = true; 
-                this.penguin.gotHit();
-                if( isAndroid ) {
-                  keeploop = false; 
-                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-                  //this.bgm.stop();
-                }
-                break;
-              }
-            }else{
-              //this.iceGroup.removeChild(ice);
-              if( isAndroid ) {
-                if(soundOn) {
-                  window.plugins.LowLatencyAudio.play('crash');
-                  /* crash.seekTo(1);
-                  crash.play(); */
-                }
-              }/* else{
-                if(soundOn) game.assets['res/break.wav'].play();
-              } */
-              ice.crashToPieces();
-              //this.setScore(1);
-            }
-          }
           
-          // Fish collision
-          for (var i = this.fishGroup.childNodes.length - 1; i >= 0; i--) {
-            var fish;
-            fish = this.fishGroup.childNodes[i];
-            if (fish.intersect(this.penguin) && this.coins < this.levelUpAt){
-              if(fish.piranha && !fish.ascending && fish.y<288){
-                if( isAndroid ) {
-                  if(soundOn) //hit.play();
-                    window.plugins.LowLatencyAudio.play('hit');
-                }
-                this.gotHit = true; 
-                this.penguin.gotHit();
-                if( isAndroid ) {
-                  keeploop = false;
-                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-                  //this.bgm.stop();
-                }
-                break;
-              }else if(fish.piranha && !fish.ascending && fish.y>=288){
-                if( isAndroid ) {
-                  if(soundOn) {
-                    window.plugins.LowLatencyAudio.play('item');
-                    /* s_item.seekTo(1);
-                    s_item.play(); */
-                  }
-                }/* else{
-                  if(soundOn) game.assets['res/fish.wav'].play();
-                } */
-                this.setScore(100,false);
-                this.setCoins(1);
-                //if(this.multiplier<8) this.multiplier=this.multiplier * 2; 
-                this.fishGroup.removeChild(fish);
-                break;
-              }else if(!fish.piranha){
-                if( isAndroid ) {
-                  if(soundOn) {
-                    window.plugins.LowLatencyAudio.play('coin');
-                    /* coin.seekTo(1);
-                    coin.play(); */
-                  }
-                }/* else{
-                  if(soundOn) game.assets['res/fish.wav'].play();
-                } */
-                this.setScore(10,false);
-                this.setCoins(1);
-                //if(this.multiplier<8) this.multiplier=this.multiplier * 2; 
-                this.fishGroup.removeChild(fish);
-                break;
-              }
-            }
-            for (var j = this.iceGroup.childNodes.length - 1; j >= 0; j--) {
-              var ice;
-              ice = this.iceGroup.childNodes[j];
-              
-              if (ice.intersect(fish) && fish.ascending && fish.piranha){
-                if( isAndroid ) {
-                  if(soundOn) {
-                    window.plugins.LowLatencyAudio.play('crash');
-                    /* crash.seekTo(1);
-                    crash.play(); */
-                  }
-                }
-                ice.crashToPieces();
-                //break;
-              }
-            } 
-          }
         }
         
         //Atingido: dispara o timer e parte para o game over no término
         if(this.gotHit==true){
-          //game.stop();
-          this.hitDuration += 1; 
-          if(this.hitDuration >= 70){
-            //this.iceGroup.removeChild(ice);
-            //game.resume();
-            if(this.lives==0){
-              if( isAndroid ) {
-                keeploop = false; 
-                //bgm.stop();
-              }
-              //this.bgm.stop();
-              game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
-            }else{
-              this.gotHit=false;
-              this.hitDuration=0;
-              this.lives-=1;
-              this.multiplier=1;
-              for (var i = this.iceGroup.childNodes.length - 1; i >= 0; i--) {
-                var ice;
-                ice = this.iceGroup.childNodes[i];
-                this.iceGroup.removeChild(ice);
-              }
-              for (var i = this.fishGroup.childNodes.length - 1; i >= 0; i--) {
-                var fish;
-                fish = this.fishGroup.childNodes[i];
-                this.fishGroup.removeChild(fish);
-              }
-              this.penguin.resetPosition();
-              if( isAndroid ) {
-                keeploop = true; 
-                if(soundOn) //this.bgm.play();
-                  window.plugins.LowLatencyAudio.loop(currentBGM);
-                //bgm.play();
-              }
-            }
-          }
+          //TODO: Got hit code
         }
         
-        //Comprando(iglu ou Yuki): dispara o timer, executa as ações necessárias e libera o jogador ao término
+        //Término da fase: conta os pontos e passa para o próximo level
         if(this.buying==true){
-          this.msgLabel.text = '  BONUS '+(10*this.levelUpAt)*(this.sabbath+1) + 'pts';
-          for (var i = this.iceGroup.childNodes.length - 1; i >= 0; i--) {
-            var ice;
-            ice = this.iceGroup.childNodes[i];
-            ice.crashToPieces();
-          }
-          //game.stop();
-          this.buyDuration += 1; 
-          this.penguin.shopping();
-          this.yuki.kiss(this.penguin.lane);
-          // if(this.hitDuration <= 1 && this.duration){
-          // }
-          if(this.buyDuration >= 90){
-            //this.iceGroup.removeChild(ice);
-            //game.resume();
-            for (var i = this.fishGroup.childNodes.length - 1; i >= 0; i--) {
-              var fish;
-              fish = this.fishGroup.childNodes[i];
-              this.fishGroup.removeChild(fish);
-            }
-            this.buying=false; 
-            //this.penguin.shopping(false);
-            this.buyDuration = 0;
-            if (this.penguin.lane==2) {
-              this.setScore((10*this.levelUpAt)*(this.sabbath+1),false);           
-              this.incLevelUp();
-            }
-            this.yuki.smile(this.coins);
-            this.yuki.price = this.igloo.price = this.levelUpAt;
-            this.startLevelMsg = 45;
-            // if(this.levelcalc<=1) this.backgroundColor = this.backgroundArray[0];
-            // else if(this.levelcalc<=3) this.backgroundColor = this.backgroundArray[1];
-            // else 
-            this.backgroundColor = this.backgroundArray[this.levelcalc];
-            this.penguin.resetPosition();
-            //break;
-          }
+          //TODO: End of level code
         }
         
         // Bonus Stage Mode
         if(this.bonusMode == true){
-          // Deal with start message        
-          if(this.startLevelMsg>0) {
-            this.startLevelMsg-=1;
-            this.msgLabel.text = '    ROUND '+ this.level +'_  BONUS ROUND';
-          }else this.msgLabel.text = glossary.text.coracoes[language]+this.hearts;
-          
-          // Check if it's time to make hearts
-          if(this.startLevelMsg<=0) {
-            if(this.heartsGenerated < this.levelUpAt){
-              this.yuki.kiss(2);
-              this.generateFishTimer += 1;
-              if (this.generateFishTimer >= this.heartTimer) {
-                var ice;
-                this.generateFishTimer = 0;
-                heart = this.yuki.giveHeart(getRandom(1,3)*(-1));
-                this.heartGroup.addChild(heart);
-                this.heartsGenerated++;
-              }
-            }
-          }
-          
-          // Heart collision
-          for (var i = this.heartGroup.childNodes.length - 1; i >= 0; i--) {
-            var heart;
-            heart = this.heartGroup.childNodes[i];
-            if (heart.intersect(this.penguin)){
-              if( isAndroid ) {
-                if(soundOn) {
-                  window.plugins.LowLatencyAudio.play('item');
-                  /* s_item.seekTo(1);
-                  s_item.play(); */
-                }
-              }/* else{
-                game.assets['res/fish.wav'].play();
-              } */
-              //this.setScore(2,false);
-              this.setHearts(1);
-              this.heartGroup.removeChild(heart);
-              break;
-            }
-          }
-          
-          if(this.heartGroup.childNodes.length == 0 && this.heartsGenerated >= this.levelUpAt){
-            this.bonusDuration += 1; 
-            if(this.hearts==this.levelUpAt) this.msgLabel.text += '_PERFECT! '+(2000*(this.sabbath))+'pts';
-            else this.msgLabel.text += 'x'+(this.sabbath)+'0_BONUS '+10*this.hearts*(this.sabbath) + 'pts';
-            this.penguin.movable = false;
-            this.penguin.lane = 2;
-            this.penguin.shopping();
-          }
-            
-          if(this.bonusDuration >=90) {
-            if(this.hearts==this.levelUpAt)this.setScore(2000*(this.sabbath),false);
-            else this.setScore(10*this.hearts*(this.sabbath),false);
-            
-            this.bonusMode = false;
-            this.incLevelUp();
-            this.yuki.smile(this.coins);
-            this.yuki.price = this.igloo.price = this.levelUpAt;
-            this.startLevelMsg = 45;
-            this.bonusDuration = 0;
-            this.heartsGenerated = 0;
-            this.hearts = 0;
-            this.penguin.movable = true;
-            this.backgroundColor = this.backgroundArray[0];
-            this.penguin.resetPosition();
-            
-            if( isAndroid ) {
-              if(soundOn) {
-                /* this.bgm.stop();
-                this.bgm = bgm; 
-                this.bgm.play();*/
-                keeploop = true;
-                window.plugins.LowLatencyAudio.stop(currentBGM);
-                currentBGM = 'bgm';
-                window.plugins.LowLatencyAudio.loop(currentBGM);
-              }
-            }
-          }
+          //TODO: Bonus mode code
         }
         
         // Loop BGM
@@ -1120,11 +855,11 @@ window.onload = function() {
       label.x = 0;
       label.y = 8;
       
-      label.text = '  ==SNOW & YUKI==__CODE, ART & DESIGN_'
+      label.text = '   ==ROLF WEST==__CODE, ART & DESIGN_'
                   +'Adinan Batista Alves___'
-                  +'ENCHANT.JS TUTORIAL_Thongrop Rodsavas_(raywenderlich.com)___'
+                  //+'ENCHANT.JS TUTORIAL_Thongrop Rodsavas_(raywenderlich.com)___'
                   +'8BIT TRACKS BY_'
-                  +'Bart Kelsey_(OpenGameArt.Org)___'
+                  +'Wonderboy(demoscene)___'
                   +'BMFONT PLUGIN BY_'
                   +'COFFEE DOG GAMES___'
                   +'SOUND EFFECTS_'
@@ -1310,21 +1045,21 @@ window.onload = function() {
       tmpLanguage = language;
       
       this.backgroundColor = '#000000';
-      map = new Map(32, 32);
-      map.image = game.assets['res/groundSheet.png'];
-      map.loadData(arrMap1Top,arrMap1Sub);
+      // map = new Map(32, 32);
+      // map.image = game.assets['res/groundSheet.png'];
+      // map.loadData(arrMap1Top,arrMap1Sub);
             
-      snow = new Sprite(32,32);
-      snow.x = 224;
-      snow.y = 288;
-      snow.frame = 4;
-      snow.image = game.assets['res/penguinSheet.png']; 
+      // snow = new Sprite(32,32);
+      // snow.x = 224;
+      // snow.y = 288;
+      // snow.frame = 4;
+      // snow.image = game.assets['res/penguinSheet.png']; 
       
-      yuki = new Sprite(32,32);
-      yuki.x = 192;
-      yuki.y = 288;
-      yuki.frame = 2;
-      yuki.image = game.assets['res/yukiSheet.png']; 
+      // yuki = new Sprite(32,32);
+      // yuki.x = 192;
+      // yuki.y = 288;
+      // yuki.frame = 2;
+      // yuki.image = game.assets['res/yukiSheet.png']; 
       
       label = new FontSprite('score', 320, 200, glossary.UI.optionsTxt[language]);
       label.x = 0;
@@ -1415,11 +1150,10 @@ window.onload = function() {
         game.replaceScene(new SceneTitle());
       });
             
-      // Add labels  
-      //this.addChild(title);
-      this.addChild(map);
-      this.addChild(snow);
-      this.addChild(yuki);
+      // Add labels
+      // this.addChild(map);
+      // this.addChild(snow);
+      // this.addChild(yuki);
       this.addChild(label);
       this.addChild(SoundOnLabel);
       this.addChild(SoundOffLabel);
@@ -1461,10 +1195,10 @@ window.onload = function() {
       label6.y = 0;
       this.hiscoreLabel = label6;
       
-      // Title label
-      // TitleLabel = new FontSprite('score', 112, 16, "ICEFALL");
-      // TitleLabel.x = 104;
-      // TitleLabel.y = 198;
+      //Title label
+      TitleLabel = new FontSprite('score', 240, 16, "ROLFWEST v0.0.1");
+      TitleLabel.x = 48;
+      TitleLabel.y = 198;
       
       // Press Start label
       PressStart = new FontSprite('score', 192, 16, glossary.UI.start[language]);
@@ -1522,10 +1256,10 @@ window.onload = function() {
       // scoreLabel._style.textShadow ="-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black";
       
       // Add labels  
-      this.addChild(title);
+      //this.addChild(title);
       //this.addChild(map);
       this.addChild(copyright);
-      //this.addChild(TitleLabel); 
+      this.addChild(TitleLabel); 
       this.addChild(PressStart);
       this.addChild(tutorialLabel);
       this.addChild(optionLabel);
