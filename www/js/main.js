@@ -69,6 +69,7 @@ window.onload = function() {
 	var game = new Core(320, gameheight);
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
+               'res/bulletSheet.png',
                'res/Ice.png',
                'res/IceFrag.png',
                'res/heart.png',

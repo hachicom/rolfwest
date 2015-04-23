@@ -87,6 +87,9 @@ var Rolf = Class.create(Sprite, {
   shoot: function(){
     this.shootTime = 5;
     this.animationDuration = 0;
+    
+    var s = new PlayerShoot(this.x, this.y);
+    this.parentNode.addChild(s);
   },
   
   stopMove: function(){
