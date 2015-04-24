@@ -15,13 +15,15 @@ var Shot = Class.create(Sprite, {
     var game;
     game = Game.instance;
     
-    this.x += this.moveSpeed * Math.cos(this.direction);
-    this.y += this.moveSpeed * Math.sin(this.direction);
+    if (!this.parentNode.parentNode.paused){//todo tiro deve pertencer ao grupo correspondente (Player ou Enemy Shot Group)
+      this.x += this.moveSpeed * Math.cos(this.direction);
+      this.y += this.moveSpeed * Math.sin(this.direction);
     
-    if(this.y > game.height || this.x > game.width || this.x < -this.width || this.y < -this.height){
-      this.remove();
+      if(this.y > game.height || this.x > game.width || this.x < -this.width || this.y < -this.height){
+        this.remove();
+      }
     }
-  }
+  },
   
   remove: function(){
     this.parentNode.removeChild(this);
@@ -29,13 +31,25 @@ var Shot = Class.create(Sprite, {
   }
 });
 
-// PlayerShoot class
-var PlayerShoot = Class.create(Shot, { 
+// PlayerShot class
+var PlayerShot = Class.create(Shot, {
   // Succeeds bullet class
   initialize: function(x, y){
-    this.angle = Math.atan2(1, 0); //shooting up
+    this.angle = Math.atan2(-1, 0); //shooting up (Ytarget-Ystart,Xtarget-Xstart)
     Shot.call(this, x, y, this.angle);
     this.frame = 0;
     this.moveSpeed = 10;
+  }
+});
+
+// EnemyShot class
+var EnemyShot = Class.create(Shot, {
+  // Succeeds bullet class
+  initialize: function(x, y, playerSprite, level){
+    this.angle = findAngle(playerSprite.x,x,playerSprite.y,y); //shooting towards player
+    Shot.call(this, x, y, this.angle);
+    this.frame = 1;
+    this.scaleY = -1;
+    this.moveSpeed = 10 + (level*2);
   }
 });

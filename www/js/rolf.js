@@ -14,40 +14,65 @@ var Rolf = Class.create(Sprite, {
       this.movable = true;
       this.moving = 0; //-1: esquerda, 0: parado, 1: direita
       //this.tl.setTimeBased();
+      
+      // 2 - Player Status
+      this.bullets = 6;
+      this.health = 3;
+      this.reload = false;
+      this.reloadTime = 0;
     
-      // 2 - Animate
-      this.frame = 2;
-      this.iniFrame = 2;
-      this.endFrame = 2;
+      // 3 - Animate
+      this.frame = 2 + this.health;
+      this.iniFrame = 2 + this.health;
+      this.endFrame = 2 + this.health;
       this.animationDuration = 0;
       this.animationSpeed = 0.25;
       this.shootTime=0;
       this.addEventListener(Event.ENTER_FRAME, this.updateAnimation);
   },
   
-  updateAnimation: function (evt) { 
+  updateAnimation: function (evt) {
     game = Game.instance;  
     if (!this.parentNode.paused){
+      /*START RELOAD BULLETS BLOCK*/
+      if(this.reloadTime>0) {
+        this.reloadTime-=1;
+        if(this.reloadTime<=0){
+          this.bullets+=1;
+          if(this.bullets>=6){
+            this.reload = false;
+          }
+          else{
+            this.reloadTime = 15;
+          }
+        }
+      }
+      /*END RELOAD BLOCK*/
+      
+      /*START ANIMATION BLOCK*/
       this.animationDuration += 0.05;    
       if(this.shootTime>0) {
-        this.frame = 2;
-        this.iniFrame = 2;
-        this.endFrame = 2;
+        this.frame = 2 + this.health;
+        this.iniFrame = 2 + this.health;
+        this.endFrame = 2 + this.health;
         this.shootTime-=1;
         if(this.shootTime==0) {
           this.animationDuration = 0;
           if(this.moving!=0){
-            this.frame = 0;
-            this.iniFrame = 0;
-            this.endFrame = 1;
+            this.frame = 0 + this.health;
+            this.iniFrame = 0 + this.health;
+            this.endFrame = 1 + this.health;
           }
         }
-      }
+      }      
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
         this.animationDuration -= this.animationSpeed;
-      }
+      }      
+      /*END ANIMATION BLOCK*/
+      
+      /*START MOVEMENT BLOCK*/
       if(this.parentNode.gotHit!=true && this.movable==false){
         if(this.x<this.nextpos) {
           this.x+=this.movespeed;
@@ -64,39 +89,43 @@ var Rolf = Class.create(Sprite, {
       else if(this.moving == 1 && this.shootTime<=0) {
         this.x+=5;
         if (this.x>game.width-this.width) this.x=game.width-this.width;
-      }
-      // if(this.x == 252){
-        // this.frame = 4;
-        // this.iniFrame = 4;
-        // this.endFrame = 4;
-      // }
+      }      
+      /*END MOVEMENT BLOCK*/      
     }
   },
   
   move: function(direction){
     if(this.moving==0){
-      this.frame = 0;
+      this.frame = 0 + this.health;
       this.animationDuration = 0;
-      this.iniFrame = 0;
-      this.endFrame = 1;
+      this.iniFrame = 0 + this.health;
+      this.endFrame = 1 + this.health;
     }
     this.moving = direction;
     this.scaleX = direction;
   },
   
   shoot: function(){
-    this.shootTime = 5;
-    this.animationDuration = 0;
-    
-    var s = new PlayerShoot(this.x, this.y);
-    this.parentNode.addChild(s);
+    if(this.bullets>0){
+      this.shootTime = 5;
+      this.animationDuration = 0;
+      shotGroup = this.parentNode.shotGroup;
+      //this.reload = false;
+      var s = new PlayerShot(this.x+9, this.y);
+      this.parentNode.shotGroup.addChild(s);
+      this.bullets-=1;
+      this.reloadTime = 30;
+      /* if(this.bullets<=0) {
+        this.reload = true;
+      } */
+    }
   },
   
   stopMove: function(){
     this.moving = 0;
-    this.frame = 2;
-    this.iniFrame = 2;
-    this.endFrame = 2;
+    this.frame = 2 + this.health;
+    this.iniFrame = 2 + this.health;
+    this.endFrame = 2 + this.health;
     this.animationDuration = 0;
   },
   
@@ -105,9 +134,9 @@ var Rolf = Class.create(Sprite, {
     this.lane=1;
     this.x = this.positions[1];
     this.nextpos = this.positions[1];
-    this.frame = 0;
-    this.iniFrame = 0;
-    this.endFrame = 1;
+    this.frame = 0 + this.health;
+    this.iniFrame = 0 + this.health;
+    this.endFrame = 1 + this.health;
     this.animationDuration = 0;
     this.animationSpeed = 0.25;
     this.movespeed = 20;

@@ -78,9 +78,9 @@ var glossary = {
             +'Extra lives rewarded_at scores below:__'
             +'->5000_->10000_->20000_->40000_->80000___Try scoring 99999_to beat the game!'
     },
-		peixe: { //glossary.text.peixe[language]
-      pt_BR: 'PEIXE',
-      en_US: 'FISH',
+		municao: { //glossary.text.peixe[language]
+      pt_BR: 'BALAS',
+      en_US: 'AMMO',
     },
 		colete: { //glossary.text.colete[language]
       pt_BR: 'COLETE ',

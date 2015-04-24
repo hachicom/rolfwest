@@ -9,6 +9,10 @@ function getRandom(min, max) {
   return nextvalret;
 } */
 
+function findAngle(xi,yi,xf,yf){
+  return Math.atan2(yf-yi, xf-xi);
+}
+
 function isMobile(){
   var vMobile;
   vMobile = /Android/i.test(navigator.userAgent);

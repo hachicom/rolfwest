@@ -67,6 +67,7 @@ window.onload = function() {
   var gameheight = (320 * screen.height)/screen.width;
   // 3 - Starting point
 	var game = new Core(320, gameheight);
+	//var game = new Core(320, 480);
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
                'res/bulletSheet.png',
@@ -249,7 +250,7 @@ window.onload = function() {
       bg.y = 200;
       bg.scale(1,2);
       bg.image = game.assets['res/mountain.png'];
-      this.backgroundArray = ['#00e8d8','#6888fc','#0058f8','#0000bc','#004058','#000000','#6844fc'];
+      this.backgroundArray = ['#005555','#6888fc','#0058f8','#0000bc','#004058','#000000','#6844fc'];
       this.backgroundColor = this.backgroundArray[0];
       map = new Map(32, 32);
       //map.y = 315;
@@ -343,7 +344,7 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       
       // Penguin
-      rolf = new Rolf(145,320);
+      rolf = new Rolf(145,340);
       this.rolf = rolf;
       
       // Igloo & Yuki
@@ -359,8 +360,8 @@ window.onload = function() {
       fishGroup = new Group();
       this.fishGroup = fishGroup;
       // Heart group
-      heartGroup = new Group();
-      this.heartGroup = heartGroup;
+      shotGroup = new Group();
+      this.shotGroup = shotGroup;
       
       // Instance variables
       this.paused = false;
@@ -407,14 +408,14 @@ window.onload = function() {
       
       // 4 - Add child nodes
       this.addChild(iceGroup);
-      this.addChild(gui);
       //this.addChild(bg);
       // this.addChild(map);
       // this.addChild(igloo);
-      this.addChild(rolf);
       // this.addChild(yuki);
       this.addChild(fishGroup);
-      this.addChild(heartGroup);
+      this.addChild(shotGroup);
+      this.addChild(rolf);
+      this.addChild(gui);
       this.addChild(label3);
       this.addChild(label2);
       this.addChild(label);
@@ -457,11 +458,8 @@ window.onload = function() {
     
     handleTouchControl: function (evt) {
       var playSnd, lane;
-      //this.parentNode.score = evt.x+','+evt.y;
       if(!this.parentNode.paused){
         if(this.parentNode.startLevelMsg<=0){
-          this.parentNode.score = evt.x+','+evt.y;
-          this.parentNode.lives = 'tch';
           if(evt.x > this.width/2) this.parentNode.rolf.move(1);//lane=1;
           else this.parentNode.rolf.move(-1);//lane=-1;
           
@@ -486,15 +484,14 @@ window.onload = function() {
     
     handleTouchShootControl: function (evt) {
       var playSnd, lane;
-      this.parentNode.coins = evt.x+','+evt.y;
-      this.parentNode.rolf.shoot();
-      
+      if(!this.parentNode.paused){
+        this.parentNode.rolf.shoot();
+      }
       evt.stopPropagation();
       evt.preventDefault();
     },
     
     handleTouchControlOff: function (evt) {
-      this.parentNode.score = 0;
       this.parentNode.rolf.stopMove();
       
       evt.stopPropagation();
@@ -586,7 +583,7 @@ window.onload = function() {
         if(this.levelUpAt < 10) levelupstr = '0';
         
         this.scoreLabel.text = 'SC ' + this.score;// + '_x' + this.multiplier;
-        this.coinsLabel.text = glossary.text.peixe[language]+'_' + coinstr + this.coins + '/' //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
+        this.coinsLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6' //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
         this.levelLabel.text = 'LVL_ ' + this.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
         this.livesLabel.text = 'ROLF_ ' + this.lives;
         this.hiscoreLabel.text = 'TOP '+hiscore;
