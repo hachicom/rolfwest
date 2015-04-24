@@ -80,6 +80,7 @@ window.onload = function() {
                'res/groundSheet.png',
                'res/title.png',
                'res/dpad.png',
+               'res/actbtn.png',
                'res/brackets.png',
                'res/pause.png',
                'res/font0_0.png');
@@ -321,9 +322,10 @@ window.onload = function() {
       
       actBtn = new Sprite(100,156);
       actBtn.x = 220;
+      actBtn.frame = 2;
       actBtn.y = game.height - 156;
       actBtn.opacity = 0.5;
-      actBtn.image = game.assets['res/dpad.png'];       
+      actBtn.image = game.assets['res/actbtn.png'];       
       actBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       this.actBtn = actBtn;
       
@@ -484,7 +486,7 @@ window.onload = function() {
     handleTouchShootControl: function (evt) {
       var playSnd, lane;
       this.parentNode.coins = evt.x+','+evt.y;
-      this.parentNode.rolf.stopMove();
+      this.parentNode.rolf.shoot();
       
       evt.stopPropagation();
       evt.preventDefault();

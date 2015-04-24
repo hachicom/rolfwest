@@ -21,13 +21,28 @@ var Rolf = Class.create(Sprite, {
       this.endFrame = 2;
       this.animationDuration = 0;
       this.animationSpeed = 0.25;
+      this.shootTime=0;
       this.addEventListener(Event.ENTER_FRAME, this.updateAnimation);
   },
   
   updateAnimation: function (evt) { 
     game = Game.instance;  
     if (!this.parentNode.paused){
-      this.animationDuration += 0.05;       
+      this.animationDuration += 0.05;    
+      if(this.shootTime>0) {
+        this.frame = 2;
+        this.iniFrame = 2;
+        this.endFrame = 2;
+        this.shootTime-=1;
+        if(this.shootTime==0) {
+          this.animationDuration = 0;
+          if(this.moving!=0){
+            this.frame = 0;
+            this.iniFrame = 0;
+            this.endFrame = 1;
+          }
+        }
+      }
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -42,11 +57,11 @@ var Rolf = Class.create(Sprite, {
           if(this.x<=this.nextpos) this.x=this.nextpos;
         }
       }
-      if(this.moving == -1) {
+      if(this.moving == -1 && this.shootTime<=0) {
         this.x-=5;
         if (this.x<0) this.x=0;
       }
-      else if(this.moving == 1) {
+      else if(this.moving == 1 && this.shootTime<=0) {
         this.x+=5;
         if (this.x>game.width-this.width) this.x=game.width-this.width;
       }
@@ -59,11 +74,19 @@ var Rolf = Class.create(Sprite, {
   },
   
   move: function(direction){
+    if(this.moving==0){
+      this.frame = 0;
+      this.animationDuration = 0;
+      this.iniFrame = 0;
+      this.endFrame = 1;
+    }
     this.moving = direction;
-    this.frame = 0;
-    this.iniFrame = 0;
-    this.endFrame = 1;
     this.scaleX = direction;
+  },
+  
+  shoot: function(){
+    this.shootTime = 5;
+    this.animationDuration = 0;
   },
   
   stopMove: function(){
@@ -71,6 +94,7 @@ var Rolf = Class.create(Sprite, {
     this.frame = 2;
     this.iniFrame = 2;
     this.endFrame = 2;
+    this.animationDuration = 0;
   },
   
   resetPosition: function(){
