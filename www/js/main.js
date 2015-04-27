@@ -20,7 +20,7 @@ var playerData = {
 }; 
 
 //Desligando os eventos de mouse (Android hack)
-document.addEventListener('mousedown', function (e) {
+/* document.addEventListener('mousedown', function (e) {
   //console.log("cliquei");
   e.stopImmediatePropagation();
   e.preventDefault();
@@ -52,7 +52,7 @@ document.addEventListener('touchend', function(e) {
 }, false);
 document.addEventListener('touchstart', function(e) {
     e.preventDefault();
-}, false);
+}, false); */
 
 
 //game global difficulty variables
@@ -99,7 +99,7 @@ window.onload = function() {
     if (isLocalStorageSupported())
     {
 	    //console.log("Supports Save!");
-      playerDataTmp = JSON.decode(localStorage["playerData"]);
+      playerDataTmp = JSON.decode(localStorage["com.hachicom.rolfwest.playerData"]);
       if (playerDataTmp!=null) playerData = playerDataTmp;
       //console.dir(playerData);
     }
@@ -222,7 +222,7 @@ window.onload = function() {
         adId:admobid.banner, 
         position:AdMob.AD_POSITION.BOTTOM_CENTER, 
         overlap:true, 
-        isTesting:false,
+        isTesting:true,
         autoShow:true,
         isForChild:true
       });
@@ -237,7 +237,7 @@ window.onload = function() {
   var SceneGame = Class.create(Scene, {
      // The main gameplay scene.     
     initialize: function() {
-      var game, label, bg, penguin, iceGroup, map;
+      var game, label, bg, penguin, batGroup, map;
 
       // 1 - Call superclass constructor
       Scene.apply(this);
@@ -343,19 +343,20 @@ window.onload = function() {
       fpslabel.y = 32;
       this.fpslabel = fpslabel;
       
-      // Penguin
+      // Hero
       rolf = new Rolf(145,340);
       this.rolf = rolf;
       
-      // Igloo & Yuki
-      /* igloo = new Igloo(282,208,levelUpAt);
-      this.igloo = igloo;
-      yuki = new Yuki(272,288,levelUpAt);
+      // Enemy Generators
+      batGenerator = new BatGenerator(145,200,160);
+      this.batGenerator = batGenerator;
+      
+      /* yuki = new Yuki(272,288,levelUpAt);
       this.yuki = yuki; */
       
       // Ice group
-      iceGroup = new Group();
-      this.iceGroup = iceGroup;
+      batGroup = new Group();
+      this.batGroup = batGroup;
       // Fish group
       fishGroup = new Group();
       this.fishGroup = fishGroup;
@@ -407,7 +408,6 @@ window.onload = function() {
       }
       
       // 4 - Add child nodes
-      this.addChild(iceGroup);
       //this.addChild(bg);
       // this.addChild(map);
       // this.addChild(igloo);
@@ -415,6 +415,8 @@ window.onload = function() {
       this.addChild(fishGroup);
       this.addChild(shotGroup);
       this.addChild(rolf);
+      this.addChild(batGenerator);
+      this.addChild(batGroup);
       this.addChild(gui);
       this.addChild(label3);
       this.addChild(label2);
@@ -668,7 +670,7 @@ window.onload = function() {
       }//else map.loadData(arrMap1Top,arrMap1Sub);
       
       playerData.scoretable.hiscore = hiscore;
-      localStorage["playerData"] = JSON.encode(playerData);
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
       
       // UI labels
       gui = new Sprite(320,56);
@@ -1139,7 +1141,7 @@ window.onload = function() {
         playerData.settings.sound = soundOn;
         playerData.settings.language = language;
         
-        localStorage["playerData"] = JSON.encode(playerData);
+        localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
         game.replaceScene(new SceneTitle());
       });
       

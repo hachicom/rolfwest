@@ -53,3 +53,36 @@ var EnemyShot = Class.create(Shot, {
     this.moveSpeed = 10 + (level*2);
   }
 });
+
+// Axe shot (machadinha)
+/* var Axe = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x,y,vx) {
+    // Call superclass constructor
+    Sprite.apply(this,[16, 16]);
+    this.image  = Game.instance.assets['res/IceFrag.png'];      
+    this.rotationSpeed = Math.random() * 100 - 50;
+    this.ySpeed = -10;
+    this.yAccel = 1;
+    this.x = x;
+    this.y = y;
+    this.xSpeed = vx;
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  update: function(evt) { 
+    if (!this.parentNode.paused){
+      var game;
+     
+      game = Game.instance;
+      
+      this.ySpeed += this.yAccel;
+      this.y += this.ySpeed;
+      this.x += this.xSpeed;
+      this.rotation += this.rotationSpeed * evt.elapsed * 0.001;           
+      if (this.y > game.height || this.x < 0 || this.x > game.width) {
+        this.parentNode.removeChild(this);        
+      }
+    }
+  }
+}); */
