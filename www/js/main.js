@@ -348,7 +348,7 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(145,200,160);
+      batGenerator = new BatGenerator(145,200);
       this.batGenerator = batGenerator;
       
       /* yuki = new Yuki(272,288,levelUpAt);
@@ -596,6 +596,7 @@ window.onload = function() {
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
             this.msgLabel.text = '    ROUND '+ this.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            if(this.startLevelMsg<=0) this.batGenerator.modeStart=true;
           }
           //else if(this.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
           else this.msgLabel.text = '';
@@ -603,10 +604,30 @@ window.onload = function() {
           // Check if it's time to create enemies
           if(this.startLevelMsg<=0) {
             //TODO: Enemy creation code
-          }
-        
-          // Check collision
-          
+            
+            // Check collisions
+            for (var i = this.shotGroup.childNodes.length - 1; i >= 0; i--) {
+              var shot;
+              shot = this.shotGroup.childNodes[i];
+              for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
+                var bat;
+                bat = this.batGroup.childNodes[j];
+                if (shot.within(bat,10)){
+                  if( isAndroid ) {
+                    if(soundOn) //hit.play();
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  //console.log(shot.y);
+                  this.shotGroup.removeChild(shot);
+                  //this.gotHit = true; 
+                  bat.gotHit();
+                  break;
+                }
+              }
+            }
+          }          
         }
         
         //Atingido: dispara o timer e parte para o game over no término
