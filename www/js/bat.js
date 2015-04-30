@@ -24,6 +24,8 @@ var BatEnemy = Class.create(Sprite, {
     this.moveSpeed = 10;
     this.xSpeed = 0;
     this.xAccel = 0.5;
+    this.shootTime = 0;
+    this.bullets = 0;
     
     // 3 - Animate
     this.frame = 0;
@@ -39,8 +41,9 @@ var BatEnemy = Class.create(Sprite, {
   gotHit: function() {
     this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
     //console.log(this.batGenKey+ ' out of ' +this.parentNode.parentNode.batGenerator.bats.length);
+    if(this.parentNode.childNodes.length == 1) this.parentNode.parentNode.endLevel = true;
     this.parentNode.removeChild(this);
-    this.remove();
+    delete this;
   },
   
   setTarget: function() {
@@ -66,17 +69,19 @@ var BatEnemy = Class.create(Sprite, {
       /*END ANIMATION BLOCK*/
       
       if(this.mode == 'start'){
-        if(this.nextposX<0) this.nextposX=0;
-        else if(this.nextposX>game.width-this.width) this.nextposX=game.width-this.width;
         this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
         this.x += this.moveSpeed * Math.cos(this.direction);
         this.y += this.moveSpeed * Math.sin(this.direction);
         if(this.nextposY >= this.y){
           this.mode = 'idle';
+          this.shootTime = 5 + getRandom(0,5);
+          this.bullets = getRandom(2,4);
           this.moveSpeed = 2;
           this.y = this.nextposY;
           this.x = this.nextposX;
         }
+        if(this.nextposX<0) {this.parentNode.parentNode.batGenerator.modeMove = 'asc'; }
+        else if(this.nextposX>game.width-this.width) {this.parentNode.parentNode.batGenerator.modeMove = 'desc'; }
       }
       if(this.mode == 'idle'){
         this.y = this.nextposY;
@@ -85,12 +90,13 @@ var BatEnemy = Class.create(Sprite, {
         else if(this.x>game.width-this.width) {this.parentNode.parentNode.batGenerator.modeMove = 'desc'; }
       }
       if(this.mode == 'fly'){
+        //movement
         if(this.x <= this.parentNode.parentNode.rolf.x){
           this.xSpeed += this.xAccel;
-          if(this.xSpeed>=10)this.xSpeed=10;
+          if(this.xSpeed>=7)this.xSpeed=7;
         } else {
           this.xSpeed -= this.xAccel;
-          if(this.xSpeed<=-10)this.xSpeed=-10;
+          if(this.xSpeed<=-7)this.xSpeed=-7;
         }
         this.x += this.xSpeed;
         this.y += this.moveSpeed;
@@ -98,7 +104,21 @@ var BatEnemy = Class.create(Sprite, {
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
           this.mode = 'start';
+          this.moveSpeed = 5;
         }
+        
+        //shoot at player
+        this.shootTime-=1;
+        if(this.bullets>0 && this.shootTime<=0){
+          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level);
+          this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.bullets-=1;
+          this.shootTime = 5 + getRandom(0,5);          
+        }
+        
+        //keep control of position on troop
+        if(this.nextposX<0) {this.parentNode.parentNode.batGenerator.modeMove = 'asc'; }
+        else if(this.nextposX>game.width-this.width) {this.parentNode.parentNode.batGenerator.modeMove = 'desc'; }
         /* TODO: fazer o morcego voar na direção do jogador */
       }
       
@@ -108,23 +128,27 @@ var BatEnemy = Class.create(Sprite, {
 
 //Bat Generator
 var BatGenerator = Class.create(Sprite, {
-  // The obstacle that the penguin must avoid
+  // The windows that will create the bats
   initialize: function(x,y) {
     // Call superclass constructor
-    Sprite.apply(this,[24, 24]);
+    Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
     
     this.x = x;
     this.y = y;
+    this.genpoint = x + (this.width/2);
     this.xTargets = [72,96,120];
     this.bats = [];
     this.createBatTime = 0;
-    this.sendBatTime = 60 + (10 * getRandom(1,4));
+    this.createBatSide = getRandom(0,1); //0=on the same position; 1=on the other side;
+    this.sendBatTime = 90 + (10 * getRandom(1,4));
     this.batIdx = 0;
     this.batIdy = 0;
     
     //movement vars
     this.modeStart = false;
+    this.readyToFight = false;
+    this.defeated = false;
     this.modeMove = 'desc'; //asc ou desc
     this.moveLeftLimit = 0;
     this.moveRightLimit = 8;
@@ -141,14 +165,16 @@ var BatGenerator = Class.create(Sprite, {
           this.createBatTime -= 1;
           if (this.createBatTime <= 0) {
             //console.log("creating bat");
-            var bat = new BatEnemy(this.x,this.y,this.batIdx,this.batIdy,1,this.bats.length);
+            var bat = new BatEnemy(this.genpoint+this.createBatSide*128,this.y,this.batIdx,this.batIdy,1,this.bats.length);
             this.bats.push(bat);
             this.parentNode.batGroup.addChild(bat);
             this.createBatTime = 8;
+            this.createBatSide = getRandom(0,1);
             this.batIdx+=1;
             if(this.batIdx >= 9){
               this.batIdy+=1;
               this.batIdx=0;
+              if(this.batIdy>=2) this.readyToFight = true;
             }
             //console.dir(this.parentNode.batGroup);
           }
@@ -160,7 +186,7 @@ var BatGenerator = Class.create(Sprite, {
             var idbat = getRandom(1,this.bats.length) - 1;
             if(this.bats[idbat].mode == 'idle') {
               this.bats[idbat].setTarget();
-              this.sendBatTime = 60 + (10 * getRandom(1,4));
+              this.sendBatTime = 90 + (10 * getRandom(1,4));
             }
           }
         }
@@ -180,6 +206,7 @@ var BatGenerator = Class.create(Sprite, {
   
   rearrangeBats: function(batGenKey) {
     this.bats.splice(batGenKey,1);
+    if(this.bats.length<=0) this.defeated = true;
     for(var i=batGenKey; i<this.bats.length; i++){
       this.bats[i].batGenKey-=1;
     }

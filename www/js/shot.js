@@ -46,11 +46,12 @@ var PlayerShot = Class.create(Shot, {
 var EnemyShot = Class.create(Shot, {
   // Succeeds bullet class
   initialize: function(x, y, playerSprite, level){
-    this.angle = findAngle(playerSprite.x,x,playerSprite.y,y); //shooting towards player
+    var playerRadius = playerSprite.width/2;
+    this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
     Shot.call(this, x, y, this.angle);
     this.frame = 1;
     this.scaleY = -1;
-    this.moveSpeed = 10 + (level*2);
+    this.moveSpeed = 5 + (level*2);
   }
 });
 

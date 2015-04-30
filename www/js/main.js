@@ -341,25 +341,28 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       
       // Hero
-      rolf = new Rolf(145,380);
+      rolf = new Rolf(145,352);
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(145,200);
+      batGenerator = new BatGenerator(64,224);
       this.batGenerator = batGenerator;
       
       /* yuki = new Yuki(272,288,levelUpAt);
       this.yuki = yuki; */
       
-      // Ice group
+      // Bats group
       batGroup = new Group();
       this.batGroup = batGroup;
       // Fish group
       fishGroup = new Group();
       this.fishGroup = fishGroup;
-      // Heart group
+      // Player Shots group
       shotGroup = new Group();
       this.shotGroup = shotGroup;
+      // Enemy Shots group
+      evilShotGroup = new Group();
+      this.evilShotGroup = evilShotGroup;
       
       // Instance variables
       this.paused = false;
@@ -382,8 +385,8 @@ window.onload = function() {
       this.iceTimer = 320;
       this.gotHit = false;
       this.hitDuration = 0;
-      this.buying = false;
-      this.buyDuration = 0; 
+      this.endLevel = false;
+      this.endLevelDuration = 0; 
       this.sabbath = 0;
       this.bonusMode = false;
       this.bonusDuration = 0; 
@@ -410,6 +413,7 @@ window.onload = function() {
       // this.addChild(igloo);
       // this.addChild(yuki);
       this.addChild(fishGroup);
+      this.addChild(evilShotGroup);
       this.addChild(shotGroup);
       this.addChild(rolf);
       this.addChild(batGenerator);
@@ -470,7 +474,7 @@ window.onload = function() {
             // }/* else{
               // if(soundOn) game.assets['res/powerup.wav'].play();
             // } */
-            // this.buying=true;
+            // this.endLevel=true;
             // this.setCoins(this.levelUpAt*(-1));
           // }
         }
@@ -523,44 +527,32 @@ window.onload = function() {
     
     incLevelUp: function(){
       this.level = this.level+1;
-      if(this.level%2==0){
-        this.fishTimerExp = this.fishTimerExp/2;
-        if (this.fishTimerExp <=5) this.fishTimerExp=5;
-      }
       if(this.level%7==0){
         this.sabbath++;
-        if(this.sabbath==1 || this.sabbath==3) this.iceTimer = this.iceTimer/2;
-        if (this.iceTimer <=80) this.iceTimer = 80;
-        this.levelUpAt = 30;
-        this.fishTimerExp = 20 - (2*this.sabbath);
-        this.heartTimer = 25 - (this.sabbath * 5);
-        if(this.heartTimer <= 10) this.heartTimer = 10;
         this.bonusMode = true;
         
         //deal with music change
-        if( isAndroid ) {
-          if(soundOn) {
+        if( soundOn ) {
+          if(isAndroid) {
             window.plugins.LowLatencyAudio.stop(currentBGM);
             currentBGM = 'bonus';
-            window.plugins.LowLatencyAudio.loop(currentBGM);
-            /* this.bgm.stop();
-            this.bgm = bonus;
-            this.bgm.play(); */
+            window.plugins.LowLatencyAudio.loop(currentBGM);            
           }
-        }else{
-          //console.log('ok');
-          //game.assets['res/powerup.wav'].play();
+          /* this.bgm.stop();
+          this.bgm = bonus;
+          this.bgm.play(); */
         }
         
-      }else this.levelUpAt = nextLevelUp(this.level,this.sabbath);
+      }
       if (this.level == 35) this.winGame = 1;
       if (this.winGame == 2) {
-        if( isAndroid ) {
-          if(soundOn) //this.bgm.stop();
+        if( soundOn ) {
+          if(isAndroid) //this.bgm.stop();
             window.plugins.LowLatencyAudio.stop(currentBGM);
         }
         game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
       }
+      game.replaceScene(new SceneTitle(0));
     },
     
     update: function(evt) {
@@ -584,7 +576,7 @@ window.onload = function() {
         this.hiscoreLabel.text = 'TOP '+hiscore;
         if(this.bonusMode == true) this.coinsLabel.text = 'BONUS_STAGE';
         
-        if(this.gotHit!=true && this.buying!=true && this.bonusMode!=true){
+        if(this.gotHit!=true && this.endLevel!=true && this.bonusMode!=true){
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
@@ -598,33 +590,36 @@ window.onload = function() {
           if(this.startLevelMsg<=0) {
             //TODO: Enemy creation code
             
-            // Check collisions
+            /*=======================================
+              ============= COLLISIONS ==============
+              =======================================*/
+            
+            /*==== PLAYER SHOTS vs BATS ====*/
             for (var i = this.shotGroup.childNodes.length - 1; i >= 0; i--) {
               var shot;
               shot = this.shotGroup.childNodes[i];
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.within(bat,10)){
+                if (shot.within(bat,12)){
                   if( isAndroid ) {
-                    if(soundOn) //hit.play();
+                    if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  //console.log(shot.y);
                   this.shotGroup.removeChild(shot);
-                  //this.gotHit = true; 
-                  bat.gotHit();
+                  bat.gotHit(); //if the bat shot is the last one, batGenerator will be defeated
                   break;
                 }
               }
             }
             
+            /*==== PLAYER vs BATS ====*/
             for (var i = this.batGroup.childNodes.length - 1; i >= 0; i--) {
               var bat;
               bat = this.batGroup.childNodes[i];
-              if (bat.within(this.rolf,10) && this.rolf.isVulnerable()){
+              if (bat.within(this.rolf,18) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
                     window.plugins.LowLatencyAudio.play('hit');
@@ -641,7 +636,35 @@ window.onload = function() {
                 break;
               }
             }
-          }          
+            
+            /*==== PLAYER vs ENEMY SHOTS ====*/
+            for (var i = this.evilShotGroup.childNodes.length - 1; i >= 0; i--) {
+              var evilshot;
+              evilshot = this.evilShotGroup.childNodes[i];
+              if (evilshot.within(this.rolf,18) && this.rolf.isVulnerable()){
+                if( isAndroid ) {
+                  if(soundOn)
+                    window.plugins.LowLatencyAudio.play('hit');
+                }/* else{
+                  if(soundOn) game.assets['res/hit.wav'].play();
+                } */
+                //bat.crashToPieces();
+                this.evilShotGroup.removeChild(evilshot);
+                this.gotHit = true; 
+                this.rolf.gotHit();
+                if( isAndroid ) {
+                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                  //this.bgm.stop();
+                }
+                break;
+              }
+            }
+            
+            if(this.batGenerator.defeated){ //if all enemy generators were defeated
+              this.endLevel = true;
+            }
+            
+          }//end startLevelMsg if
         }
         
         //Atingido: dispara o timer e parte para o game over no término
@@ -666,8 +689,12 @@ window.onload = function() {
         }
         
         //Término da fase: conta os pontos e passa para o próximo level
-        if(this.buying==true){
-          //TODO: End of level code
+        if(this.endLevel==true){
+          this.msgLabel.text = '   ROUND CLEAR!';
+          this.endLevelDuration += 1; 
+          if(this.endLevelDuration >= 90){
+            this.incLevelUp();
+          }
         }
         
         // Bonus Stage Mode

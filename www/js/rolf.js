@@ -145,6 +145,8 @@ var Rolf = Class.create(Sprite, {
   resetPosition: function(){
     this.health=this.healthStartFrame;
     this.alive = true;
+    this.vulnerableTime = 150;
+    this.bullets = 6;
     //this.lane=1;
     //this.x = this.positions[1];
     //this.nextpos = this.positions[1];
@@ -162,8 +164,9 @@ var Rolf = Class.create(Sprite, {
     this.iniFrame = 2 + this.health;
     this.endFrame = 2 + this.health;
     this.animationDuration = 0;
-    if(this.health<0) this.alive = false;
-    this.vulnerableTime = 150;
+    if(this.health<0) {
+      this.alive = false;
+    }else this.vulnerableTime = 150;
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   
