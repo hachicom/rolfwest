@@ -17,9 +17,12 @@ var Rolf = Class.create(Sprite, {
       
       // 2 - Player Status
       this.bullets = 6;
-      this.health = 3;
+      this.healthStartFrame = 3;
+      this.health = this.healthStartFrame;
       this.reload = false;
       this.reloadTime = 0;
+      this.vulnerableTime = 0;
+      this.alive = true;
     
       // 3 - Animate
       this.frame = 2 + this.health;
@@ -69,7 +72,14 @@ var Rolf = Class.create(Sprite, {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
         this.animationDuration -= this.animationSpeed;
-      }      
+      }
+      if(this.vulnerableTime > 0 && this.alive==true){
+        this.vulnerableTime-=1;
+        if(this.vulnerableTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.vulnerableTime<=0) this.visible=true;
+      }
       /*END ANIMATION BLOCK*/
       
       /*START MOVEMENT BLOCK*/
@@ -82,15 +92,18 @@ var Rolf = Class.create(Sprite, {
           if(this.x<=this.nextpos) this.x=this.nextpos;
         }
       }
-      if(this.moving == -1 && this.shootTime<=0) {
-        this.x-=5;
-        if (this.x<0) this.x=0;
+      if(this.alive==true){
+        if(this.moving == -1 && this.shootTime<=0) {
+          this.x-=5;
+          if (this.x<0) this.x=0;
+        }
+        else if(this.moving == 1 && this.shootTime<=0) {
+          this.x+=5;
+          if (this.x>game.width-this.width) this.x=game.width-this.width;
+        }
       }
-      else if(this.moving == 1 && this.shootTime<=0) {
-        this.x+=5;
-        if (this.x>game.width-this.width) this.x=game.width-this.width;
-      }      
-      /*END MOVEMENT BLOCK*/      
+      /*END MOVEMENT BLOCK*/
+      //console.log(this.vulnerableTime+' '+this.alive+' '+this.health);
     }
   },
   
@@ -106,7 +119,7 @@ var Rolf = Class.create(Sprite, {
   },
   
   shoot: function(){
-    if(this.bullets>0){
+    if(this.bullets>0 && this.alive==true){
       this.shootTime = 5;
       this.animationDuration = 0;
       shotGroup = this.parentNode.shotGroup;
@@ -130,25 +143,27 @@ var Rolf = Class.create(Sprite, {
   },
   
   resetPosition: function(){
-    //this.tl.clear();
-    this.lane=1;
-    this.x = this.positions[1];
-    this.nextpos = this.positions[1];
-    this.frame = 0 + this.health;
-    this.iniFrame = 0 + this.health;
-    this.endFrame = 1 + this.health;
+    this.health=this.healthStartFrame;
+    this.alive = true;
+    //this.lane=1;
+    //this.x = this.positions[1];
+    //this.nextpos = this.positions[1];
+    this.frame = 2 + this.health;
+    this.iniFrame = 2 + this.health;
+    this.endFrame = 2 + this.health;
     this.animationDuration = 0;
     this.animationSpeed = 0.25;
     this.movespeed = 20;
   },
   
-  gotHit: function(lane){     
-    //this.tl.clear();
-    this.frame = 2;
-    this.iniFrame = 2;
-    this.endFrame = 3;
+  gotHit: function(){     
+    this.health-=this.healthStartFrame;
+    this.frame = 2 + this.health;
+    this.iniFrame = 2 + this.health;
+    this.endFrame = 2 + this.health;
     this.animationDuration = 0;
-    this.animationSpeed = 0.1;
+    if(this.health<0) this.alive = false;
+    this.vulnerableTime = 150;
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   
@@ -165,7 +180,7 @@ var Rolf = Class.create(Sprite, {
   },
   
   isVulnerable: function(){
-    return (this.x==this.nextpos);
+    return (this.vulnerableTime<=0);
     //return true;
   }
 });

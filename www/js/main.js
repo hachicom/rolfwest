@@ -1,4 +1,3 @@
-var keeploop = true;
 var hiscore = 10000;
 var paused = false;
 var oldTime = new Date();
@@ -74,7 +73,7 @@ window.onload = function() {
                'res/Ice.png',
                'res/IceFrag.png',
                'res/heart.png',
-               'res/fishSheet.png',
+               'res/batSheet.png',
                'res/piranhaSheet.png',
                'res/yukiSheet.png',
                'res/iglooSheet.png',
@@ -192,7 +191,6 @@ window.onload = function() {
 	            navigator.device.exitApp();
 	          }
 	        }
-	        keeploop=false;
 	        //bgm.release();
 	        //console.log("exited");
           //window.close();
@@ -243,7 +241,6 @@ window.onload = function() {
       Scene.apply(this);
       // 2 - Access to the game singleton instance
       game = Game.instance;
-      keeploop=true;
       // 3 - Create child nodes
       // Background
       bg = new Sprite(320,128);
@@ -344,7 +341,7 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       
       // Hero
-      rolf = new Rolf(145,340);
+      rolf = new Rolf(145,380);
       this.rolf = rolf;
       
       // Enemy Generators
@@ -442,15 +439,13 @@ window.onload = function() {
       if(this.parentNode.paused == false) {
         this.parentNode.paused = true;
         if( isAndroid ) {
-          keeploop = false; 
+          if(soundOn) //this.parentNode.bgm.pause();
+            window.plugins.LowLatencyAudio.stop(currentBGM);
           //bgm.pause();
         }
-        if(soundOn) //this.parentNode.bgm.pause();
-          window.plugins.LowLatencyAudio.stop(currentBGM);
       }else {
         this.parentNode.paused = false;
         if( isAndroid ) {
-          keeploop = true; 
           if(soundOn) //this.parentNode.bgm.play();
             window.plugins.LowLatencyAudio.loop(currentBGM);
         }
@@ -545,7 +540,6 @@ window.onload = function() {
         //deal with music change
         if( isAndroid ) {
           if(soundOn) {
-            keeploop = false;
             window.plugins.LowLatencyAudio.stop(currentBGM);
             currentBGM = 'bonus';
             window.plugins.LowLatencyAudio.loop(currentBGM);
@@ -562,7 +556,6 @@ window.onload = function() {
       if (this.level == 35) this.winGame = 1;
       if (this.winGame == 2) {
         if( isAndroid ) {
-          keeploop = false;
           if(soundOn) //this.bgm.stop();
             window.plugins.LowLatencyAudio.stop(currentBGM);
         }
@@ -627,12 +620,49 @@ window.onload = function() {
                 }
               }
             }
+            
+            for (var i = this.batGroup.childNodes.length - 1; i >= 0; i--) {
+              var bat;
+              bat = this.batGroup.childNodes[i];
+              if (bat.within(this.rolf,10) && this.rolf.isVulnerable()){
+                if( isAndroid ) {
+                  if(soundOn)
+                    window.plugins.LowLatencyAudio.play('hit');
+                }/* else{
+                  if(soundOn) game.assets['res/hit.wav'].play();
+                } */
+                //bat.crashToPieces();
+                this.gotHit = true; 
+                this.rolf.gotHit();
+                if( isAndroid ) {
+                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                  //this.bgm.stop();
+                }
+                break;
+              }
+            }
           }          
         }
         
         //Atingido: dispara o timer e parte para o game over no término
         if(this.gotHit==true){
-          //TODO: Got hit code
+          if(this.rolf.alive == false){
+            this.hitDuration += 1; 
+            if(this.hitDuration >= 90){
+              this.lives-=1;
+              if(this.lives<0){
+                if( isAndroid ) {
+                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                }
+                game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
+              }else{
+                this.rolf.resetPosition();
+                this.gotHit=false;
+                this.hitDuration=0;
+              }
+            }
+          }
+          else this.gotHit=false;
         }
         
         //Término da fase: conta os pontos e passa para o próximo level
@@ -681,13 +711,13 @@ window.onload = function() {
       bg = new Sprite(320,128);
       bg.y = 193;
       //bg.scale(2,2);
-      bg.image = game.assets['res/mountain.png'];
-      map = new Map(32, 32);
-      map.image = game.assets['res/groundSheet.png'];
+      //bg.image = game.assets['res/mountain.png'];
+      //map = new Map(32, 32);
+      //map.image = game.assets['res/groundSheet.png'];
       
       if(winGame>=1){
-        map.loadData(arrMap2Top,arrMap2Sub);
-        map.y = 16;
+        //map.loadData(arrMap2Top,arrMap2Sub);
+        //map.y = 16;
       }//else map.loadData(arrMap1Top,arrMap1Sub);
       
       playerData.scoretable.hiscore = hiscore;
@@ -944,7 +974,7 @@ window.onload = function() {
       fish.x = 270;
       fish.y = 110;
       fish.frame = [0,0,0,0,0,0,0,1,1,1,1,1,1,1];
-      fish.image = game.assets['res/fishSheet.png']; 
+      fish.image = game.assets['res/batSheet.png']; 
       this.spritesArr[3] = fish;
       
       piranha = new Sprite(24,24);
