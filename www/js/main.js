@@ -345,7 +345,7 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(64,224);
+      batGenerator = new BatGenerator(64,224,globalEnemyMap.stage1);
       this.batGenerator = batGenerator;
       
       /* yuki = new Yuki(272,288,levelUpAt);
