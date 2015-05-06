@@ -345,8 +345,10 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(64,224,globalEnemyMap.stage1);
+      batGenerator = new BatGenerator(0,280,globalBatMap.stage1,1);
       this.batGenerator = batGenerator;
+      batkidGenerator = new BatKidGenerator(138,136,globalBatKidMap.stage1,globalBatKidMap.stage1Lim,1);
+      this.batkidGenerator = batkidGenerator;
       
       /* yuki = new Yuki(272,288,levelUpAt);
       this.yuki = yuki; */
@@ -355,8 +357,8 @@ window.onload = function() {
       batGroup = new Group();
       this.batGroup = batGroup;
       // Fish group
-      fishGroup = new Group();
-      this.fishGroup = fishGroup;
+      batkidGroup = new Group();
+      this.batkidGroup = batkidGroup;
       // Player Shots group
       shotGroup = new Group();
       this.shotGroup = shotGroup;
@@ -410,14 +412,13 @@ window.onload = function() {
       // 4 - Add child nodes
       //this.addChild(bg);
       // this.addChild(map);
-      // this.addChild(igloo);
-      // this.addChild(yuki);
-      this.addChild(fishGroup);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
       this.addChild(rolf);
       this.addChild(batGenerator);
+      this.addChild(batkidGenerator);
       this.addChild(batGroup);
+      this.addChild(batkidGroup);
       this.addChild(gui);
       this.addChild(label3);
       this.addChild(label2);
@@ -526,6 +527,7 @@ window.onload = function() {
     },
     
     incLevelUp: function(){
+      /*TODO: Instead of getting back to title, restart scene with next level data*/
       this.level = this.level+1;
       if(this.level%7==0){
         this.sabbath++;
@@ -581,15 +583,18 @@ window.onload = function() {
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
             this.msgLabel.text = '    ROUND '+ this.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            
+            /* Starts enemy generators: First is the bat generator.
+             * After finishing creation, it will call batkid generator
+             * and so on until batsniper generator is done
+             */
             if(this.startLevelMsg<=0) this.batGenerator.modeStart=true;
           }
           //else if(this.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
           else this.msgLabel.text = '';
         
           // Check if it's time to create enemies
-          if(this.startLevelMsg<=0) {
-            //TODO: Enemy creation code
-            
+          if(this.startLevelMsg<=0) {            
             /*=======================================
               ============= COLLISIONS ==============
               =======================================*/
@@ -598,6 +603,7 @@ window.onload = function() {
             for (var i = this.shotGroup.childNodes.length - 1; i >= 0; i--) {
               var shot;
               shot = this.shotGroup.childNodes[i];
+              //BATS
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
@@ -610,6 +616,23 @@ window.onload = function() {
                   } */
                   this.shotGroup.removeChild(shot);
                   bat.gotHit(); //if the bat shot is the last one, batGenerator will be defeated
+                  break;
+                }
+              }
+                            
+              //BATKIDS
+              for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
+                var batkid;
+                batkid = this.batkidGroup.childNodes[j];
+                if (shot.within(batkid,12)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  this.shotGroup.removeChild(shot);
+                  batkid.gotHit(); //if the batkid shot is the last one, batkidGenerator will be defeated
                   break;
                 }
               }
@@ -660,7 +683,7 @@ window.onload = function() {
               }
             }
             
-            if(this.batGenerator.defeated){ //if all enemy generators were defeated
+            if(this.batGenerator.defeated && this.batkidGenerator.defeated){ //if all enemy generators were defeated
               this.endLevel = true;
             }
             

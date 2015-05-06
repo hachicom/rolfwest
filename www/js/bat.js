@@ -16,7 +16,7 @@ var BatEnemy = Class.create(Sprite, {
     this.nextposY = yTarget;
     this.direction = findAngle(x,y,this.nextposX,this.nextposY);
     this.mode = 'start'; //start, idle, fly, hit
-    this.moveSpeed = 10;
+    this.moveSpeed = 12;
     this.xSpeed = 0;
     this.xAccel = 0.5;
     this.shootTime = 0;
@@ -37,14 +37,13 @@ var BatEnemy = Class.create(Sprite, {
   gotHit: function() {
     this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
     //console.log(this.batGenKey+ ' out of ' +this.parentNode.parentNode.batGenerator.bats.length);
-    if(this.parentNode.childNodes.length == 1) this.parentNode.parentNode.endLevel = true;
+    //if(this.parentNode.childNodes.length == 1) this.parentNode.parentNode.endLevel = true;
     this.parentNode.removeChild(this);
     delete this;
   },
   
   setTarget: function() {
-    console.log(this.batGenKey+ ' mode:' +this.mode);
-    this.direction = findAngle(this.x,this.y,this.parentNode.parentNode.rolf.x,this.parentNode.parentNode.rolf.y);
+    //this.direction = findAngle(this.x,this.y,this.parentNode.parentNode.rolf.x,this.parentNode.parentNode.rolf.y);
     this.mode = 'fly';
   },
   
@@ -104,14 +103,14 @@ var BatEnemy = Class.create(Sprite, {
         if(this.y>=this.parentNode.parentNode.rolf.y+24){
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
-          this.mode = 'start';
+          this.mode = 'retreat';
           this.moveSpeed = 5;
         }
         
         //shoot at player
         this.shootTime-=1;
         if(this.bullets>0 && this.shootTime<=0){
-          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level);
+          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'bat');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 5 + getRandom(0,5);          
@@ -120,7 +119,15 @@ var BatEnemy = Class.create(Sprite, {
         //keep control of position on troop
         if(this.nextposX<0) {this.parentNode.parentNode.batGenerator.modeMove = 'asc'; }
         else if(this.nextposX>game.width-this.width) {this.parentNode.parentNode.batGenerator.modeMove = 'desc'; }
-        /* TODO: fazer o morcego voar na direção do jogador */
+      }      
+      if(this.mode == 'retreat'){
+        this.y -= this.moveSpeed;
+        if(this.y<=this.parentNode.parentNode.rolf.y-72){
+          //this.y = -this.height;
+          this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
+          this.mode = 'start';
+          this.moveSpeed = 8;
+        }
       }
       
     }
@@ -130,21 +137,21 @@ var BatEnemy = Class.create(Sprite, {
 //Bat Generator
 var BatGenerator = Class.create(Sprite, {
   // The windows that will create the bats
-  initialize: function(x,y,lvlBatEnemyMap) {
+  initialize: function(x,y,lvlBatEnemyMap,level) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
     
     this.x = x;
     this.y = y;
-    this.genpoint = x + (this.width/2);
-    this.xTargets = [72,96,120];
+    this.genpoint = -24;
     this.bats = [];
     this.createBatTime = 0;
     this.createBatSide = getRandom(0,1); //0=on the same position; 1=on the other side;
     this.sendBatTime = 90 + (10 * getRandom(1,4));
     this.batIdx = 0;
     this.batIdy = 0;
+    this.level = level;
     
     //movement vars
     this.modeStart = false;
@@ -168,7 +175,7 @@ var BatGenerator = Class.create(Sprite, {
           this.createBatTime -= 1;
           if (this.createBatTime <= 0) {
             //console.log("creating bat");
-            var bat = new BatEnemy(this.genpoint+this.createBatSide*128,this.y,this.batIdx,this.batIdy,1,this.bats.length);
+            var bat = new BatEnemy(this.genpoint+this.createBatSide*(game.width+48),this.y,this.batIdx,this.batIdy,this.level,this.bats.length);
             this.bats.push(bat);
             this.parentNode.batGroup.addChild(bat);
             this.createBatTime = 8;
@@ -177,7 +184,10 @@ var BatGenerator = Class.create(Sprite, {
             if(this.batIdx >= 9){
               this.batIdy+=1;
               this.batIdx=0;
-              if(this.batIdy>=2) this.readyToFight = true;
+              if(this.batIdy>=2) {
+                this.readyToFight = true;
+                this.parentNode.batkidGenerator.modeStart = true;
+              }
             }
             //console.dir(this.parentNode.batGroup);
           }

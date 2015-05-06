@@ -45,13 +45,18 @@ var PlayerShot = Class.create(Shot, {
 // EnemyShot class
 var EnemyShot = Class.create(Shot, {
   // Succeeds bullet class
-  initialize: function(x, y, playerSprite, level){
+  initialize: function(x, y, playerSprite, level, author){
     var playerRadius = playerSprite.width/2;
     this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
     Shot.call(this, x, y, this.angle);
-    this.frame = 1;
     this.scaleY = -1;
-    this.moveSpeed = 5 + (level*2);
+    switch(author){
+      case 'bat': this.frame = 1; this.moveSpeed = 4 + level; break;
+      case 'batkid': this.frame = 2; this.moveSpeed = 6 + level; break;
+      case 'batsniper': this.frame = 3; this.moveSpeed = 8 + level; break;
+      case 'boss': this.frame = 0; this.moveSpeed = 16 + level; break;
+      default: this.frame = 1; this.moveSpeed = 4 + level; break;
+    }
   }
 });
 
