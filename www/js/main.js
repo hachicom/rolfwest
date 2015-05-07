@@ -1,3 +1,5 @@
+var version = '0.1.0';
+
 var hiscore = 10000;
 var paused = false;
 var oldTime = new Date();
@@ -227,7 +229,8 @@ window.onload = function() {
     }
   }
   
-	// 7 - Start
+	// 7 - Start 
+  var hachiplayer = new Hachiplayer(1);
   game.start();
   //window.scrollTo(0, 1);
   
@@ -247,8 +250,7 @@ window.onload = function() {
       bg.y = 200;
       bg.scale(1,2);
       bg.image = game.assets['res/mountain.png'];
-      this.backgroundArray = ['#005555','#6888fc','#0058f8','#0000bc','#004058','#000000','#6844fc'];
-      this.backgroundColor = this.backgroundArray[0];
+      this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
       map = new Map(32, 32);
       //map.y = 315;
       map.image = game.assets['res/groundSheet.png'];
@@ -366,25 +368,12 @@ window.onload = function() {
       evilShotGroup = new Group();
       this.evilShotGroup = evilShotGroup;
       
+      // Player Instance
+      this.hachiplayer = hachiplayer;
+      
       // Instance variables
       this.paused = false;
       this.startLevelMsg = 60;
-      this.generateIceTimer = 300;
-      this.generateFishTimer = 10;
-      this.createPiranha = getRandom(4,6);
-      this.fishCount = 0;
-      this.fishTimerExp = 20;
-      this.heartTimer = 25;
-      this.fishTimer = getRandom(3,6)*this.fishTimerExp;
-      this.lives = 3;
-      this.score = 0;
-      this.multiplier = 1;
-      this.coins = 0;
-      this.hearts = 0;
-      this.level = 1; //LEVEL SELECT
-      this.levelcalc = this.level;
-      this.levelUpAt = levelUpAt;
-      this.iceTimer = 320;
       this.gotHit = false;
       this.hitDuration = 0;
       this.endLevel = false;
@@ -392,7 +381,6 @@ window.onload = function() {
       this.sabbath = 0;
       this.bonusMode = false;
       this.bonusDuration = 0; 
-      this.heartsGenerated = 0;
       this.scoreTarget = 0; //posição de scoreRewards que aumenta ao ser atingida
       this.winGame = 0; //ao passar do level 34, considera o jogo ganho e apresenta uma mensagem de parabéns no SceneGameOver
       
@@ -456,6 +444,8 @@ window.onload = function() {
         }
       }
       paused = this.parentNode.paused;
+      // this.parentNode.batGenerator.defeated = true;
+      // this.parentNode.batkidGenerator.defeated = true;
     },
     
     handleTouchControl: function (evt) {
@@ -501,25 +491,25 @@ window.onload = function() {
     },
     
     setScore: function (value,multi) {
-      if (multi) this.score = this.score + (value * this.multiplier);
-      else this.score = this.score + value;
-      if (this.score >= scoreRewards[this.scoreTarget]){
+      if (multi) hachiplayer.score = hachiplayer.score + (value * this.multiplier);
+      else hachiplayer.score = hachiplayer.score + value;
+      if (hachiplayer.score >= scoreRewards[this.scoreTarget]){
         if(this.scoreTarget<=scoreRewards.length){
-          this.lives+=1;
+          hachiplayer.lives+=1;
           this.scoreTarget+=1;
         }
       }
-      if (this.score >= 99999) {
-        this.score = 99999;
+      if (hachiplayer.score >= 99999) {
+        hachiplayer.score = 99999;
         this.winGame = 2;
       }
-      if (this.score >= hiscore) hiscore = this.score;
+      if (hachiplayer.score >= hiscore) hiscore = hachiplayer.score;
     },
     
     setCoins: function (value) {
-      this.coins = this.coins + value;
-      this.igloo.turnLights(this.coins);
-      this.yuki.smile(this.coins);
+      hachiplayer.coins = hachiplayer.coins + value;
+      //this.igloo.turnLights(hachiplayer.coins);
+      //this.yuki.smile(hachiplayer.coins);
     },
     
     setHearts: function (value) {
@@ -528,8 +518,8 @@ window.onload = function() {
     
     incLevelUp: function(){
       /*TODO: Instead of getting back to title, restart scene with next level data*/
-      this.level = this.level+1;
-      if(this.level%7==0){
+      hachiplayer.level += 1;
+      if(hachiplayer.level%7==0){
         this.sabbath++;
         this.bonusMode = true;
         
@@ -544,9 +534,8 @@ window.onload = function() {
           this.bgm = bonus;
           this.bgm.play(); */
         }
-        
       }
-      if (this.level == 35) this.winGame = 1;
+      if (hachiplayer.level == 35) this.winGame = 1;
       if (this.winGame == 2) {
         if( soundOn ) {
           if(isAndroid) //this.bgm.stop();
@@ -554,7 +543,37 @@ window.onload = function() {
         }
         game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
       }
-      game.replaceScene(new SceneTitle(0));
+      
+      if(hachiplayer.level>Object.keys(globalBatMap).length){
+        /******************************
+         *******  ENDING GAME  ********
+         ******************************/
+        //TODO: show an ending screen instead of title screen
+        hachiplayer.reset();
+        game.replaceScene(new SceneTitle(0));
+      }else{
+        /******************************
+         ****  LOADING NEXT LEVEL  ****
+         ******************************/
+        // Reload tilemaps and bgcolor
+        this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
+        
+        // Reset Stage Variables      
+        this.startLevelMsg = 60;
+        this.gotHit = false;
+        this.hitDuration = 0;
+        this.endLevel = false;
+        this.endLevelDuration = 0; 
+        this.bonusMode = false;
+        this.bonusDuration = 0;
+        
+        // Reset Hero Position
+        this.rolf.resetPosition();
+        
+        // Reload Enemy Generators
+        this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
+        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage2'],globalBatKidMap['stage2Lim'],hachiplayer.level);
+      }
     },
     
     update: function(evt) {
@@ -568,13 +587,13 @@ window.onload = function() {
         
       if(!this.paused){
         coinstr = levelupstr = '';
-        if(this.coins < 10) coinstr = '0';
+        if(hachiplayer.coins < 10) coinstr = '0';
         if(this.levelUpAt < 10) levelupstr = '0';
         
-        this.scoreLabel.text = 'SC ' + this.score;// + '_x' + this.multiplier;
+        this.scoreLabel.text = 'SC ' + hachiplayer.score;// + '_x' + this.multiplier;
         this.coinsLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6' //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
-        this.levelLabel.text = 'LVL_ ' + this.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
-        this.livesLabel.text = 'ROLF_ ' + this.lives;
+        this.levelLabel.text = 'LVL_ ' + hachiplayer.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
+        this.livesLabel.text = 'ROLF_ ' + hachiplayer.lives;
         this.hiscoreLabel.text = 'TOP '+hiscore;
         if(this.bonusMode == true) this.coinsLabel.text = 'BONUS_STAGE';
         
@@ -582,7 +601,7 @@ window.onload = function() {
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
-            this.msgLabel.text = '    ROUND '+ this.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            this.msgLabel.text = '    ROUND '+ hachiplayer.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
             
             /* Starts enemy generators: First is the bat generator.
              * After finishing creation, it will call batkid generator
@@ -590,7 +609,7 @@ window.onload = function() {
              */
             if(this.startLevelMsg<=0) this.batGenerator.modeStart=true;
           }
-          //else if(this.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
+          //else if(hachiplayer.coins == this.levelUpAt) this.msgLabel.text = glossary.text.alertaYuki[language];
           else this.msgLabel.text = '';
         
           // Check if it's time to create enemies
@@ -615,7 +634,7 @@ window.onload = function() {
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   this.shotGroup.removeChild(shot);
-                  bat.gotHit(); //if the bat shot is the last one, batGenerator will be defeated
+                  bat.gotHit(hachiplayer); //if the bat shot is the last one, batGenerator will be defeated
                   break;
                 }
               }
@@ -632,7 +651,7 @@ window.onload = function() {
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   this.shotGroup.removeChild(shot);
-                  batkid.gotHit(); //if the batkid shot is the last one, batkidGenerator will be defeated
+                  batkid.gotHit(hachiplayer); //if the batkid shot is the last one, batkidGenerator will be defeated
                   break;
                 }
               }
@@ -695,8 +714,8 @@ window.onload = function() {
           if(this.rolf.alive == false){
             this.hitDuration += 1; 
             if(this.hitDuration >= 90){
-              this.lives-=1;
-              if(this.lives<0){
+              hachiplayer.lives-=1;
+              if(hachiplayer.lives<0){
                 if( isAndroid ) {
                   if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                 }
@@ -900,6 +919,10 @@ window.onload = function() {
     
     touchToRestart: function(evt) {
       var game = Game.instance;
+      
+      // Reset player
+      hachiplayer.reset();
+      
       if(this.winGame>=1) game.replaceScene(new SceneCredits());
       else game.replaceScene(new SceneTitle(0));
     },
@@ -907,6 +930,9 @@ window.onload = function() {
     update: function(evt){
       this.timeToRestart += 1;
       if(this.timeToRestart>=200){
+        // Reset player
+        hachiplayer.reset();
+        
         var game = Game.instance;
         game.replaceScene(new SceneTitle(0));        
       }
@@ -1299,7 +1325,7 @@ window.onload = function() {
       this.hiscoreLabel = label6;
       
       //Title label
-      TitleLabel = new FontSprite('score', 240, 16, "ROLFWEST v0.0.1");
+      TitleLabel = new FontSprite('score', 240, 16, "ROLFWEST v"+version);
       TitleLabel.x = 48;
       TitleLabel.y = 198;
       

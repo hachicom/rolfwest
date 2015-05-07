@@ -34,10 +34,14 @@ var BatEnemy = Class.create(Sprite, {
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  gotHit: function() {
+  gotHit: function(playerObj) {
     this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
-    //console.log(this.batGenKey+ ' out of ' +this.parentNode.parentNode.batGenerator.bats.length);
-    //if(this.parentNode.childNodes.length == 1) this.parentNode.parentNode.endLevel = true;
+    switch(this.mode){
+      case 'start'  : playerObj.score+=20; break;
+      case 'idle'   : playerObj.score+=10; break;
+      case 'fly'    : playerObj.score+=40; break;
+      case 'retreat': playerObj.score+=80; break;
+    }
     this.parentNode.removeChild(this);
     delete this;
   },
@@ -142,6 +146,7 @@ var BatGenerator = Class.create(Sprite, {
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
     
+    //control vars
     this.x = x;
     this.y = y;
     this.genpoint = -24;
@@ -158,9 +163,8 @@ var BatGenerator = Class.create(Sprite, {
     this.readyToFight = false;
     this.defeated = false;
     this.modeMove = 'desc'; //asc ou desc
-    this.moveLeftLimit = 0;
-    this.moveRightLimit = 8;
     
+    //level map loading
     this.batEnemyMap = JSON.parse(JSON.stringify(lvlBatEnemyMap));
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -169,7 +173,8 @@ var BatGenerator = Class.create(Sprite, {
   update: function(evt) { 
     var game = Game.instance;
     if (!this.parentNode.paused && this.modeStart){
-      //console.log(this.parentNode.batGroup.childNodes.length);
+    
+      //ENEMY CREATION PROCESS
       if (this.batIdy < this.batEnemyMap.length){
         if (this.batIdx < this.batEnemyMap[this.batIdy].length){
           this.createBatTime -= 1;
@@ -193,6 +198,8 @@ var BatGenerator = Class.create(Sprite, {
           }
         }
       }else{
+      
+        //ENEMY SENDING PROCESS
         if(!this.parentNode.gotHit){
           this.sendBatTime-=1;
           if(this.sendBatTime<=0 && this.bats.length>0){
@@ -205,15 +212,13 @@ var BatGenerator = Class.create(Sprite, {
         }
       }
       
+      //ENEMY MOVING PROCESS
       for(var i=0; i<this.batEnemyMap.length; i++){
         for(var j=0; j<this.batEnemyMap[i].length; j++){
           if(this.modeMove == 'asc') this.batEnemyMap[i][j][0]+=1;
           else if(this.modeMove == 'desc') this.batEnemyMap[i][j][0]-=1;
         }
       }
-      
-      // if(this.batEnemyMap[0][this.moveLeftLimit][0]<=0) this.modeMove = 'asc';
-      // else if(this.batEnemyMap[0][this.moveRightLimit][0]>=game.width-24) this.modeMove = 'desc';
     }
   },
   
@@ -225,7 +230,22 @@ var BatGenerator = Class.create(Sprite, {
     }
   },
   
-  changeBatEnemyMap: function(lvlBatEnemyMap) {
+  loadNewLevel: function(lvlBatEnemyMap,level) {
+    //reseting vars
+    this.bats = [];
+    this.createBatTime = 0;
+    this.createBatSide = getRandom(0,1);
+    this.sendBatTime = 90 + (10 * getRandom(1,4));
+    this.batIdx = 0;
+    this.batIdy = 0;
+    this.level = level;
+    
+    this.modeStart = false;
+    this.readyToFight = false;
+    this.defeated = false;
+    this.modeMove = 'desc';
+    
+    //loading new map
     this.batEnemyMap = JSON.parse(JSON.stringify(lvlBatEnemyMap));
   }
 });
