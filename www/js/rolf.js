@@ -21,8 +21,9 @@ var Rolf = Class.create(Sprite, {
       this.health = this.healthStartFrame;
       this.reload = false;
       this.reloadTime = 0;
-      this.vulnerableTime = 0;
+      this.vulnerableTime = 60;
       this.alive = true;
+      this.winPose = false;
     
       // 3 - Animate
       this.frame = 2 + this.health;
@@ -46,7 +47,7 @@ var Rolf = Class.create(Sprite, {
             this.reload = false;
           }
           else{
-            this.reloadTime = 15;
+            this.reloadTime = 10;
           }
         }
       }
@@ -92,7 +93,7 @@ var Rolf = Class.create(Sprite, {
           if(this.x<=this.nextpos) this.x=this.nextpos;
         }
       }
-      if(this.alive==true){
+      if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
           this.x-=5;
           if (this.x<0) this.x=0;
@@ -108,11 +109,13 @@ var Rolf = Class.create(Sprite, {
   },
   
   move: function(direction){
-    if(this.moving==0){
-      this.frame = 0 + this.health;
-      this.animationDuration = 0;
-      this.iniFrame = 0 + this.health;
-      this.endFrame = 1 + this.health;
+    if(this.alive==true && this.winPose==false){
+      if(this.moving==0){
+        this.frame = 0 + this.health;
+        this.animationDuration = 0;
+        this.iniFrame = 0 + this.health;
+        this.endFrame = 1 + this.health;
+      }
     }
     this.moving = direction;
     this.scaleX = direction;
@@ -127,7 +130,7 @@ var Rolf = Class.create(Sprite, {
       var s = new PlayerShot(this.x+9, this.y);
       this.parentNode.shotGroup.addChild(s);
       this.bullets-=1;
-      this.reloadTime = 30;
+      this.reloadTime = 20;
       /* if(this.bullets<=0) {
         this.reload = true;
       } */
@@ -136,37 +139,65 @@ var Rolf = Class.create(Sprite, {
   
   stopMove: function(){
     this.moving = 0;
-    this.frame = 2 + this.health;
-    this.iniFrame = 2 + this.health;
-    this.endFrame = 2 + this.health;
+    if(this.alive==true && this.winPose==false){
+      this.frame = 2 + this.health;
+      this.iniFrame = 2 + this.health;
+      this.endFrame = 2 + this.health;
+      this.animationDuration = 0;
+    }
+  },
+  
+  wonStage: function(){
+    this.frame = 7;
+    this.iniFrame = 7;
+    this.endFrame = 7;
     this.animationDuration = 0;
+    this.winPose = true;
   },
   
   resetPosition: function(){
     this.health=this.healthStartFrame;
     this.alive = true;
-    this.vulnerableTime = 150;
+    this.winPose = false;
+    this.vulnerableTime = 60;
     this.bullets = 6;
+    this.x = 145;
     //this.lane=1;
-    //this.x = this.positions[1];
     //this.nextpos = this.positions[1];
-    this.frame = 2 + this.health;
-    this.iniFrame = 2 + this.health;
-    this.endFrame = 2 + this.health;
+    if(this.moving == 0){
+      this.frame = 2 + this.health;
+      this.iniFrame = 2 + this.health;
+      this.endFrame = 2 + this.health;    
+    } else {      
+      this.frame = 0 + this.health;
+      this.iniFrame = 0 + this.health;
+      this.endFrame = 1 + this.health;
+    }
     this.animationDuration = 0;
     this.animationSpeed = 0.25;
     this.movespeed = 20;
   },
   
-  gotHit: function(){     
-    this.health-=this.healthStartFrame;
-    this.frame = 2 + this.health;
-    this.iniFrame = 2 + this.health;
-    this.endFrame = 2 + this.health;
-    this.animationDuration = 0;
+  gotHit: function(){
+    this.health-=this.healthStartFrame;    
     if(this.health<0) {
       this.alive = false;
-    }else this.vulnerableTime = 150;
+      this.frame = 6;
+      this.iniFrame = 6;
+      this.endFrame = 6;
+    }else{
+      if(this.moving == 0){
+        this.frame = 2 + this.health;
+        this.iniFrame = 2 + this.health;
+        this.endFrame = 2 + this.health;    
+      } else {      
+        this.frame = 0 + this.health;
+        this.iniFrame = 0 + this.health;
+        this.endFrame = 1 + this.health;
+      }
+      this.animationDuration = 0;
+      this.vulnerableTime = 90;
+    }
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   

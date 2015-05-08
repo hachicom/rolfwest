@@ -80,7 +80,7 @@ window.onload = function() {
                'res/yukiSheet.png',
                'res/iglooSheet.png',
                'res/mountain.png',
-               'res/groundSheet.png',
+               'res/western1Sheet.png',
                'res/title.png',
                'res/dpad.png',
                'res/actbtn.png',
@@ -253,8 +253,8 @@ window.onload = function() {
       this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
       map = new Map(32, 32);
       //map.y = 315;
-      map.image = game.assets['res/groundSheet.png'];
-      map.loadData(arrMap1Top,arrMap1Sub);
+      map.image = game.assets['res/western1Sheet.png'];
+      map.loadData(arrMap1Sub);
             
       //UI
       gui = new Sprite(320,56);
@@ -343,7 +343,7 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       
       // Hero
-      rolf = new Rolf(145,352);
+      rolf = new Rolf(145,360);
       this.rolf = rolf;
       
       // Enemy Generators
@@ -398,8 +398,8 @@ window.onload = function() {
       }
       
       // 4 - Add child nodes
-      //this.addChild(bg);
-      // this.addChild(map);
+      // this.addChild(bg);
+      this.addChild(map);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
       this.addChild(rolf);
@@ -572,7 +572,7 @@ window.onload = function() {
         
         // Reload Enemy Generators
         this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
-        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage2'],globalBatKidMap['stage2Lim'],hachiplayer.level);
+        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],globalBatKidMap['stage'+hachiplayer.level+'Lim'],hachiplayer.level);
       }
     },
     
@@ -734,6 +734,7 @@ window.onload = function() {
         if(this.endLevel==true){
           this.msgLabel.text = '   ROUND CLEAR!';
           this.endLevelDuration += 1; 
+          this.rolf.wonStage();
           if(this.endLevelDuration >= 90){
             this.incLevelUp();
           }
@@ -762,7 +763,7 @@ window.onload = function() {
           }, 5);
         } */
       }else{
-        this.msgLabel.text = '      PAUSE';
+        this.fpslabel.text = 'PAUSE';
       }
       
     }
@@ -782,7 +783,7 @@ window.onload = function() {
       //bg.scale(2,2);
       //bg.image = game.assets['res/mountain.png'];
       //map = new Map(32, 32);
-      //map.image = game.assets['res/groundSheet.png'];
+      //map.image = game.assets['res/western1Sheet.png'];
       
       if(winGame>=1){
         //map.loadData(arrMap2Top,arrMap2Sub);
@@ -953,7 +954,7 @@ window.onload = function() {
       // title.image = game.assets['res/title.png'];      
       this.backgroundColor = '#000000';
       map = new Map(32, 32);
-      map.image = game.assets['res/groundSheet.png'];
+      map.image = game.assets['res/western1Sheet.png'];
       map.loadData(arrMap2Top,arrMap2Sub);
       map.y = 16;
       
@@ -1175,7 +1176,7 @@ window.onload = function() {
       
       this.backgroundColor = '#000000';
       // map = new Map(32, 32);
-      // map.image = game.assets['res/groundSheet.png'];
+      // map.image = game.assets['res/western1Sheet.png'];
       // map.loadData(arrMap1Top,arrMap1Sub);
             
       // snow = new Sprite(32,32);
@@ -1311,7 +1312,7 @@ window.onload = function() {
       this.backgroundColor = '#000000';
       map = new Map(32, 32);
       //map.y = 320;
-      map.image = game.assets['res/groundSheet.png'];
+      map.image = game.assets['res/western1Sheet.png'];
       map.loadData(arrMap1Top,arrMap1Sub);
       
       label = new FontSprite('score', 128, 16, 'SC 0');

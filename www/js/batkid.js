@@ -194,6 +194,7 @@ var BatKidGenerator = Class.create(Sprite, {
         this.createBatKidTime -= 1;
         if (this.createBatKidTime <= 0) {
           //console.log("creating batkid");
+          this.y = this.batkidEnemyMap[this.batkidIdx][1];
           var batkid = new BatKidEnemy(this.x,this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit);
           this.batkids.push(batkid);
           this.parentNode.batkidGroup.addChild(batkid);
