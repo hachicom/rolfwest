@@ -170,8 +170,8 @@ var BatGenerator = Class.create(Sprite, {
     var game = Game.instance;
     if (!this.parentNode.paused && this.modeStart){
       //console.log(this.parentNode.batGroup.childNodes.length);
-      if (this.batIdy < 2){
-        if (this.batIdx < 9){
+      if (this.batIdy < this.batEnemyMap.length){
+        if (this.batIdx < this.batEnemyMap[this.batIdy].length){
           this.createBatTime -= 1;
           if (this.createBatTime <= 0) {
             //console.log("creating bat");
@@ -181,10 +181,10 @@ var BatGenerator = Class.create(Sprite, {
             this.createBatTime = 8;
             this.createBatSide = getRandom(0,1);
             this.batIdx+=1;
-            if(this.batIdx >= 9){
+            if(this.batIdx >= this.batEnemyMap[this.batIdy].length){
               this.batIdy+=1;
               this.batIdx=0;
-              if(this.batIdy>=2) {
+              if(this.batIdy>=this.batEnemyMap.length) {
                 this.readyToFight = true;
                 this.parentNode.batkidGenerator.modeStart = true;
               }
@@ -205,8 +205,8 @@ var BatGenerator = Class.create(Sprite, {
         }
       }
       
-      for(var i=0; i<2; i++){
-        for(var j=0; j<9; j++){
+      for(var i=0; i<this.batEnemyMap.length; i++){
+        for(var j=0; j<this.batEnemyMap[i].length; j++){
           if(this.modeMove == 'asc') this.batEnemyMap[i][j][0]+=1;
           else if(this.modeMove == 'desc') this.batEnemyMap[i][j][0]-=1;
         }

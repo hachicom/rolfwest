@@ -4,8 +4,7 @@ var BatKidEnemy = Class.create(Sprite, {
   initialize: function(x,y,xTarget,level,batkidGenKey,moveLimit) {
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
-    //this.image  = Game.instance.assets['res/batkidSheet.png'];
-    this.image  = Game.instance.assets['res/piranhaSheet.png'];
+    this.image  = Game.instance.assets['res/batkidSheet.png'];
     this.x = x;
     this.y = y;
     this.originX = x;
@@ -29,12 +28,12 @@ var BatKidEnemy = Class.create(Sprite, {
     this.horizontalDir = getRandom(1,2); //left/right
     
     // 3 - Animate
-    this.frame = 0;
-    this.iniFrame = 0;
-    this.endFrame = 1;
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
+    this.frame = 4;
+    this.iniFrame = 4;
+    this.endFrame = 7;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -60,31 +59,33 @@ var BatKidEnemy = Class.create(Sprite, {
     this.nextposX = this.parentNode.parentNode.batkidGenerator.batkidEnemyMap[this.position][0];
     //this.nextposY = this.y;
     
-    if (!this.parentNode.parentNode.paused){
-      /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
-      if (this.animationDuration >= this.animationSpeed) {
-        if(this.frame<this.endFrame) this.frame ++;
-        else this.frame = this.iniFrame;
-        this.animationDuration -= this.animationSpeed;
-      }
-      /*END ANIMATION BLOCK*/
-      
+    if (!this.parentNode.parentNode.paused){      
       if(this.mode == 'start'){
         this.direction = findAngle(this.x,this.y,this.nextposX,this.y);
         this.x += this.moveSpeed * Math.cos(this.direction);
         this.y += this.moveSpeed * Math.sin(this.direction);
         if(this.nextposX < this.originX){//to the left
+          this.iniFrame = 2;
+          this.endFrame = 3;
           if(this.nextposX >= this.x){
             this.mode = 'idle';
             this.y = this.nextposY;
             this.x = this.nextposX;
+            this.frame = 4;
+            this.iniFrame = 4;
+            this.endFrame = 7;
           }
         } else {//to the right
+          //this.scaleX = 1;
+          this.iniFrame = 0;
+          this.endFrame = 1;
           if(this.nextposX <= this.x){
             this.mode = 'idle';
             this.y = this.nextposY;
             this.x = this.nextposX;
+            this.frame = 4;
+            this.iniFrame = 4;
+            this.endFrame = 7;
           }
         }
         /* 
@@ -134,6 +135,15 @@ var BatKidEnemy = Class.create(Sprite, {
           this.x = this.nextposX;
         }
       }
+      
+      /*START ANIMATION BLOCK*/
+      this.animationDuration += 0.05;    
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
+      }
+      /*END ANIMATION BLOCK*/
     }
   }
 });
@@ -202,8 +212,8 @@ var BatKidGenerator = Class.create(Sprite, {
       }
       
       for(var j=0; j<this.batkidEnemyMap.length; j++){
-        if(this.modeMove == 'asc') this.batkidEnemyMap[j][0]+=1;
-        else if(this.modeMove == 'desc') this.batkidEnemyMap[j][0]-=1;
+        //if(this.modeMove == 'asc') this.batkidEnemyMap[j][0]+=1;
+        //else if(this.modeMove == 'desc') this.batkidEnemyMap[j][0]-=1;
       }
       
       // if(this.batkidEnemyMap[0][this.moveLeftLimit][0]<=0) this.modeMove = 'asc';

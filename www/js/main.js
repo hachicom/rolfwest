@@ -74,7 +74,7 @@ window.onload = function() {
                'res/IceFrag.png',
                'res/heart.png',
                'res/batSheet.png',
-               'res/piranhaSheet.png',
+               'res/batkidSheet.png',
                'res/yukiSheet.png',
                'res/iglooSheet.png',
                'res/mountain.png',
@@ -1031,7 +1031,7 @@ window.onload = function() {
       piranha.x = 270;
       piranha.y = 170;
       piranha.frame = [0,0,0,0,0,0,0,1,1,1,1,1,1,1];
-      piranha.image = game.assets['res/piranhaSheet.png'];
+      piranha.image = game.assets['res/batkidSheet.png'];
       this.spritesArr[4] = piranha;
       
       yuki = new Sprite(32,32);
