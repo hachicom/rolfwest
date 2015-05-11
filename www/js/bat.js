@@ -104,7 +104,7 @@ var BatEnemy = Class.create(Sprite, {
         }
         this.x += this.xSpeed;
         this.y += this.moveSpeed;
-        if(this.y>=this.parentNode.parentNode.rolf.y+24){
+        if(this.y>=this.parentNode.parentNode.rolf.y){
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
           this.mode = 'retreat';

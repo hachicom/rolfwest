@@ -116,13 +116,13 @@ var Rolf = Class.create(Sprite, {
         this.iniFrame = 0 + this.health;
         this.endFrame = 1 + this.health;
       }
+      this.scaleX = direction;
     }
     this.moving = direction;
-    this.scaleX = direction;
   },
   
   shoot: function(){
-    if(this.bullets>0 && this.alive==true){
+    if(this.bullets>0 && this.alive==true && this.winPose==false){
       this.shootTime = 5;
       this.animationDuration = 0;
       shotGroup = this.parentNode.shotGroup;
