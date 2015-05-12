@@ -261,7 +261,7 @@ window.onload = function() {
       this.lvlMap = map;
             
       // GUI
-      gui = new Sprite(320,36);
+      gui = new Sprite(320,38);
       gui.backgroundColor = '#aaaaaa';
       // GUI Labels
       scoreLabel = new FontSprite('sega12', 144, 14, 'SCORE 0');
@@ -305,9 +305,9 @@ window.onload = function() {
       dpad.y = game.height - 156;
       dpad.opacity = 0.5;
       dpad.image = game.assets['res/dpad.png'];       
-      dpad.addEventListener(Event.TOUCH_START,this.handleTouchControl);
-      dpad.addEventListener(Event.TOUCH_MOVE,this.handleTouchControl);
-      dpad.addEventListener(Event.TOUCH_END,this.handleTouchControlOff);
+      // dpad.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      // dpad.addEventListener(Event.TOUCH_MOVE,this.handleTouchControl);
+      // dpad.addEventListener(Event.TOUCH_END,this.handleTouchControlOff);
       this.dpad = dpad;
       
       actBtn = new Sprite(100,156);
@@ -398,12 +398,14 @@ window.onload = function() {
       this.addChild(msgLabel);
       this.addChild(livesLabel);
       this.addChild(hiscoreLabel);
-      this.addChild(dpad);
-      this.addChild(actBtn);
+      //this.addChild(dpad);
+      //this.addChild(actBtn);
       this.addChild(pauseBtn);
       this.addChild(fpslabel);
             
-      //this.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      this.addEventListener(Event.TOUCH_START,this.handleTouchControl);
+      this.addEventListener(Event.TOUCH_MOVE,this.handleTouchMoveControl);
+      this.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
     },
@@ -428,43 +430,36 @@ window.onload = function() {
       // this.parentNode.batkidGenerator.defeated = true;
     },
     
-    handleTouchControl: function (evt) {
-      var playSnd, lane;
-      if(!this.parentNode.paused){
-        if(this.parentNode.startLevelMsg<=0){
-          if(evt.x > this.width/2) this.parentNode.rolf.move(1);//lane=1;
-          else this.parentNode.rolf.move(-1);//lane=-1;
-          
-          //Verifica a posição do pinguim e dependendo do caso dispara um som
-          // playSnd = this.penguin.switchToLaneNumber(lane,this.igloo.isLit,this.yuki.isThere);
-          // if (playSnd=='jump') { //apenas moveu o pinguim
-          // }else if(playSnd=='powerup') { //dispara o modo de entrega dos peixes
-            // if( isAndroid ) {
-              // if(soundOn) //powerup.play();
-                // window.plugins.LowLatencyAudio.play('powerup');
-            // }/* else{
-              // if(soundOn) game.assets['res/powerup.wav'].play();
-            // } */
-            // this.endLevel=true;
-            // this.setCoins(this.levelUpAt*(-1));
-          // }
+    handleTouchControl: function (evt,mode) {
+      var playSnd;
+      if(!this.paused){
+        if(this.startLevelMsg<=0){
+          if(evt.localY > 360) {
+            this.rolf.moveTouch(evt);//move the hero
+          }else{ //shoot
+            this.rolf.shoot();
+          }
         }
       }
       evt.stopPropagation();
       evt.preventDefault();
     },
     
-    handleTouchShootControl: function (evt) {
-      var playSnd, lane;
-      if(!this.parentNode.paused){
-        this.parentNode.rolf.shoot();
+    handleTouchMoveControl: function (evt,mode) {
+      var playSnd;
+      if(!this.paused){
+        if(this.startLevelMsg<=0){
+          if(evt.localY > 360) {
+            this.rolf.moveTouch(evt);//move the hero
+          }
+        }
       }
       evt.stopPropagation();
       evt.preventDefault();
     },
     
-    handleTouchControlOff: function (evt) {
-      this.parentNode.rolf.stopMove();
+    handleTouchEndControl: function (evt) {
+      this.rolf.stopMove();
       
       evt.stopPropagation();
       evt.preventDefault();
@@ -606,7 +601,7 @@ window.onload = function() {
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.intersect(bat,16)){
+                if (shot.intersect(bat,14)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -623,7 +618,7 @@ window.onload = function() {
               for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
                 var batkid;
                 batkid = this.batkidGroup.childNodes[j];
-                if (shot.within(batkid,16)){
+                if (shot.within(batkid,14)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');

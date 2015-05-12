@@ -5,12 +5,10 @@ var Rolf = Class.create(Sprite, {
       // 1 - Call superclass constructor
       Sprite.apply(this,[24, 24]);
       this.image = Game.instance.assets['res/rolfSheet.png'];
-      //this.lane = 1;
-      this.positions = [0,296];
-      this.nextpos = x;
-      this.movespeed = 20;
+      this.movespeed = 10;
       this.x = x;
       this.y = y;
+      this.nextpos = x;
       this.movable = true;
       this.moving = 0; //-1: esquerda, 0: parado, 1: direita
       //this.tl.setTimeBased();
@@ -84,16 +82,22 @@ var Rolf = Class.create(Sprite, {
       /*END ANIMATION BLOCK*/
       
       /*START MOVEMENT BLOCK*/
-      if(this.parentNode.gotHit!=true && this.movable==false){
+      if(this.alive==true && this.winPose==false && this.shootTime<=0){
         if(this.x<this.nextpos) {
           this.x+=this.movespeed;
-          if(this.x>=this.nextpos) this.x=this.nextpos;
+          if(this.x>=this.nextpos) {
+            this.x=this.nextpos;
+            //this.stopMove();
+          }
         }else if(this.x>this.nextpos){
           this.x-=this.movespeed;
-          if(this.x<=this.nextpos) this.x=this.nextpos;
+          if(this.x<=this.nextpos) {
+            this.x=this.nextpos;
+            //this.stopMove();
+          }
         }
       }
-      if(this.alive==true && this.winPose==false){
+      /* if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
           this.x-=5;
           if (this.x<0) this.x=0;
@@ -102,7 +106,7 @@ var Rolf = Class.create(Sprite, {
           this.x+=5;
           if (this.x>game.width-this.width) this.x=game.width-this.width;
         }
-      }
+      } */
       /*END MOVEMENT BLOCK*/
       //console.log(this.vulnerableTime+' '+this.alive+' '+this.health);
     }
@@ -119,6 +123,24 @@ var Rolf = Class.create(Sprite, {
       this.scaleX = direction;
     }
     this.moving = direction;
+  },
+  
+  moveTouch: function(evt){
+    if(this.alive==true && this.winPose==false){
+      if(this.moving==0){
+        this.frame = 0 + this.health;
+        this.animationDuration = 0;
+        this.iniFrame = 0 + this.health;
+        this.endFrame = 1 + this.health;
+      }
+      this.nextpos = evt.localX;
+      if (this.nextpos < this.x)//finger touched left side of hero
+        this.moving = -1;
+      else //finger touched right side of hero
+        this.moving = 1;
+      this.scaleX = this.moving;
+    }
+    //this.moving = direction;
   },
   
   shoot: function(){
@@ -139,6 +161,7 @@ var Rolf = Class.create(Sprite, {
   
   stopMove: function(){
     this.moving = 0;
+    this.nextpos = this.x;
     if(this.alive==true && this.winPose==false){
       this.frame = 2 + this.health;
       this.iniFrame = 2 + this.health;
@@ -162,8 +185,8 @@ var Rolf = Class.create(Sprite, {
     this.vulnerableTime = 60;
     this.bullets = 6;
     this.x = 145;
+    this.nextpos = this.x;
     //this.lane=1;
-    //this.nextpos = this.positions[1];
     if(this.moving == 0){
       this.frame = 2 + this.health;
       this.iniFrame = 2 + this.health;
