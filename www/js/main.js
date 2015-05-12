@@ -86,7 +86,8 @@ window.onload = function() {
                'res/actbtn.png',
                'res/brackets.png',
                'res/pause.png',
-               'res/font0_0.png');
+               'res/font0_0.png',
+               'res/sega16_0.png');
   
 	// 5 - Game settings
 	game.fps = 30;
@@ -94,7 +95,8 @@ window.onload = function() {
 	// 6 - Once Game finishes loading
   game.onload = function() {
 		// 1 - Variables
-    enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
+    //enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
+    enchant.bmfont.createFont('sega16', 'res/font0.fnt', game.assets['res/font0_0.png']);
     var scene;
     
     if (isLocalStorageSupported())
@@ -258,34 +260,34 @@ window.onload = function() {
             
       //UI
       gui = new Sprite(320,56);
-      gui.backgroundColor = '#000000';
+      gui.backgroundColor = '#aaaaaa';
       // Label
-      label = new FontSprite('score', 128, 32, 'SC 0');
+      label = new FontSprite('sega16', 128, 32, 'SC 0');
       label.x = 8;
       label.y = 0;
       this.scoreLabel = label;
       
-      label6 = new FontSprite('score', 144, 16, 'TOP 0');
+      label6 = new FontSprite('sega16', 144, 16, 'TOP 0');
       label6.x = 160;
       label6.y = 0;
       this.hiscoreLabel = label6;
       
-      label5 = new FontSprite('score', 96, 32, 'ROLF_ 3');
+      label5 = new FontSprite('sega16', 96, 32, 'ROLF_ 3');
       label5.x = 100;
       label5.y = 24;
       this.livesLabel = label5;
       
-      label3 = new FontSprite('score', 96, 32, 'COIN_0');
+      label3 = new FontSprite('sega16', 96, 32, 'COIN_0');
       label3.x = 177;
       label3.y = 24;
       this.coinsLabel = label3;
       
-      label2 = new FontSprite('score', 80, 32, 'LVL_0');
+      label2 = new FontSprite('sega16', 80, 32, 'LVL_0');
       label2.x = 268;
       label2.y = 24;
       this.levelLabel = label2;
       
-      label4 = new FontSprite('score', 256, 32, 'SHOOT ALL BANDITS!');
+      label4 = new FontSprite('sega16', 256, 32, 'SHOOT ALL BANDITS!');
       label4.x = 32;
       label4.y = 140;
       this.msgLabel = label4;
@@ -337,7 +339,7 @@ window.onload = function() {
       labelPause.opacity = 0.6;
       labelPause.addEventListener(Event.TOUCH_START,this.pauseGame);
         
-      fpslabel = new FontSprite('score', 80, 16, 'fps30');
+      fpslabel = new FontSprite('sega16', 80, 16, 'fps30');
       fpslabel.x = 8;
       fpslabel.y = 32;
       this.fpslabel = fpslabel;
@@ -838,7 +840,7 @@ window.onload = function() {
       if(winGame==1) gameovertxt = glossary.text.wingame1[language];
       else if(winGame==2) gameovertxt = glossary.text.wingame2[language];
       else gameovertxt = glossary.text.gameover[language]+"____"+this.textbook[getRandom(0,this.textbook.length-1)];
-      gameOverLabel = new FontSprite('score', 320, 320, gameovertxt);
+      gameOverLabel = new FontSprite('sega16', 320, 320, gameovertxt);
       gameOverLabel.x = 0;
       gameOverLabel.y = 140;
       
@@ -981,7 +983,7 @@ window.onload = function() {
       yuki.frame = [1,1,1,1,1,1,1,2,2,2,2,2,2,2,2];
       yuki.image = game.assets['res/yukiSheet.png']; 
       
-      label = new FontSprite('score', 320, 440, '');
+      label = new FontSprite('sega16', 320, 440, '');
       label.x = 0;
       label.y = 8;
       
@@ -1075,14 +1077,14 @@ window.onload = function() {
       heart.image = game.assets['res/heart.png']; 
       this.spritesArr[6] = heart;
       
-      label = new FontSprite('score', 320, 440, '');
+      label = new FontSprite('sega16', 320, 440, '');
       label.x = 0;
       label.y = 8;
       
       label.text = this.textbook[0];
       this.labeltext = label;
       
-      previousLabel = new FontSprite('score', 144, 16, glossary.UI.voltar[language]);
+      previousLabel = new FontSprite('sega16', 144, 16, glossary.UI.voltar[language]);
       previousLabel.x = 20;
       previousLabel.y = game.height - 16 - 60;
       previousLabel.visible = false;
@@ -1096,7 +1098,7 @@ window.onload = function() {
       });
       this.prevlabel = previousLabel;
       
-      nextLabel = new FontSprite('score', 144, 16, glossary.UI.proximo[language]);
+      nextLabel = new FontSprite('sega16', 144, 16, glossary.UI.proximo[language]);
       nextLabel.x = 160;
       nextLabel.y = game.height - 16 - 60;
       nextLabel.visible = true;
@@ -1191,12 +1193,12 @@ window.onload = function() {
       // yuki.frame = 2;
       // yuki.image = game.assets['res/yukiSheet.png']; 
       
-      label = new FontSprite('score', 320, 200, glossary.UI.optionsTxt[language]);
+      label = new FontSprite('sega16', 320, 200, glossary.UI.optionsTxt[language]);
       label.x = 0;
       label.y = 8;
       
       // SOUND SETTINGS
-      SoundOnLabel = new FontSprite('score', 80, 16, " [ON]");
+      SoundOnLabel = new FontSprite('sega16', 80, 16, " [ON]");
       SoundOnLabel.x = 16;
       SoundOnLabel.y = 60;
       SoundOnLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1206,7 +1208,7 @@ window.onload = function() {
       });
       if (soundOn) SoundOnLabel.text = '>[ON]';
       
-      SoundOffLabel = new FontSprite('score', 96, 16, ' [OFF]');
+      SoundOffLabel = new FontSprite('sega16', 96, 16, ' [OFF]');
       SoundOffLabel.x = 140;
       SoundOffLabel.y = 60;
       SoundOffLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1217,7 +1219,7 @@ window.onload = function() {
       if (!soundOn) SoundOffLabel.text = '>[OFF]';
       
       // LANGUAGE SETTINGS
-      PtBrLabel = new FontSprite('score', 144, 16, " [BRASIL]");
+      PtBrLabel = new FontSprite('sega16', 144, 16, " [BRASIL]");
       PtBrLabel.x = 16;
       PtBrLabel.y = 126;
       PtBrLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1227,7 +1229,7 @@ window.onload = function() {
       });
       if (language == 'pt_BR') PtBrLabel.text = '>[BRASIL]';
       
-      EnUsLabel = new FontSprite('score', 128, 16, ' [WORLD]');
+      EnUsLabel = new FontSprite('sega16', 128, 16, ' [WORLD]');
       EnUsLabel.x = 172;
       EnUsLabel.y = 126;
       EnUsLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1238,7 +1240,7 @@ window.onload = function() {
       if (language == 'en_US') EnUsLabel.text = '>[WORLD]';
       
       // HISCORE SETTINGS
-      ResetYesLabel = new FontSprite('score', 96, 16, " "+glossary.UI.sim[language]);
+      ResetYesLabel = new FontSprite('sega16', 96, 16, " "+glossary.UI.sim[language]);
       ResetYesLabel.x = 16;
       ResetYesLabel.y = 190;
       ResetYesLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1248,7 +1250,7 @@ window.onload = function() {
       });
       if (resetHiscore) ResetYesLabel.text = '>'+glossary.UI.sim[language];
       
-      ResetNoLabel = new FontSprite('score', 96, 16, ' '+glossary.UI.nao[language]);
+      ResetNoLabel = new FontSprite('sega16', 96, 16, ' '+glossary.UI.nao[language]);
       ResetNoLabel.x = 140;
       ResetNoLabel.y = 190;
       ResetNoLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1258,7 +1260,7 @@ window.onload = function() {
       });
       if (!resetHiscore) ResetNoLabel.text = '>'+glossary.UI.nao[language];
       
-      saveLabel = new FontSprite('score', 144, 16, glossary.UI.salvar[language]);
+      saveLabel = new FontSprite('sega16', 144, 16, glossary.UI.salvar[language]);
       saveLabel.x = 160;
       saveLabel.y = 240;
       saveLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1273,7 +1275,7 @@ window.onload = function() {
         game.replaceScene(new SceneTitle());
       });
       
-      exitLabel = new FontSprite('score', 144, 16, glossary.UI.voltar[language]);
+      exitLabel = new FontSprite('sega16', 144, 16, glossary.UI.voltar[language]);
       exitLabel.x = 16;
       exitLabel.y = 240;
       exitLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1315,23 +1317,23 @@ window.onload = function() {
       map.image = game.assets['res/western1Sheet.png'];
       map.loadData(arrMap1Top,arrMap1Sub);
       
-      label = new FontSprite('score', 128, 16, 'SC 0');
+      label = new FontSprite('sega16', 128, 16, 'SC 0');
       label.x = 8;
       label.y = 0;
       this.scoreLabel = label;
             
-      label6 = new FontSprite('score', 144, 16, 'TOP '+hiscore);
+      label6 = new FontSprite('sega16', 144, 16, 'TOP '+hiscore);
       label6.x = 160;
       label6.y = 0;
       this.hiscoreLabel = label6;
       
       //Title label
-      TitleLabel = new FontSprite('score', 240, 16, "ROLFWEST v"+version);
+      TitleLabel = new FontSprite('sega16', 240, 16, "ROLFWEST v"+version);
       TitleLabel.x = 48;
       TitleLabel.y = 198;
       
       // Press Start label
-      PressStart = new FontSprite('score', 192, 16, glossary.UI.start[language]);
+      PressStart = new FontSprite('sega16', 192, 16, glossary.UI.start[language]);
       PressStart.x = 64;
       PressStart.y = 264;
       PressStart.addEventListener(Event.TOUCH_START, function(e){
@@ -1344,14 +1346,14 @@ window.onload = function() {
         game.replaceScene(new SceneGame());
       });
       
-      tutorialLabel = new FontSprite('score', 192, 16, glossary.UI.tutorial[language]);
+      tutorialLabel = new FontSprite('sega16', 192, 16, glossary.UI.tutorial[language]);
       tutorialLabel.x = 64;
       tutorialLabel.y = 304;
       tutorialLabel.addEventListener(Event.TOUCH_START, function(e){
         game.replaceScene(new SceneTutorial());
       });
       
-      optionLabel = new FontSprite('score', 160, 16, glossary.UI.settings[language]);
+      optionLabel = new FontSprite('sega16', 160, 16, glossary.UI.settings[language]);
       optionLabel.x = 64;
       optionLabel.y = 344;
       optionLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1364,7 +1366,7 @@ window.onload = function() {
         game.replaceScene(new SceneSettings());
       });
       
-      creditLabel = new FontSprite('score', 160, 16, glossary.UI.credits[language]);
+      creditLabel = new FontSprite('sega16', 160, 16, glossary.UI.credits[language]);
       creditLabel.x = 64;
       creditLabel.y = 384;
       creditLabel.addEventListener(Event.TOUCH_START, function(e){
@@ -1372,7 +1374,7 @@ window.onload = function() {
       });
       
       // Copyright label
-      copyright = new FontSprite('score', 240, 16, "© 2015 HACHICOM");
+      copyright = new FontSprite('sega16', 240, 16, "© 2015 HACHICOM");
       copyright.x = 40;
       copyright.y = game.height - 16 - 60;
       
