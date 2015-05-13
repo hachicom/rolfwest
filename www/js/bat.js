@@ -74,7 +74,7 @@ var BatEnemy = Class.create(Sprite, {
         if(this.nextposY >= this.y){
           this.mode = 'idle';
           this.shootTime = 5 + getRandom(0,5);
-          this.bullets = getRandom(2,4);
+          this.bullets = getRandom(2,3);
           this.moveSpeed = 2;
           this.y = this.nextposY;
           this.x = this.nextposX;
@@ -108,7 +108,7 @@ var BatEnemy = Class.create(Sprite, {
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
           this.mode = 'retreat';
-          this.moveSpeed = 5;
+          this.moveSpeed = 3;
         }
         
         //shoot at player

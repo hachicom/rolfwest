@@ -86,8 +86,8 @@ window.onload = function() {
                'res/actbtn.png',
                'res/brackets.png',
                'res/pause.png',
-               'res/sega14_0.png',
-               'res/sega24_0.png');
+               'res/sega16_0.png',
+               'res/sega22_0.png');
   
 	// 5 - Game settings
 	game.fps = 30;
@@ -96,8 +96,8 @@ window.onload = function() {
   game.onload = function() {
 		// 1 - Variables
     //enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
-    enchant.bmfont.createFont('sega12', 'res/sega14.fnt', game.assets['res/sega14_0.png']);
-    enchant.bmfont.createFont('sega24', 'res/sega24.fnt', game.assets['res/sega24_0.png']);
+    enchant.bmfont.createFont('sega12', 'res/sega16.fnt', game.assets['res/sega16_0.png']);
+    enchant.bmfont.createFont('sega24', 'res/sega22.fnt', game.assets['res/sega22_0.png']);
     var scene;
     
     if (isLocalStorageSupported())
@@ -261,7 +261,7 @@ window.onload = function() {
       this.lvlMap = map;
             
       // GUI
-      gui = new Sprite(320,32);
+      gui = new Sprite(320,36);
       gui.backgroundColor = '#aaaaaa';
       // GUI Labels
       scoreLabel = new FontSprite('sega12', 144, 14, 'SCORE 0');
@@ -606,7 +606,7 @@ window.onload = function() {
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.within(bat,12)){
+                if (shot.intersect(bat,16)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -623,7 +623,7 @@ window.onload = function() {
               for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
                 var batkid;
                 batkid = this.batkidGroup.childNodes[j];
-                if (shot.within(batkid,12)){
+                if (shot.within(batkid,16)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -641,7 +641,7 @@ window.onload = function() {
             for (var i = this.batGroup.childNodes.length - 1; i >= 0; i--) {
               var bat;
               bat = this.batGroup.childNodes[i];
-              if (bat.within(this.rolf,18) && this.rolf.isVulnerable()){
+              if (bat.within(this.rolf,16) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
                     window.plugins.LowLatencyAudio.play('hit');
@@ -663,7 +663,7 @@ window.onload = function() {
             for (var i = this.evilShotGroup.childNodes.length - 1; i >= 0; i--) {
               var evilshot;
               evilshot = this.evilShotGroup.childNodes[i];
-              if (evilshot.within(this.rolf,18) && this.rolf.isVulnerable()){
+              if (evilshot.within(this.rolf,16) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
                     window.plugins.LowLatencyAudio.play('hit');
