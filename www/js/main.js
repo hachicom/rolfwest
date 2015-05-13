@@ -1128,7 +1128,7 @@ window.onload = function() {
       if(this.page == 0){
         console.log('beh');
       }
-    }
+    },
     
     update: function(evt) {
       this.sceneAnimationTime += 1;
