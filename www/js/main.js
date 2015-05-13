@@ -86,7 +86,7 @@ window.onload = function() {
                'res/actbtn.png',
                'res/brackets.png',
                'res/pause.png',
-               'res/sega12_0.png',
+               'res/sega14_0.png',
                'res/sega24_0.png');
   
 	// 5 - Game settings
@@ -96,7 +96,7 @@ window.onload = function() {
   game.onload = function() {
 		// 1 - Variables
     //enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
-    enchant.bmfont.createFont('sega12', 'res/sega12.fnt', game.assets['res/sega12_0.png']);
+    enchant.bmfont.createFont('sega12', 'res/sega14.fnt', game.assets['res/sega14_0.png']);
     enchant.bmfont.createFont('sega24', 'res/sega24.fnt', game.assets['res/sega24_0.png']);
     var scene;
     
@@ -264,38 +264,38 @@ window.onload = function() {
       gui = new Sprite(320,32);
       gui.backgroundColor = '#aaaaaa';
       // GUI Labels
-      scoreLabel = new FontSprite('sega12', 144, 12, 'SCORE 0');
+      scoreLabel = new FontSprite('sega12', 144, 14, 'SCORE 0');
       scoreLabel.x = 50;
       scoreLabel.y = 0;
       this.scoreLabel = scoreLabel;
       
-      hiscoreLabel = new FontSprite('sega12', 144, 12, 'TOP 0');
+      hiscoreLabel = new FontSprite('sega12', 144, 14, 'TOP 0');
       hiscoreLabel.x = 180;
       hiscoreLabel.y = 0;
       this.hiscoreLabel = hiscoreLabel;
       
-      livesLabel = new FontSprite('sega12', 96, 24, 'ROLF_ 3');
+      livesLabel = new FontSprite('sega12', 96, 28, 'ROLF_ 3');
       livesLabel.x = 8;
       livesLabel.y = 12;
       this.livesLabel = livesLabel;
       
-      coinsLabel = new FontSprite('sega12', 96, 24, 'COIN_0');
+      coinsLabel = new FontSprite('sega12', 96, 28, 'COIN_0');
       coinsLabel.x = 136;
       coinsLabel.y = 12;
       this.coinsLabel = coinsLabel;
       
-      levelLabel = new FontSprite('sega12', 80, 24, 'LEVEL_0');
+      levelLabel = new FontSprite('sega12', 80, 28, 'LEVEL_0');
       levelLabel.x = 268;
       levelLabel.y = 12;
       this.levelLabel = levelLabel;
         
-      fpslabel = new FontSprite('sega12', 80, 12, 'fps30');
+      fpslabel = new FontSprite('sega12', 80, 14, 'fps30');
       fpslabel.x = 8;
       fpslabel.y = 36;
       this.fpslabel = fpslabel;
       //END GUI BLOCK
       
-      msgLabel = new FontSprite('sega24', 256, 24, 'SHOOT ALL BANDITS!');
+      msgLabel = new FontSprite('sega24', 256, 28, 'SHOOT ALL BANDITS!');
       msgLabel.x = 32;
       msgLabel.y = 140;
       this.msgLabel = msgLabel;
@@ -1352,8 +1352,8 @@ window.onload = function() {
       });
       
       // Copyright label
-      copyright = new FontSprite('sega12', 240, 12, "© 2015 HACHICOM");
-      copyright.x = 160;
+      copyright = new FontSprite('sega12', 240, 14, "© 2015 HACHICOM");
+      copyright.x = 120;
       copyright.y = game.height - 16 - 60;
       
       // Hiscore label
@@ -1374,8 +1374,8 @@ window.onload = function() {
       this.addChild(tutorialLabel);
       this.addChild(optionLabel);
       this.addChild(creditLabel);
-      this.addChild(scoreLabel);
-      this.addChild(hiscoreLabel);
+      // this.addChild(scoreLabel);
+      // this.addChild(hiscoreLabel);
       
       if( isAndroid ) {
         if(soundOn) {
