@@ -4,6 +4,8 @@ var Hachiplayer = Class.create({
     this.score = 0;
     this.coins = 0;
     this.level = level;
+    this.controlx = 0;
+    this.padtouched = false;
   },
 
   reset: function() {

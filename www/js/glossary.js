@@ -21,8 +21,8 @@ var glossary = {
       en_US: '[CREDITS]'
     },
     optionsTxt :{ //glossary.UI.optionsTxt[language]
-      pt_BR: '  ==CONFIGURAÇÔES==__SOM & BGM____REGIÃO/REGION____RESETAR HISCORE',
-      en_US: '  ==OPTIONS MENU==__SFX & BGM____REGIÃO/REGION____RESET HISCORE'
+      pt_BR: '  ==CONFIGURAÇÔES==__SOM & BGM_____REGIÃO/REGION_____RESETAR HISCORE',
+      en_US: '  ==OPTIONS MENU==__SFX & BGM_____REGIÃO/REGION_____RESET HISCORE'
     },
     sim :{ //glossary.UI.sim[language]
       pt_BR: '[SIM]',
@@ -90,9 +90,9 @@ var glossary = {
       pt_BR: ' PEIXES!',
       en_US: ' FISH!'
     },
-		alertaYuki: { //glossary.text.alertaYuki[language]
-      pt_BR: 'LEVE OS PEIXES_  PARA YUKI!!!',
-      en_US: 'TAKE YOUR FISH_    TO YUKI!!!'
+		alertaReload: { //glossary.text.alertaReload[language]
+      pt_BR: '  RECARREGUE!!!',
+      en_US: '     RELOAD!!!'
     },
 		coracoes: { //glossary.text.coracoes[language]
       pt_BR: ' CORAçÕES: ',

@@ -38,10 +38,17 @@ var BatSniperEnemy = Class.create(Sprite, {
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  gotHit: function() {
+  gotHit: function(playerObj) {
     this.parentNode.parentNode.batsniperGenerator.rearrangeBatSnipers(this.batsniperGenKey);
-    //console.log(this.batsniperGenKey+ ' out of ' +this.parentNode.parentNode.batsniperGenerator.batsnipers.length);
-    //if(this.parentNode.childNodes.length == 1) this.parentNode.parentNode.endLevel = true;
+    switch(this.mode){
+      case 'start'  : playerObj.score+=120; break;
+      case 'idle'   : playerObj.score+=30; break;
+      case 'fly'    : playerObj.score+=40; break;
+      case 'shoot'  : playerObj.score+=50; break;
+      case 'retreat': playerObj.score+=60; break;
+    }
+    var batsniperk = new BatsniperKilled(this.x,this.y);
+    this.parentNode.parentNode.addChild(batsniperk);
     this.parentNode.removeChild(this);
     delete this;
   },
@@ -148,6 +155,34 @@ var BatSniperEnemy = Class.create(Sprite, {
   }
 });
 
+var BatsniperKilled = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x,y) {
+    // Call superclass constructor
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/batsniperSheet.png'];
+    this.x = x;
+    this.y = y;
+    this.aboutToDieTime = 10;
+    
+    // 3 - Animate
+    this.frame = 4;
+    
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  update: function(evt) {
+    this.aboutToDieTime-=1;
+    if(this.aboutToDieTime%2==0){
+      this.visible=false;
+    }else this.visible=true;
+    if(this.aboutToDieTime<=0){
+      this.parentNode.removeChild(this);
+      delete this;
+    }
+  }
+});
+
 //BatSniper Generator
 var BatSniperGenerator = Class.create(Sprite, {
   // The windows that will create the batsnipers
@@ -155,7 +190,8 @@ var BatSniperGenerator = Class.create(Sprite, {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
-    
+
+    //controle vars
     this.x = x;
     this.y = y;
     //this.genpoint = x + (this.width/2);
@@ -174,6 +210,7 @@ var BatSniperGenerator = Class.create(Sprite, {
     this.modeMove = 'asc'; //asc ou desc
     this.moveLimit = lvlLim;
     
+    //level map loading
     this.batsniperEnemyMap = JSON.parse(JSON.stringify(lvlBatSniperEnemyMap));
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -187,6 +224,7 @@ var BatSniperGenerator = Class.create(Sprite, {
         this.createBatSniperTime -= 1;
         if (this.createBatSniperTime <= 0) {
           //console.log("creating batsniper");
+          this.y = this.batsniperEnemyMap[this.batsniperIdx][1];
           var batsniper = new BatSniperEnemy(this.x,this.y,this.batsniperIdx,this.level,this.batsnipers.length,this.moveLimit);
           this.batsnipers.push(batsniper);
           this.parentNode.batsniperGroup.addChild(batsniper);
@@ -230,7 +268,21 @@ var BatSniperGenerator = Class.create(Sprite, {
     }
   },
   
-  changeBatSniperEnemyMap: function(lvlBatSniperEnemyMap) {
+  loadNewLevel: function(lvlBatSniperEnemyMap,lvlLim,level) {
+    //reseting vars
+    this.batsnipers = [];
+    this.createBatSniperTime = 0;
+    this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
+    this.batsniperIdx = 0;
+    this.level = level;
+    
+    this.modeStart = false;
+    this.readyToFight = false;
+    this.defeated = false;
+    this.modeMove = 'asc';
+    this.moveLimit = lvlLim;
+    
+    //loading new map
     this.batsniperEnemyMap = JSON.parse(JSON.stringify(lvlBatSniperEnemyMap));
   }
 });

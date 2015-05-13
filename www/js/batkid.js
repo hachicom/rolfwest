@@ -26,6 +26,7 @@ var BatKidEnemy = Class.create(Sprite, {
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
+    this.health = 2;
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -47,6 +48,8 @@ var BatKidEnemy = Class.create(Sprite, {
       case 'shoot'  : playerObj.score+=50; break;
       case 'retreat': playerObj.score+=60; break;
     }
+    var batkidk = new BatkidKilled(this.x,this.y);
+    this.parentNode.parentNode.addChild(batkidk);
     this.parentNode.removeChild(this);
     delete this;
   },
@@ -149,6 +152,34 @@ var BatKidEnemy = Class.create(Sprite, {
         this.animationDuration -= this.animationSpeed;
       }
       /*END ANIMATION BLOCK*/
+    }
+  }
+});
+
+var BatkidKilled = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x,y) {
+    // Call superclass constructor
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/batkidSheet.png'];
+    this.x = x;
+    this.y = y;
+    this.aboutToDieTime = 10;
+    
+    // 3 - Animate
+    this.frame = 8;
+    
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  update: function(evt) {
+    this.aboutToDieTime-=1;
+    if(this.aboutToDieTime%2==0){
+      this.visible=false;
+    }else this.visible=true;
+    if(this.aboutToDieTime<=0){
+      this.parentNode.removeChild(this);
+      delete this;
     }
   }
 });

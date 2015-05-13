@@ -17,7 +17,7 @@ var Rolf = Class.create(Sprite, {
       this.bullets = 6;
       this.healthStartFrame = 3;
       this.health = this.healthStartFrame;
-      this.reload = false;
+      //this.reload = false;
       this.reloadTime = 0;
       this.vulnerableTime = 60;
       this.alive = true;
@@ -42,10 +42,10 @@ var Rolf = Class.create(Sprite, {
         if(this.reloadTime<=0){
           this.bullets+=1;
           if(this.bullets>=6){
-            this.reload = false;
+            //this.reload = false;
           }
           else{
-            this.reloadTime = 10;
+            this.reloadTime = 2;
           }
         }
       }
@@ -79,10 +79,17 @@ var Rolf = Class.create(Sprite, {
         }else this.visible=true;
         if(this.vulnerableTime<=0) this.visible=true;
       }
+      if(this.alive==false){
+        this.vulnerableTime-=1;
+        if(this.vulnerableTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.vulnerableTime<=0) this.visible=false;
+      }
       /*END ANIMATION BLOCK*/
       
       /*START MOVEMENT BLOCK*/
-      if(this.alive==true && this.winPose==false && this.shootTime<=0){
+      if(this.alive==true && this.movable==false){
         if(this.x<this.nextpos) {
           this.x+=this.movespeed;
           if(this.x>=this.nextpos) {
@@ -125,7 +132,8 @@ var Rolf = Class.create(Sprite, {
     this.moving = direction;
   },
   
-  moveTouch: function(evt){
+  moveTouch: function(distance){
+    game = Game.instance;  
     if(this.alive==true && this.winPose==false){
       if(this.moving==0){
         this.frame = 0 + this.health;
@@ -133,11 +141,13 @@ var Rolf = Class.create(Sprite, {
         this.iniFrame = 0 + this.health;
         this.endFrame = 1 + this.health;
       }
-      this.nextpos = evt.localX;
-      if (this.nextpos < this.x)//finger touched left side of hero
+      if (distance < 0)//finger dragged to left side of hero
         this.moving = -1;
-      else //finger touched right side of hero
+      else //finger dragged to right side of hero
         this.moving = 1;
+      this.x += distance;
+      if(this.x<0) this.x=0;
+      if(this.x>game.width-24) this.x=game.width-24;
       this.scaleX = this.moving;
     }
     //this.moving = direction;
@@ -152,10 +162,17 @@ var Rolf = Class.create(Sprite, {
       var s = new PlayerShot(this.x+9, this.y);
       this.parentNode.shotGroup.addChild(s);
       this.bullets-=1;
-      this.reloadTime = 20;
+      //this.reloadTime = 20;
       /* if(this.bullets<=0) {
         this.reload = true;
       } */
+    }
+  },
+  
+  reloadBullets: function(){
+    if(this.bullets<6 && this.alive==true && this.winPose==false){
+      //this.reload = true;
+      this.reloadTime=2;
     }
   },
   
@@ -219,8 +236,8 @@ var Rolf = Class.create(Sprite, {
         this.endFrame = 1 + this.health;
       }
       this.animationDuration = 0;
-      this.vulnerableTime = 90;
     }
+    this.vulnerableTime = 90;
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   
