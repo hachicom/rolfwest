@@ -72,18 +72,17 @@ window.onload = function() {
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
                'res/bulletSheet.png',
-               'res/Ice.png',
+               'res/fingerSheet.png',
                'res/IceFrag.png',
                'res/heart.png',
                'res/batSheet.png',
                'res/batkidSheet.png',
-               'res/yukiSheet.png',
-               'res/iglooSheet.png',
-               'res/mountain.png',
+               'res/batsniperSheet.png',
                'res/western1Sheet.png',
                'res/title.png',
                'res/dpad.png',
-               'res/actbtn.png',
+               'res/shootbtn.png',
+               'res/reloadbtn.png',
                'res/brackets.png',
                'res/pause.png',
                'res/sega16_0.png',
@@ -249,11 +248,8 @@ window.onload = function() {
       game = Game.instance;
       // 3 - Create child nodes
       // Background
-      bg = new Sprite(320,128);
-      bg.y = 200;
-      bg.scale(1,2);
-      bg.image = game.assets['res/mountain.png'];
       this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
+      
       map = new Map(32, 32);
       //map.y = 315;
       map.image = game.assets['res/western1Sheet.png'];
@@ -279,10 +275,10 @@ window.onload = function() {
       livesLabel.y = 12;
       this.livesLabel = livesLabel;
       
-      coinsLabel = new FontSprite('sega12', 96, 28, 'COIN_0');
-      coinsLabel.x = 136;
-      coinsLabel.y = 12;
-      this.coinsLabel = coinsLabel;
+      ammoLabel = new FontSprite('sega12', 96, 28, 'COIN_0');
+      ammoLabel.x = 136;
+      ammoLabel.y = 12;
+      this.ammoLabel = ammoLabel;
       
       levelLabel = new FontSprite('sega12', 80, 28, 'LEVEL_0');
       levelLabel.x = 268;
@@ -317,14 +313,21 @@ window.onload = function() {
       dpad.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
       this.dpad = dpad;
       
-      actBtn = new Sprite(100,156);
-      actBtn.x = 220;
-      actBtn.frame = 2;
-      actBtn.y = game.height - 156;
-      actBtn.opacity = 0.5;
-      actBtn.image = game.assets['res/actbtn.png'];       
-      actBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
-      this.actBtn = actBtn;
+      shootBtn = new Sprite(64,64);
+      shootBtn.x = 256;
+      shootBtn.y = game.height/2;
+      shootBtn.opacity = 0.5;
+      shootBtn.image = game.assets['res/shootbtn.png'];       
+      //shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
+      this.shootBtn = shootBtn;
+      
+      reloadBtn = new Sprite(64,64);
+      reloadBtn.x = 256;
+      reloadBtn.y = game.height/2 - 64;
+      reloadBtn.opacity = 0.5;
+      reloadBtn.image = game.assets['res/reloadbtn.png'];       
+      //reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
+      this.reloadBtn = reloadBtn;
       
       pauseBtn = new Sprite(64, 64);
       pauseBtn.image = game.assets['res/pause.png'];
@@ -399,7 +402,7 @@ window.onload = function() {
       this.addChild(batGroup);
       this.addChild(batkidGroup);
       this.addChild(gui);
-      this.addChild(coinsLabel);
+      this.addChild(ammoLabel);
       this.addChild(levelLabel);
       this.addChild(scoreLabel);
       this.addChild(msgLabel);
@@ -407,7 +410,8 @@ window.onload = function() {
       this.addChild(livesLabel);
       this.addChild(hiscoreLabel);
       this.addChild(dpad);
-      //this.addChild(actBtn);
+      this.addChild(shootBtn);
+      this.addChild(reloadBtn);
       this.addChild(pauseBtn);
       this.addChild(fpslabel);
             
@@ -478,7 +482,7 @@ window.onload = function() {
       if(!this.paused){
         if(this.startLevelMsg<=0){
           if(evt.localY >= 134 && evt.localY <= this.dpad.y) {
-            if(evt.localX >= game.width/2) {this.rolf.shoot();}
+            if(evt.localY >= game.height/2) {this.rolf.shoot();}
             else {this.rolf.reloadBullets();}
           }
         }
@@ -537,7 +541,7 @@ window.onload = function() {
           if(isAndroid) //this.bgm.stop();
             window.plugins.LowLatencyAudio.stop(currentBGM);
         }
-        game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
+        game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
       }
       
       if(hachiplayer.level>Object.keys(globalBatMap).length){
@@ -588,11 +592,11 @@ window.onload = function() {
         if(this.levelUpAt < 10) levelupstr = '0';
         
         this.scoreLabel.text = 'SCORE ' + hachiplayer.score;// + '_x' + this.multiplier;
-        this.coinsLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6' //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
+        this.ammoLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6'; //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
         this.levelLabel.text = 'LEVEL_  ' + hachiplayer.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
         this.livesLabel.text = 'ROLF_ ' + hachiplayer.lives;
         this.hiscoreLabel.text = 'TOP '+hiscore;
-        if(this.bonusMode == true) this.coinsLabel.text = 'BONUS_STAGE';
+        if(this.bonusMode == true) this.ammoLabel.text = 'BONUS_STAGE';
         
         if(this.gotHit!=true && this.endLevel!=true && this.bonusMode!=true){
           // Deal with start message        
@@ -734,7 +738,7 @@ window.onload = function() {
                 if( isAndroid ) {
                   if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                 }
-                game.replaceScene(new SceneGameOver(this.scoreLabel,this.coinsLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
+                game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
               }else{
                 this.rolf.resetPosition();
                 this.gotHit=false;
@@ -789,7 +793,7 @@ window.onload = function() {
     initialize: function(score,coin,level,life,hiscorelb,winGame) {
       var gameOverLabel, scoreLabel;
       Scene.apply(this);    
-      this.backgroundColor = '#000000';
+      this.backgroundColor = '#0000FF';
       this.winGame = winGame;
       
       // Background
@@ -813,32 +817,7 @@ window.onload = function() {
       gui.backgroundColor = '#000000';
       
       scoreLabel = score;
-      coinLabel = coin;
-      levelLabel = level;
-      livesLabel = life;
-      hiscoreLabel = hiscorelb;
             
-      bracket1 = new Sprite(5, 32);
-      bracket1.image = game.assets['res/brackets.png'];
-      bracket1.frame = 1;
-      bracket1.x = 93;
-      bracket1.y = 24;
-      
-      bracket2 = new Sprite(11, 32);
-      bracket2.image = game.assets['res/brackets.png'];
-      bracket2.x = 164;
-      bracket2.y = 24;
-      
-      bracket3 = new Sprite(11, 32);
-      bracket3.image = game.assets['res/brackets.png'];
-      bracket3.x = 257;
-      bracket3.y = 24;
-      
-      bracket4 = new Sprite(4, 32);
-      bracket4.image = game.assets['res/brackets.png'];
-      bracket4.x = 314;
-      bracket4.y = 24;
-      
       this.textbook = [
         glossary.text.gameoverHint1[language],
         glossary.text.gameoverHint2[language],
@@ -850,12 +829,16 @@ window.onload = function() {
       ];
             
       // Game Over label
-      if(winGame==1) gameovertxt = glossary.text.wingame1[language];
-      else if(winGame==2) gameovertxt = glossary.text.wingame2[language];
-      else gameovertxt = glossary.text.gameover[language]+"____"+this.textbook[getRandom(0,this.textbook.length-1)];
-      gameOverLabel = new FontSprite('sega12', 320, 320, gameovertxt);
+      gameOverLabel = new FontSprite('sega24', 320, 320, glossary.text.gameover[language]);
       gameOverLabel.x = 0;
       gameOverLabel.y = 140;
+      
+      if(winGame==1) gameovertxt = glossary.text.wingame1[language];
+      else if(winGame==2) gameovertxt = glossary.text.wingame2[language];
+      else gameovertxt = this.textbook[getRandom(0,this.textbook.length-1)];
+      hintLabel = new FontSprite('sega12', 320, 320, gameovertxt);
+      hintLabel.x = 0;
+      hintLabel.y = 170;
       
       this.timeToRestart = 0;
       
@@ -865,14 +848,7 @@ window.onload = function() {
       this.addChild(gui);
       this.addChild(gameOverLabel);
       this.addChild(scoreLabel);
-      this.addChild(coinLabel);
-      this.addChild(levelLabel);
-      this.addChild(livesLabel);
-      this.addChild(hiscoreLabel);
-      this.addChild(bracket1);
-      this.addChild(bracket2);
-      this.addChild(bracket3);
-      this.addChild(bracket4);
+      this.addChild(hintLabel);
       
       if(winGame>=1){
         this.backgroundColor = '#6844fc';
@@ -1036,23 +1012,22 @@ window.onload = function() {
   
   // SceneTutorial
   var SceneTutorial = Class.create(Scene, {
-    initialize: function(score) {
-      var TitleLabel, scoreLabel;
+    initialize: function() {
       Scene.apply(this);      
       this.backgroundColor = '#0000FF';
       
       /**
        * SCENE ANIMATION
-       * (0 frames) - finger moves up, next to dpad
-       * (30 frames) - finger moves left, and rolf moves along
-       * (60 frames) - finger moves right, and rolf moves along
-       * (90 frames) - finger stops, and rolf stops as well
-       * (110 frames) - finger press right side above dpad, rolf shoots
-       * (150 frames) - finger goes up
-       * (160 frames) - finger press right side above dpad, rolf shoots and reload message blinks
-       * (200 frames) - finger goes up
-       * (240 frames) - finger press left side above dpad, reload message disappears
-       * (280 frames) - animation ended, go to next screen
+       * pg0 (10 frames)  - finger moves up, next to dpad
+       * pg1 (30 frames)  - finger moves left, and rolf moves along
+       * pg2 (60 frames)  - finger moves right, and rolf moves along
+       * pg3 (90 frames)  - finger stops, and rolf stops as well
+       * pg4 (110 frames) - finger press right side above dpad, rolf shoots
+       * pg5 (130 frames) - finger goes up
+       * pg6 (160 frames) - finger press right side above dpad, rolf shoots and reload message blinks
+       * pg7 (180 frames) - finger goes up
+       * pg8 (220 frames) - finger press left side above dpad, reload message disappears
+       * pg9 (280 frames) - animation ended, go to next screen
        */
       
       this.sceneAnimationTime = 0;
@@ -1063,60 +1038,84 @@ window.onload = function() {
       dpad.x = 0;
       dpad.y = 300;
       dpad.image = game.assets['res/dpad.png'];       
-      this.spritesArr[0] = dpad; 
+      this.dpad = dpad; 
       
-      rolf = new Sprite(32,32);
+      rolf = new Sprite(24,24);
       rolf.x = 144;
       rolf.y = 220;
-      rolf.frame = [3,3,3,3,3,3,3,4,4,4,4,4,4,4];
       rolf.image = game.assets['res/rolfSheet.png'];
-      this.spritesArr[1] = snow;
+      rolf.frame = [3,3,3,3,3,3,3,4,4,4,4,4,4,4];
+      this.rolf = rolf;
       
-      finger = new Sprite(48,48);
-      finger.x = 260;
-      finger.y = 40;
-      finger.image = game.assets['res/Ice.png']; 
-      this.spritesArr[2] = finger;
-            
-      /* fish = new Sprite(24,24);
-      fish.x = 270;
-      fish.y = 110;
-      fish.frame = [0,0,0,0,0,0,0,1,1,1,1,1,1,1];
-      fish.image = game.assets['res/batSheet.png']; 
-      this.spritesArr[3] = fish;
+      shot = new Sprite(5,8);
+      shot.x = 153;
+      shot.y = 220;
+      shot.image = game.assets['res/bulletSheet.png'];
+      shot.frame = [0];
+      shot.visible = false;
+      this.shot = shot;
       
-      piranha = new Sprite(24,24);
-      piranha.x = 270;
-      piranha.y = 170;
-      piranha.frame = [0,0,0,0,0,0,0,1,1,1,1,1,1,1];
-      piranha.image = game.assets['res/batkidSheet.png'];
-      this.spritesArr[4] = piranha;
+      finger = new Sprite(32,32);
+      finger.x = 144;
+      finger.y = 420;
+      finger.frame = 0;
+      finger.image = game.assets['res/fingerSheet.png']; 
+      this.finger = finger;
       
-      yuki = new Sprite(32,32);
-      yuki.x = 192;
-      yuki.y = 400;
-      yuki.scaleX = -1;
-      yuki.frame = [1,1,1,1,1,1,1,2,2,2,2,2,2,2,2];
-      yuki.image = game.assets['res/yukiSheet.png']; 
-      this.spritesArr[5] = yuki; */
+      shootBtn = new Sprite(64,64);
+      shootBtn.x = 256;
+      shootBtn.y = rolf.y - 46;
+      //shootBtn.opacity = 0.5;
+      shootBtn.image = game.assets['res/shootbtn.png'];
+      this.shootBtn = shootBtn;
       
-      label = new FontSprite('sega12', 320, 440, '');
-      label.x = 0;
-      label.y = 8;
+      reloadBtn = new Sprite(64,64);
+      reloadBtn.x = 256;
+      reloadBtn.y = rolf.y - 110;
+      //reloadBtn.opacity = 0.5;
+      reloadBtn.image = game.assets['res/reloadbtn.png'];
+      this.reloadBtn = reloadBtn;
       
-      label.text = this.textbook[0];
-      this.labeltext = label;
-            
-      // Add labels  
-      //this.addChild(title);
-      //this.addChild(igloo);
-      //this.addChild(igloo2);
+      this.fingerAddX = 0;
+      this.fingerAddY = 0;
+      this.shotAddY = 0;
+      this.bullets = 2;
+      
+      titleLabel = new FontSprite('sega24', 320, 440, glossary.text.tutorialTitle[language]);
+      titleLabel.x = 32;
+      titleLabel.y = 8;
+      this.titleLabel = titleLabel;
+      
+      skipLabel = new FontSprite('sega24', 320, 440, glossary.text.tutorialSkip[language]);
+      skipLabel.x = 48;
+      skipLabel.y = game.height-100;
+      this.skipLabel = skipLabel;
+      
+      ammoLabel = new FontSprite('sega12', 96, 28, 'AMMO');
+      ammoLabel.x = 144;
+      ammoLabel.y = 32;
+      this.ammoLabel = ammoLabel;
+      
+      reloadLabel = new FontSprite('sega24', 256, 28, '');
+      reloadLabel.x = 32;
+      reloadLabel.y = 120;
+      this.reloadLabel = reloadLabel;
+      this.reloadLabelShow = true;
+      this.reloadLabelTime = 10;
+      
+      //label.text = this.textbook[0];
+      //this.labeltext = label;
+
+      this.addChild(shot);
       this.addChild(rolf);
       this.addChild(dpad);
+      this.addChild(shootBtn);
+      this.addChild(reloadBtn);
       this.addChild(finger);
-      this.addChild(fish);
-      this.addChild(piranha);
-      this.addChild(label);
+      this.addChild(titleLabel);
+      this.addChild(skipLabel);
+      this.addChild(ammoLabel);
+      this.addChild(reloadLabel);
       
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -1124,30 +1123,80 @@ window.onload = function() {
       this.addEventListener(Event.TOUCH_START, this.touchToStart);
     },
     
-    changePage: function(){
-      if(this.page == 0){
-        console.log('beh');
+    changePage: function(page){
+      this.page = page;
+      switch(this.page){
+        case 0: this.fingerAddX = 0; this.fingerAddY = -5; break;
+        case 1: this.fingerAddX = -2; this.fingerAddY = 0; this.finger.frame = 1; this.rolf.scaleX = -1; break;
+        case 2: this.fingerAddX = 2; this.fingerAddY = 0; this.rolf.scaleX = 1; break;
+        case 3: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; this.rolf.frame = 5; break;
+        case 4: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.finger.x = 280; this.finger.y = this.rolf.y - 32; this.createShot(); break;
+        case 5: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
+        case 6: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.createShot(); break;
+        case 7: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
+        case 8: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.bullets=6; this.finger.x = 280; this.finger.y = this.rolf.y - 96; break;
       }
+    },
+    
+    createShot: function(){
+      //var s = new PlayerShot(this.rolf.x+9, this.rolf.y);
+      //this.addChild(s);
+      this.bullets-=1;
+      this.shot.visible = true;
+      this.shotAddY=-20;
     },
     
     update: function(evt) {
       this.sceneAnimationTime += 1;
       switch(this.sceneAnimationTime){
-        case 30:  this.page = 1; break;
-        case 60:  this.page = 2; break; 
-        case 90:  this.page = 3; break; 
-        case 110: this.page = 4; break;
-        case 150: this.page = 5; break;
-        case 160: this.page = 6; break;
-        case 200: this.page = 7; break;
-        case 240: this.page = 8; break;
+        case 10:  this.changePage(0); break;
+        case 30:  this.changePage(1); break;
+        case 60:  this.changePage(2); break; 
+        case 90:  this.changePage(3); break; 
+        case 110: this.changePage(4); break;
+        case 130: this.changePage(5); break;
+        case 160: this.changePage(6); break;
+        case 180: this.changePage(7); break;
+        case 220: this.changePage(8); break;
         case 280: 
           if( isAndroid ) {
             //if(soundOn && endingstatus==2)//ending.stop();
             if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
           }
-          game.replaceScene(new SceneTitle());
+          game.replaceScene(new SceneGame());
         break;
+      }
+      
+      this.ammoLabel.text = glossary.text.municao[language]+'_' + this.bullets + '/6';
+      
+      //movement update
+      this.finger.x += this.fingerAddX;
+      this.finger.y += this.fingerAddY;
+      this.rolf.x += this.fingerAddX;
+      this.shot.y += this.shotAddY;
+      if(this.shot.y<=0) {
+        this.shotAddY = 0;
+        this.shot.visible = false;
+        this.shot.y = this.rolf.y;
+      }
+      
+      //reload gun message
+      if(this.bullets <= 0){
+        this.reloadLabelTime-=1;
+        if(this.reloadLabelTime <= 0) 
+          if (this.reloadLabelShow){
+            this.reloadLabelShow = false;
+            this.reloadLabel.text = glossary.text.alertaReload[language];
+            this.reloadLabelTime = 10;
+          } else {
+            this.reloadLabelShow = true;
+            this.reloadLabel.text = '';
+            this.reloadLabelTime = 10;
+          }
+      }else {
+        this.reloadLabel.text = '';
+        this.reloadLabelShow = true;
+        this.reloadLabelTime = 10;
       }
     },
 
@@ -1157,7 +1206,7 @@ window.onload = function() {
         //if(soundOn && endingstatus==2)//ending.stop();
         if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
       }
-      game.replaceScene(new SceneTitle());
+      game.replaceScene(new SceneGame());
     }
   });
   
@@ -1338,19 +1387,19 @@ window.onload = function() {
         }/* else{
           if(soundOn) game.assets['res/intro.mp3'].stop();
         } */
-        game.replaceScene(new SceneGame());
-      });
-      
-      tutorialLabel = new FontSprite('sega24', 192, 24, glossary.UI.tutorial[language]);
-      tutorialLabel.x = 64;
-      tutorialLabel.y = 304;
-      tutorialLabel.addEventListener(Event.TOUCH_START, function(e){
         game.replaceScene(new SceneTutorial());
       });
       
+      // tutorialLabel = new FontSprite('sega24', 192, 24, glossary.UI.tutorial[language]);
+      // tutorialLabel.x = 64;
+      // tutorialLabel.y = 304;
+      // tutorialLabel.addEventListener(Event.TOUCH_START, function(e){
+        // game.replaceScene(new SceneTutorial());
+      // });
+      
       optionLabel = new FontSprite('sega24', 160, 24, glossary.UI.settings[language]);
       optionLabel.x = 64;
-      optionLabel.y = 344;
+      optionLabel.y = 304;
       optionLabel.addEventListener(Event.TOUCH_START, function(e){
         if( isAndroid ) {
           //if(soundOn && introstatus==2)intro.stop();
@@ -1363,7 +1412,7 @@ window.onload = function() {
       
       creditLabel = new FontSprite('sega24', 160, 24, glossary.UI.credits[language]);
       creditLabel.x = 64;
-      creditLabel.y = 384;
+      creditLabel.y = 344;
       creditLabel.addEventListener(Event.TOUCH_START, function(e){
         game.replaceScene(new SceneCredits());
       });
@@ -1388,7 +1437,7 @@ window.onload = function() {
       this.addChild(copyright);
       this.addChild(TitleLabel); 
       this.addChild(PressStart);
-      this.addChild(tutorialLabel);
+      //this.addChild(tutorialLabel);
       this.addChild(optionLabel);
       this.addChild(creditLabel);
       // this.addChild(scoreLabel);

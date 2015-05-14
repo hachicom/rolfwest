@@ -21,8 +21,8 @@ var glossary = {
       en_US: '[CREDITS]'
     },
     optionsTxt :{ //glossary.UI.optionsTxt[language]
-      pt_BR: '  ==CONFIGURAÇÔES==__SOM & BGM_____REGIÃO/REGION_____RESETAR HISCORE',
-      en_US: '  ==OPTIONS MENU==__SFX & BGM_____REGIÃO/REGION_____RESET HISCORE'
+      pt_BR: '  *MENU DE OPÇÕES*__SOM & BGM_____REGIÃO/REGION_____RESETAR HISCORE',
+      en_US: '  *SETTINGS MENU*__SFX & BGM_____REGIÃO/REGION_____RESET HISCORE'
     },
     sim :{ //glossary.UI.sim[language]
       pt_BR: '[SIM]',
@@ -50,6 +50,14 @@ var glossary = {
     }
 	},
   text: {
+    tutorialTitle: { //glossary.text.tutorialTitle[language]
+      pt_BR: '   *COMO JOGAR*',
+      en_US: '   *HOW TO PLAY*'
+    },
+    tutorialSkip: { //glossary.text.tutorialSkip[language]
+      pt_BR: 'TOQUE PARA PULAR',
+      en_US: '  TAP TO SKIP'
+    },
 		tutorialPg1: { //glossary.text.tutorialPg1[language]
       pt_BR: '  ==COMO JOGAR==__'
             +'Snow & Yuki é_um jogo estilo_Game & Watch_(minigame)!__'
