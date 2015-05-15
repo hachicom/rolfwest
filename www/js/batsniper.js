@@ -334,7 +334,7 @@ var BatSniperGenerator = Class.create(Sprite, {
     }
   },
   
-  loadNewLevel: function(lvlBatSniperEnemyMap,lvlLim,level) {
+  loadNewLevel: function(lvlBatSniperEnemyMap,level) {
     //reseting vars
     this.batsnipers = [];
     this.createBatSniperTime = 0;
