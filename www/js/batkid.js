@@ -187,7 +187,7 @@ var BatkidKilled = Class.create(Sprite, {
 //BatKid Generator
 var BatKidGenerator = Class.create(Sprite, {
   // The windows that will create the batkids
-  initialize: function(x,y,lvlBatKidEnemyMap,lvlLim,level) {
+  initialize: function(x,y,lvlBatKidEnemyMap,level) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
@@ -271,7 +271,7 @@ var BatKidGenerator = Class.create(Sprite, {
     }
   },
   
-  loadNewLevel: function(lvlBatKidEnemyMap,lvlLim,level) {
+  loadNewLevel: function(lvlBatKidEnemyMap,level) {
     //reseting vars
     this.batkids = [];
     this.createBatKidTime = 0;
