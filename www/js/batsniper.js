@@ -212,7 +212,7 @@ var BatsniperKilled = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
   initialize: function(x,y) {
     // Call superclass constructor
-    Sprite.apply(this,[24, 24]);
+    Sprite.apply(this,[32, 32]);
     this.image  = Game.instance.assets['res/batsniperSheet.png'];
     this.x = x;
     this.y = y;
@@ -346,7 +346,6 @@ var BatSniperGenerator = Class.create(Sprite, {
     this.readyToFight = false;
     this.defeated = false;
     this.modeMove = 'asc';
-    this.moveLimit = lvlLim;
     
     //loading new map
     parsedMap = JSON.parse(JSON.stringify(lvlBatSniperEnemyMap));
