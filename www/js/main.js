@@ -66,9 +66,10 @@ enchant();
 window.onload = function() {
   //console.log(screen.width+"X"+screen.height);
   var gameheight = (320 * screen.height)/screen.width;
+  //alert(gameheight);
   // 3 - Starting point
-	var game = new Core(320, gameheight);
-	//var game = new Core(320, 480);
+	//var game = new Core(320, gameheight);
+	var game = new Core(320, 569);
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
                'res/bulletSheet.png',
@@ -250,11 +251,17 @@ window.onload = function() {
       // Background
       this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
       
-      map = new Map(32, 32);
+      lvlMap = new Map(32, 32);
       //map.y = 315;
-      map.image = game.assets['res/western1Sheet.png'];
-      map.loadData(globalTileMap['stage'+hachiplayer.level]);
-      this.lvlMap = map;
+      lvlMap.image = game.assets['res/western1Sheet.png'];
+      lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
+      this.lvlMap = lvlMap;
+      
+      lvlFrontLayer = new Map(32, 32);
+      //map.y = 315;
+      lvlFrontLayer.image = game.assets['res/western1Sheet.png'];
+      lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
+      this.lvlFrontLayer = lvlFrontLayer;
             
       // GUI
       gui = new Sprite(320,38);
@@ -303,9 +310,9 @@ window.onload = function() {
       this.reloadLabelShow = true;
       this.reloadLabelTime = 10;
       
-      dpad = new Sprite(320,156);
+      dpad = new Sprite(320,64);
       dpad.x = 0;
-      dpad.y = game.height - 156;
+      dpad.y = game.height - 64;
       dpad.opacity = 0.5;
       dpad.image = game.assets['res/dpad.png'];       
       dpad.addEventListener(Event.TOUCH_START,this.handleTouchStartControl);
@@ -314,16 +321,16 @@ window.onload = function() {
       this.dpad = dpad;
       
       shootBtn = new Sprite(64,64);
-      shootBtn.x = 256;
-      shootBtn.y = game.height/2;
+      shootBtn.x = game.width - 64;
+      shootBtn.y = game.height - 128;
       shootBtn.opacity = 0.5;
       shootBtn.image = game.assets['res/shootbtn.png'];       
       //shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       this.shootBtn = shootBtn;
       
       reloadBtn = new Sprite(64,64);
-      reloadBtn.x = 256;
-      reloadBtn.y = game.height/2 - 64;
+      reloadBtn.x = 0;
+      reloadBtn.y = game.height - 128;
       reloadBtn.opacity = 0.5;
       reloadBtn.image = game.assets['res/reloadbtn.png'];       
       //reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
@@ -341,10 +348,12 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(0,280,globalBatMap.stage1,1);
+      batGenerator = new BatGenerator(0,280,globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batGenerator = batGenerator;
-      batkidGenerator = new BatKidGenerator(138,136,globalBatKidMap.stage1,globalBatKidMap.stage1Lim,1);
+      batkidGenerator = new BatKidGenerator(138,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batkidGenerator = batkidGenerator;
+      batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
+      this.batsniperGenerator = batsniperGenerator;
       
       /* yuki = new Yuki(272,288,levelUpAt);
       this.yuki = yuki; */
@@ -352,9 +361,13 @@ window.onload = function() {
       // Bats group
       batGroup = new Group();
       this.batGroup = batGroup;
-      // Fish group
+      // Batkids group
       batkidGroup = new Group();
       this.batkidGroup = batkidGroup;
+      //Batsnipers group
+      batsniperGroup = new Group();
+      this.batsniperGroup = batsniperGroup;
+      
       // Player Shots group
       shotGroup = new Group();
       this.shotGroup = shotGroup;
@@ -393,14 +406,17 @@ window.onload = function() {
       
       // 4 - Add child nodes
       // this.addChild(bg);
-      this.addChild(map);
+      this.addChild(lvlMap);
+      this.addChild(batGenerator);
+      this.addChild(batkidGenerator);
+      this.addChild(batsniperGenerator);
+      this.addChild(batGroup);
+      this.addChild(batkidGroup);
+      this.addChild(batsniperGroup);
+      this.addChild(lvlFrontLayer);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
       this.addChild(rolf);
-      this.addChild(batGenerator);
-      this.addChild(batkidGenerator);
-      this.addChild(batGroup);
-      this.addChild(batkidGroup);
       this.addChild(gui);
       this.addChild(ammoLabel);
       this.addChild(levelLabel);
@@ -482,7 +498,7 @@ window.onload = function() {
       if(!this.paused){
         if(this.startLevelMsg<=0){
           if(evt.localY >= 134 && evt.localY <= this.dpad.y) {
-            if(evt.localY >= game.height/2) {this.rolf.shoot();}
+            if(evt.localX >= game.width/2) {this.rolf.shoot();}
             else {this.rolf.reloadBullets();}
           }
         }
@@ -558,6 +574,7 @@ window.onload = function() {
         // Reload tilemaps and bgcolor
         this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
         this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
+        this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
         
         // Reset Stage Variables      
         this.startLevelMsg = 60;
@@ -573,7 +590,8 @@ window.onload = function() {
         
         // Reload Enemy Generators
         this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
-        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],globalBatKidMap['stage'+hachiplayer.level+'Lim'],hachiplayer.level);
+        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
+        this.batsniperGenerator.loadNewLevel(globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       }
     },
     
@@ -657,7 +675,7 @@ window.onload = function() {
                   break;
                 }
               }
-                            
+
               //BATKIDS
               for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
                 var batkid;
@@ -671,6 +689,23 @@ window.onload = function() {
                   } */
                   this.shotGroup.removeChild(shot);
                   batkid.gotHit(hachiplayer); //if the batkid shot is the last one, batkidGenerator will be defeated
+                  break;
+                }
+              }
+
+              //BATSNIPERS
+              for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
+                var batsniper;
+                batsniper = this.batsniperGroup.childNodes[j];
+                if (shot.within(batsniper,14)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  this.shotGroup.removeChild(shot);
+                  batsniper.gotHit(hachiplayer); //if the batsniper shot is the last one, batkidGenerator will be defeated
                   break;
                 }
               }
@@ -721,7 +756,7 @@ window.onload = function() {
               }
             }
             
-            if(this.batGenerator.defeated && this.batkidGenerator.defeated){ //if all enemy generators were defeated
+            if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ //if all enemy generators were defeated
               this.endLevel = true;
             }
             
@@ -1034,7 +1069,7 @@ window.onload = function() {
       // this.page = 0;
       // this.textbook = [glossary.text.tutorialPg1[language],glossary.text.tutorialPg2[language],glossary.text.tutorialPg3[language]];
       this.spritesArr = [];
-      dpad = new Sprite(320,156);
+      dpad = new Sprite(320,64);
       dpad.x = 0;
       dpad.y = 300;
       dpad.image = game.assets['res/dpad.png'];       
@@ -1057,21 +1092,21 @@ window.onload = function() {
       
       finger = new Sprite(32,32);
       finger.x = 144;
-      finger.y = 420;
+      finger.y = 440;
       finger.frame = 0;
       finger.image = game.assets['res/fingerSheet.png']; 
       this.finger = finger;
       
       shootBtn = new Sprite(64,64);
-      shootBtn.x = 256;
-      shootBtn.y = rolf.y - 46;
+      shootBtn.x = game.width - 64;
+      shootBtn.y = dpad.y - 64;
       //shootBtn.opacity = 0.5;
       shootBtn.image = game.assets['res/shootbtn.png'];
       this.shootBtn = shootBtn;
       
       reloadBtn = new Sprite(64,64);
-      reloadBtn.x = 256;
-      reloadBtn.y = rolf.y - 110;
+      reloadBtn.x = 0;
+      reloadBtn.y = dpad.y - 64;
       //reloadBtn.opacity = 0.5;
       reloadBtn.image = game.assets['res/reloadbtn.png'];
       this.reloadBtn = reloadBtn;
@@ -1130,11 +1165,11 @@ window.onload = function() {
         case 1: this.fingerAddX = -2; this.fingerAddY = 0; this.finger.frame = 1; this.rolf.scaleX = -1; break;
         case 2: this.fingerAddX = 2; this.fingerAddY = 0; this.rolf.scaleX = 1; break;
         case 3: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; this.rolf.frame = 5; break;
-        case 4: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.finger.x = 280; this.finger.y = this.rolf.y - 32; this.createShot(); break;
+        case 4: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.finger.x = this.shootBtn.x + 20; this.finger.y = this.shootBtn.y + 32; this.createShot(); break;
         case 5: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
         case 6: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.createShot(); break;
         case 7: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
-        case 8: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.bullets=6; this.finger.x = 280; this.finger.y = this.rolf.y - 96; break;
+        case 8: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.bullets=6; this.finger.x = this.reloadBtn.x + 20; ; this.finger.y = this.reloadBtn.y + 32; break;
       }
     },
     
@@ -1155,8 +1190,8 @@ window.onload = function() {
         case 90:  this.changePage(3); break; 
         case 110: this.changePage(4); break;
         case 130: this.changePage(5); break;
-        case 160: this.changePage(6); break;
-        case 180: this.changePage(7); break;
+        case 150: this.changePage(6); break;
+        case 170: this.changePage(7); break;
         case 220: this.changePage(8); break;
         case 280: 
           if( isAndroid ) {

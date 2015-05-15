@@ -46,7 +46,7 @@ var BatKidEnemy = Class.create(Sprite, {
       case 'idle'   : playerObj.score+=30; break;
       case 'fly'    : playerObj.score+=40; break;
       case 'shoot'  : playerObj.score+=50; break;
-      case 'retreat': playerObj.score+=60; break;
+      case 'retreat': playerObj.score+=80; break;
     }
     var batkidk = new BatkidKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batkidk);
@@ -209,10 +209,11 @@ var BatKidGenerator = Class.create(Sprite, {
     this.readyToFight = false;
     this.defeated = false;
     this.modeMove = 'asc'; //asc ou desc
-    this.moveLimit = lvlLim;
     
     //level map loading
-    this.batkidEnemyMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
+    parsedMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
+    this.batkidEnemyMap = parsedMap.startAt;
+    this.moveLimit = parsedMap.limit;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -234,6 +235,7 @@ var BatKidGenerator = Class.create(Sprite, {
           this.batkidIdx+=1;
           if(this.batkidIdx >= this.batkidEnemyMap.length){
             this.readyToFight = true;
+            this.parentNode.batsniperGenerator.modeStart = true;
           }
           //console.dir(this.parentNode.batkidGroup);
         }
@@ -284,6 +286,8 @@ var BatKidGenerator = Class.create(Sprite, {
     this.moveLimit = lvlLim;
     
     //loading new map
-    this.batkidEnemyMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
+    parsedMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
+    this.batkidEnemyMap = parsedMap.startAt;
+    this.moveLimit = parsedMap.limit;
   }
 });
