@@ -283,7 +283,6 @@ var BatKidGenerator = Class.create(Sprite, {
     this.readyToFight = false;
     this.defeated = false;
     this.modeMove = 'asc';
-    this.moveLimit = lvlLim;
     
     //loading new map
     parsedMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
