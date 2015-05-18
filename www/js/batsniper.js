@@ -48,7 +48,8 @@ var BatSniperEnemy = Class.create(Sprite, {
   
   isHidden: function() {
     if(this.hideoutStart==0 && this.hideoutEnd==0) return false; //there's no place to hide in this stage
-    if(this.x>this.hideoutStart && (this.x+32)<this.hideoutEnd) return true; //is behind hideout
+    if(this.mode=='start' || this.mode=='hiding') return true; //is behind hideout
+    else if(this.x>this.hideoutStart && (this.x+32)<this.hideoutEnd) return true; //is behind hideout
     else return false; //is exposed
   },
   
@@ -74,7 +75,9 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.iniFrame = 4;
         this.endFrame = 4;
       }
+      return true;
     }
+    else return false;
   },
   
   setTarget: function(batqty) {
@@ -91,9 +94,8 @@ var BatSniperEnemy = Class.create(Sprite, {
       this.mode = 'shoot';
       this.bullets = 3 + addBullet*2;
     }else if(this.hp<=0) {
-      this.shootTime = 2;
-      this.mode = 'shoot';
-      this.bullets = 7;
+      this.startTime = 20;
+      this.mode = 'hiding';
     }
     //this.moveSpeed = 6;
     //this.direction = findAngle(this.x,this.y,this.parentNode.parentNode.rolf.x,this.parentNode.parentNode.rolf.y);
@@ -134,19 +136,6 @@ var BatSniperEnemy = Class.create(Sprite, {
           }
         }
       }
-      if(this.mode == 'fly'){
-        //movement
-        this.x += this.moveSpeed * Math.cos(this.direction);
-        this.y += this.moveSpeed * Math.sin(this.direction);
-        if(this.y >= 220){
-          this.mode = 'shoot';
-          this.shootTime = 10;
-          this.bullets = 3;
-          this.moveSpeed = 2;
-          this.y = 220;
-          //this.x = this.nextposX;
-        }
-      }
       if(this.mode == 'shoot'){
         //shoot at player
         this.shootTime-=1;
@@ -168,15 +157,38 @@ var BatSniperEnemy = Class.create(Sprite, {
          this.mode = 'idle';
          if(this.isHidden()) this.y=this.originY;        
         }
+      }      
+      if(this.mode == 'hiding'){
+        this.startTime-=1;
+        if(this.startTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.startTime<=0){
+          this.visible = true;
+          this.bullets = 5;
+          this.shootTime = 2;
+          this.y = 248;
+          this.x = -32;
+          this.moveSpeed = 8;
+          this.mode = 'fly';
+        }
       }
-      if(this.mode == 'retreat'){
-        this.direction = findAngle(this.x,this.y,this.nextposX,this.originY);
-        this.x += this.moveSpeed * Math.cos(this.direction);
-        this.y += this.moveSpeed * Math.sin(this.direction);
-        if(this.nextposY >= this.y){
-          this.mode = 'idle';
-          this.y = this.nextposY;
-          this.x = this.nextposX;
+      if(this.mode == 'fly'){
+        //movement
+        this.x += this.moveSpeed;
+        this.shootTime-=1;
+        if(this.bullets>=0 && this.shootTime<=0){
+          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
+          this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.bullets-=1;
+          this.shootTime = 12;
+        }
+        if(this.x >= game.width){
+          this.startTime = 30;
+          this.moveSpeed = 2;
+          this.mode = 'start';
+          this.x = this.originX;
+          this.y = this.originY;
         }
       }
       if(this.gotHitTime>0){

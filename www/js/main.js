@@ -1,4 +1,4 @@
-var version = '0.2.0';
+var version = '0.3.0';
 
 var hiscore = 10000;
 var paused = false;
@@ -285,6 +285,7 @@ window.onload = function() {
       ammoLabel = new FontSprite('sega12', 96, 28, 'COIN_0');
       ammoLabel.x = 136;
       ammoLabel.y = 12;
+      //ammoLabel.scale(2,2);
       this.ammoLabel = ammoLabel;
       
       levelLabel = new FontSprite('sega12', 80, 28, 'LEVEL_0');
@@ -310,10 +311,10 @@ window.onload = function() {
       this.reloadLabelShow = true;
       this.reloadLabelTime = 10;
       
-      dpad = new Sprite(320,64);
+      dpad = new Sprite(256,128);
       dpad.x = 0;
-      dpad.y = game.height - 64;
-      dpad.opacity = 0.5;
+      dpad.y = game.height - 128;
+      dpad.opacity = 0.8;
       dpad.image = game.assets['res/dpad.png'];       
       dpad.addEventListener(Event.TOUCH_START,this.handleTouchStartControl);
       dpad.addEventListener(Event.TOUCH_MOVE,this.handleTouchMoveControl);
@@ -322,18 +323,18 @@ window.onload = function() {
       
       shootBtn = new Sprite(64,64);
       shootBtn.x = game.width - 64;
-      shootBtn.y = game.height - 128;
-      shootBtn.opacity = 0.5;
+      shootBtn.y = game.height - 64;
+      shootBtn.opacity = 0.8;
       shootBtn.image = game.assets['res/shootbtn.png'];       
-      //shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
+      shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       this.shootBtn = shootBtn;
       
       reloadBtn = new Sprite(64,64);
-      reloadBtn.x = 0;
+      reloadBtn.x = game.width - 64;
       reloadBtn.y = game.height - 128;
-      reloadBtn.opacity = 0.5;
+      reloadBtn.opacity = 0.8;
       reloadBtn.image = game.assets['res/reloadbtn.png'];       
-      //reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
+      reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
       this.reloadBtn = reloadBtn;
       
       pauseBtn = new Sprite(64, 64);
@@ -350,7 +351,7 @@ window.onload = function() {
       // Enemy Generators
       batGenerator = new BatGenerator(0,280,globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batGenerator = batGenerator;
-      batkidGenerator = new BatKidGenerator(138,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
+      batkidGenerator = new BatKidGenerator(96,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batkidGenerator = batkidGenerator;
       batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batsniperGenerator = batsniperGenerator;
@@ -431,7 +432,7 @@ window.onload = function() {
       this.addChild(pauseBtn);
       this.addChild(fpslabel);
             
-      this.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
+      // this.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       // this.addEventListener(Event.TOUCH_MOVE,this.handleTouchMoveControl);
       // this.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
       // Update
@@ -467,8 +468,8 @@ window.onload = function() {
           //this.parentNode.hiscoreLabel.text = evt.localX;
         }
       }
-      evt.stopPropagation();
-      evt.preventDefault();
+      // evt.stopPropagation();
+      // evt.preventDefault();
     },
     
     handleTouchMoveControl: function (evt) {
@@ -481,30 +482,36 @@ window.onload = function() {
           //this.parentNode.hiscoreLabel.text = distance;
         }
       }
-      evt.stopPropagation();
-      evt.preventDefault();
+      // evt.stopPropagation();
+      // evt.preventDefault();
     },
     
     handleTouchEndControl: function (evt) {
       this.parentNode.rolf.stopMove();
       hachiplayer.padtouched = false;
       
-      evt.stopPropagation();
-      evt.preventDefault();
+      // evt.stopPropagation();
+      // evt.preventDefault();
     },
     
     handleTouchShootControl: function (evt) {
-      var playSnd;
-      if(!this.paused){
-        if(this.startLevelMsg<=0){
-          if(evt.localY >= 134 && evt.localY <= this.dpad.y) {
-            if(evt.localX >= game.width/2) {this.rolf.shoot();}
-            else {this.rolf.reloadBullets();}
-          }
+      if(!this.parentNode.paused){
+        if(this.parentNode.startLevelMsg<=0){
+          this.parentNode.rolf.shoot();
         }
       }
-      evt.stopPropagation();
-      evt.preventDefault();
+      // evt.stopPropagation();
+      // evt.preventDefault();
+    },
+    
+    handleTouchReloadControl: function (evt) {
+      if(!this.parentNode.paused){
+        if(this.parentNode.startLevelMsg<=0){
+          this.parentNode.rolf.reloadBullets();
+        }
+      }
+      // evt.stopPropagation();
+      // evt.preventDefault();
     },
     
     setScore: function (value,multi) {
@@ -704,8 +711,8 @@ window.onload = function() {
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  this.shotGroup.removeChild(shot);
-                  batsniper.gotHit(hachiplayer); //if the batsniper shot is the last one, batkidGenerator will be defeated
+                  var ks = batsniper.gotHit(hachiplayer); //if the batsniper shot is the last one, batkidGenerator will be defeated
+                  if(ks) this.shotGroup.removeChild(shot);
                   break;
                 }
               }
@@ -787,6 +794,7 @@ window.onload = function() {
         //Término da fase: conta os pontos e passa para o próximo level
         if(this.endLevel==true){
           this.msgLabel.text = '   ROUND CLEAR!';
+          this.reloadLabel.text = '';
           this.endLevelDuration += 1; 
           this.rolf.wonStage();
           if(this.endLevelDuration >= 90){

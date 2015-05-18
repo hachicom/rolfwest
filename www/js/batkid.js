@@ -123,7 +123,7 @@ var BatKidEnemy = Class.create(Sprite, {
         //shoot at player
         this.shootTime-=1;
         if(this.bullets>0 && this.shootTime<=0){
-          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'batkid');
+          var s = new EnemyShot(this.x+12, this.y+12, this.parentNode.parentNode.rolf, this.level, 'batkid');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           if(this.bullets<=0){

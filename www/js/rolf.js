@@ -145,7 +145,7 @@ var Rolf = Class.create(Sprite, {
         this.moving = -1;
       else //finger dragged to right side of hero
         this.moving = 1;
-      this.x += distance;
+      this.x += distance + (distance * 0.89);
       if(this.x<0) this.x=0;
       if(this.x>game.width-24) this.x=game.width-24;
       this.scaleX = this.moving;
