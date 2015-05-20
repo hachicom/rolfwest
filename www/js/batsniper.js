@@ -166,10 +166,10 @@ var BatSniperEnemy = Class.create(Sprite, {
         if(this.startTime<=0){
           this.visible = true;
           this.bullets = 5;
-          this.shootTime = 2;
+          this.shootTime = 16;
           this.y = 248;
           this.x = -32;
-          this.moveSpeed = 8;
+          this.moveSpeed = 5;
           this.mode = 'fly';
         }
       }
@@ -181,7 +181,7 @@ var BatSniperEnemy = Class.create(Sprite, {
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
-          this.shootTime = 12;
+          this.shootTime = 16;
         }
         if(this.x >= game.width){
           this.startTime = 30;

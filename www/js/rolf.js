@@ -104,7 +104,8 @@ var Rolf = Class.create(Sprite, {
           }
         }
       }
-      /* if(this.alive==true && this.winPose==false){
+      //COMMENT NEXT 10 LINES TO ENABLE VIRTUAL DPAD MOVEMENT
+      if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
           this.x-=5;
           if (this.x<0) this.x=0;
@@ -113,7 +114,7 @@ var Rolf = Class.create(Sprite, {
           this.x+=5;
           if (this.x>game.width-this.width) this.x=game.width-this.width;
         }
-      } */
+      }
       /*END MOVEMENT BLOCK*/
       //console.log(this.vulnerableTime+' '+this.alive+' '+this.health);
     }

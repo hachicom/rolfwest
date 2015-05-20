@@ -47,6 +47,14 @@ var glossary = {
     fim :{ //glossary.UI.fim[language]
       pt_BR: '[  FIM  ]',
       en_US: '[  END  ]'
+    },
+    continuar :{ //glossary.UI.continuar[language]
+      pt_BR: '[CONTINUAR]',
+      en_US: '[RESUME]'
+    },
+    sair :{ //glossary.UI.sair[language]
+      pt_BR: '[SAIR]',
+      en_US: '[QUIT]'
     }
 	},
   text: {

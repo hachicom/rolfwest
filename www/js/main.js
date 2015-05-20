@@ -233,7 +233,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(1);
+  var hachiplayer = new Hachiplayer(1,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -249,7 +249,7 @@ window.onload = function() {
       game = Game.instance;
       // 3 - Create child nodes
       // Background
-      this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
+      this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
       
       lvlMap = new Map(32, 32);
       //map.y = 315;
@@ -311,7 +311,7 @@ window.onload = function() {
       this.reloadLabelShow = true;
       this.reloadLabelTime = 10;
       
-      dpad = new Sprite(256,128);
+      dpad = new Sprite(200,128);
       dpad.x = 0;
       dpad.y = game.height - 128;
       dpad.opacity = 0.8;
@@ -343,6 +343,10 @@ window.onload = function() {
       pauseBtn.y = 70;
       pauseBtn.opacity = 0.6;
       pauseBtn.addEventListener(Event.TOUCH_START,this.pauseGame);
+      
+      pausewin = new PauseWindow(80,200);
+      pausewin.setVisibility(false);
+      this.pausewin = pausewin;
       
       // Hero
       rolf = new Rolf(145,360);
@@ -431,6 +435,7 @@ window.onload = function() {
       this.addChild(reloadBtn);
       this.addChild(pauseBtn);
       this.addChild(fpslabel);
+      this.addChild(pausewin);
             
       // this.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       // this.addEventListener(Event.TOUCH_MOVE,this.handleTouchMoveControl);
@@ -442,6 +447,7 @@ window.onload = function() {
     pauseGame: function (evt) {
       if(this.parentNode.paused == false) {
         this.parentNode.paused = true;
+        this.parentNode.pausewin.setVisibility(true);
         if( isAndroid ) {
           if(soundOn) //this.parentNode.bgm.pause();
             window.plugins.LowLatencyAudio.stop(currentBGM);
@@ -449,12 +455,13 @@ window.onload = function() {
         }
       }else {
         this.parentNode.paused = false;
+        this.parentNode.pausewin.setVisibility(false);
         if( isAndroid ) {
           if(soundOn) //this.parentNode.bgm.play();
             window.plugins.LowLatencyAudio.loop(currentBGM);
         }
       }
-      paused = this.parentNode.paused;
+      //paused = this.parentNode.paused;
       // this.parentNode.batGenerator.defeated = true;
       // this.parentNode.batkidGenerator.defeated = true;
     },
@@ -465,7 +472,8 @@ window.onload = function() {
         if(this.parentNode.startLevelMsg<=0){
           hachiplayer.controlx = evt.localX;
           hachiplayer.padtouched = true;
-          //this.parentNode.hiscoreLabel.text = evt.localX;
+          if(evt.x > this.width/2) this.parentNode.rolf.move(1);
+          else this.parentNode.rolf.move(-1);
         }
       }
       // evt.stopPropagation();
@@ -477,9 +485,10 @@ window.onload = function() {
       if(!this.parentNode.paused){
         if(this.parentNode.startLevelMsg<=0){
           var distance = evt.localX - hachiplayer.controlx;
-          this.parentNode.rolf.moveTouch(distance);//move the hero
+          //this.parentNode.rolf.moveTouch(distance);//move the hero by dragging
           hachiplayer.controlx = evt.localX;
-          //this.parentNode.hiscoreLabel.text = distance;
+          if(evt.x > this.width/2) this.parentNode.rolf.move(1);
+          else this.parentNode.rolf.move(-1);
         }
       }
       // evt.stopPropagation();
@@ -540,11 +549,16 @@ window.onload = function() {
       this.hearts = this.hearts + value;
     },
     
+    goToTitleScreen: function (value) {
+      hachiplayer.reset();
+      game.replaceScene(new SceneTitle(0));
+    },
+    
     incLevelUp: function(){
-      hachiplayer.level += 1;
-      if(hachiplayer.level%7==0){
-        this.sabbath++;
-        this.bonusMode = true;
+      hachiplayer.levelUp(1);
+      /* if(hachiplayer.level%4==0){
+        //this.sabbath++;
+        //this.bonusMode = true;
         
         //deal with music change
         if( soundOn ) {
@@ -553,11 +567,8 @@ window.onload = function() {
             currentBGM = 'bonus';
             window.plugins.LowLatencyAudio.loop(currentBGM);            
           }
-          /* this.bgm.stop();
-          this.bgm = bonus;
-          this.bgm.play(); */
         }
-      }
+      } */
       if (hachiplayer.level == 35) this.winGame = 1;
       if (this.winGame == 2) {
         if( soundOn ) {
@@ -579,7 +590,7 @@ window.onload = function() {
          ****  LOADING NEXT LEVEL  ****
          ******************************/
         // Reload tilemaps and bgcolor
-        this.backgroundColor = globalBgColor['stage'+hachiplayer.level];
+        this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
         this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
         this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
         
@@ -627,7 +638,7 @@ window.onload = function() {
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
-            this.msgLabel.text = '    ROUND '+ hachiplayer.level;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            this.msgLabel.text = '    WORLD '+ hachiplayer.world + '-' + hachiplayer.round;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
             
             /* Starts enemy generators: First is the bat generator.
              * After finishing creation, it will call batkid generator
@@ -670,7 +681,7 @@ window.onload = function() {
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.intersect(bat,14)){
+                if (shot.within(bat,14)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -704,7 +715,7 @@ window.onload = function() {
               for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
                 var batsniper;
                 batsniper = this.batsniperGroup.childNodes[j];
-                if (shot.within(batsniper,14)){
+                if (shot.intersect(batsniper,16)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -825,7 +836,7 @@ window.onload = function() {
           }, 5);
         } */
       }else{
-        this.fpslabel.text = 'PAUSE';
+        //this.fpslabel.text = 'PAUSE';
       }
       
     }
@@ -1077,7 +1088,7 @@ window.onload = function() {
       // this.page = 0;
       // this.textbook = [glossary.text.tutorialPg1[language],glossary.text.tutorialPg2[language],glossary.text.tutorialPg3[language]];
       this.spritesArr = [];
-      dpad = new Sprite(320,64);
+      dpad = new Sprite(200,128);
       dpad.x = 0;
       dpad.y = 300;
       dpad.image = game.assets['res/dpad.png'];       
@@ -1099,22 +1110,22 @@ window.onload = function() {
       this.shot = shot;
       
       finger = new Sprite(32,32);
-      finger.x = 144;
-      finger.y = 440;
+      finger.x = dpad.width/2;
+      finger.y = 460;
       finger.frame = 0;
       finger.image = game.assets['res/fingerSheet.png']; 
       this.finger = finger;
       
       shootBtn = new Sprite(64,64);
       shootBtn.x = game.width - 64;
-      shootBtn.y = dpad.y - 64;
+      shootBtn.y = dpad.y + 64;
       //shootBtn.opacity = 0.5;
       shootBtn.image = game.assets['res/shootbtn.png'];
       this.shootBtn = shootBtn;
       
       reloadBtn = new Sprite(64,64);
-      reloadBtn.x = 0;
-      reloadBtn.y = dpad.y - 64;
+      reloadBtn.x = game.width - 64;
+      reloadBtn.y = dpad.y;
       //reloadBtn.opacity = 0.5;
       reloadBtn.image = game.assets['res/reloadbtn.png'];
       this.reloadBtn = reloadBtn;
@@ -1170,8 +1181,8 @@ window.onload = function() {
       this.page = page;
       switch(this.page){
         case 0: this.fingerAddX = 0; this.fingerAddY = -5; break;
-        case 1: this.fingerAddX = -2; this.fingerAddY = 0; this.finger.frame = 1; this.rolf.scaleX = -1; break;
-        case 2: this.fingerAddX = 2; this.fingerAddY = 0; this.rolf.scaleX = 1; break;
+        case 1: this.fingerAddX =-2; this.finger.x = this.dpad.x + 60; this.fingerAddY = 0; this.finger.frame = 1; this.rolf.scaleX = -1; break;
+        case 2: this.fingerAddX = 2; this.finger.x = this.dpad.x + 130; this.fingerAddY = 0; this.rolf.scaleX = 1; break;
         case 3: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; this.rolf.frame = 5; break;
         case 4: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.finger.x = this.shootBtn.x + 20; this.finger.y = this.shootBtn.y + 32; this.createShot(); break;
         case 5: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
@@ -1213,7 +1224,7 @@ window.onload = function() {
       this.ammoLabel.text = glossary.text.municao[language]+'_' + this.bullets + '/6';
       
       //movement update
-      this.finger.x += this.fingerAddX;
+      //this.finger.x += this.fingerAddX;
       this.finger.y += this.fingerAddY;
       this.rolf.x += this.fingerAddX;
       this.shot.y += this.shotAddY;
