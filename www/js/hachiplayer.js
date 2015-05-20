@@ -7,7 +7,10 @@ var Hachiplayer = Class.create({
     this.levellimit = levellimit;
     this.world = Math.ceil((level/levellimit));
     this.round = level%levellimit;
-    if (this.world<1) this.world = 1;
+    if (this.round<=0) {
+      //this.world += 1;
+      this.round = levellimit;
+    }
     this.controlx = 0;
     this.padtouched = false;
   },
@@ -25,5 +28,9 @@ var Hachiplayer = Class.create({
     this.level += incVal;
     this.world = Math.ceil((this.level/this.levellimit));
     this.round = this.level%this.levellimit;
+    if (this.round<=0) {
+      //this.world += 1;
+      this.round = this.levellimit;
+    }
   }
 });
