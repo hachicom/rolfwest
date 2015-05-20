@@ -23,7 +23,7 @@ var Hachiplayer = Class.create({
   
   levelUp: function(incVal) {
     this.level += incVal;
-    this.world = Math.ceil((level/levellimit));
-    this.round = level%levellimit;
+    this.world = Math.ceil((this.level/this.levellimit));
+    this.round = this.level%this.levellimit;
   }
 });
