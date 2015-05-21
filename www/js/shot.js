@@ -38,7 +38,7 @@ var PlayerShot = Class.create(Shot, {
     this.angle = Math.atan2(-1, 0); //shooting up (Ytarget-Ystart,Xtarget-Xstart)
     Shot.call(this, x, y, this.angle);
     this.frame = 0;
-    this.moveSpeed = 20;
+    this.moveSpeed = 10;
   }
 });
 

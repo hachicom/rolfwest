@@ -50,6 +50,12 @@ var BatKidEnemy = Class.create(Sprite, {
     }
     var batkidk = new BatkidKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batkidk);
+    
+    var coinchance = getRandom(1,3);
+    if(coinchance == 2){
+      var coin = new CoinItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(coin);
+    }
     this.parentNode.removeChild(this);
     delete this;
   },
@@ -212,8 +218,10 @@ var BatKidGenerator = Class.create(Sprite, {
     
     //level map loading
     parsedMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
-    this.batkidEnemyMap = parsedMap.startAt;
-    this.moveLimit = parsedMap.limit;
+    if(Object.keys(parsedMap).length>0){
+      this.batkidEnemyMap = parsedMap.startAt;
+      this.moveLimit = parsedMap.limit;
+    }else this.defeated = true;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -286,7 +294,9 @@ var BatKidGenerator = Class.create(Sprite, {
     
     //loading new map
     parsedMap = JSON.parse(JSON.stringify(lvlBatKidEnemyMap));
-    this.batkidEnemyMap = parsedMap.startAt;
-    this.moveLimit = parsedMap.limit;
+    if(Object.keys(parsedMap).length>0){
+      this.batkidEnemyMap = parsedMap.startAt;
+      this.moveLimit = parsedMap.limit;
+    }else this.defeated = true;
   }
 });

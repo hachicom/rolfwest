@@ -1,84 +1,112 @@
-// Fish
-var Fish = Class.create(Sprite, {
-  // The obstacle that the penguin must avoid
-  initialize: function(lane,level,piranha) {
+// Item Class
+var Item = Class.create(Sprite, {
+  initialize: function(x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed){
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
-    this.piranha = piranha;
-    if(this.piranha){
-      this.image  = Game.instance.assets['res/piranhaSheet.png'];
-      this.ySpeed = 20;
-      this.rotationTime = 0;
-      this.yAccel = 0.5;
-    }else{
-      this.image  = Game.instance.assets['res/fishSheet.png'];
-      this.ySpeed = 21;
-      this.rotationTime = 2;
-      this.yAccel = 0.7;
-    }
-    this.frame = 0;  
-    this.rotationSpeed = 0;
+    this.image = game.assets['res/itemSheet.png'];
+    this.x = x;
+    this.y = y;
+    this.direction = direction;
+    this.moveSpeed = movespeed;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.xAccel = xAccel;
+    this.yAccel = yAccel;
+    
+    // Animate
+    this.frame = 0;
+    this.iniFrame = iniframe;
+    this.endFrame = endframe;
     this.animationDuration = 0;
-    this.ascending = true;
-    this.setLane(lane);
+    this.animationSpeed = animationSpeed;
+    this.idleTime=0;
+    
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  setLane: function(lane) {
-    var game, distance;
-    game = Game.instance;        
-    distance = 70;
-   
-    this.rotationSpeed = 50;
-   
-    this.x = game.width/2 - this.width/2 + (lane - 1) * distance;
-    this.y = 569;    
-    this.rotation = Math.floor( Math.random() * 360 );
+  update: function(){
+    var game;
+    game = Game.instance;
+    
+    if (!this.parentNode.parentNode.paused){//todo item deve pertencer ao grupo correspondente (Item Group)
+      /*START MOVEMENT BLOCK*/
+      this.x += this.moveSpeed * Math.cos(this.direction);
+      this.y += this.moveSpeed * Math.sin(this.direction);
+    
+      if(this.y > game.height || this.x > game.width || this.x < -this.width || this.y < -this.height){
+        this.remove();
+      }
+      this.ySpeed += this.yAccel;
+      this.xSpeed += this.xAccel;
+      this.y += this.ySpeed;
+      this.x += this.xSpeed;
+      /*END MOVEMENT BLOCK*/
+      
+      /*START ANIMATION BLOCK*/
+      this.animationDuration += 0.05;    
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
+      }
+      /*END ANIMATION BLOCK*/
+    }
   },
   
-  update: function(evt) {
-    //IMKORTANTE: � preciso que este objeto seja parte de um grupo filho da scene
+  remove: function(){
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
+// HatItem class
+var HatItem = Class.create(Item, {
+  // Succeeds bullet class
+  initialize: function(x, y){
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
+    Item.call(this, x, y, 0, 0, 2, -20, 0, 2, 0, 0, 0);
+    this.frame = 0;
+    this.itemId = 'hat';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
     if (!this.parentNode.parentNode.paused){
-      var ySpeed, game;
-     
-      game = Game.instance;
-      level = this.parentNode.parentNode.levelcalc;
-     
-      if(this.parentNode.parentNode.gotHit!=true && this.parentNode.parentNode.buying!=true){
-        //Dealing with movement
-        if(this.ascending){
-          this.ySpeed -= this.yAccel;
-          this.y -= this.ySpeed;
-          if (this.ySpeed <= 0) this.ascending = false;
-        }else{
-          this.rotationTime -= evt.elapsed * (level+1) * 0.001;
-          if(this.rotationTime <= 0){
-            this.ySpeed += this.yAccel;
-            this.y += this.ySpeed;
-            if (this.y > game.height && this.ascending===false) {
-              if(this.parentNode.parentNode.coins != this.parentNode.parentNode.levelUpAt) 
-                this.parentNode.parentNode.multiplier=1;  
-              this.parentNode.removeChild(this);           
-            }
-          }
-        }
-        
-        //Dealing with animation
-        if(this.rotationTime <= 0 && !this.ascending){
-          this.rotation = 270;
-        }else{
-          if(this.ascending) {
-            if(this.piranha) this.rotation += this.rotationSpeed;
-            else this.rotation = 90;
-          }
-          else this.rotation += this.rotationSpeed;
-        }
-        this.animationDuration += evt.elapsed * 0.001;       
-        if (this.animationDuration >= 1) {
-          this.frame = (this.frame + 1) % 2;
-          this.animationDuration -= 1;
-        }
+      if(this.y >= 360){
+        this.y = 360;
+        this.xSpeed = 0;
       }
     }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    hero.incHealth(playerObj);
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
+// CoinItem class
+var CoinItem = Class.create(Item, {
+  // Succeeds bullet class
+  initialize: function(x, y, playerSprite, level, author){
+    Item.call(this, x, y, 0, 0, 0, 3, 0, 0, 0, 0, 0.25);
+    this.frame = 0;
+    this.itemId = 'coin';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
+    if (!this.parentNode.parentNode.paused){
+      if(this.y >= 360){
+        this.y = 360;
+      }
+    }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    playerObj.score+=100;
+    this.parentNode.removeChild(this);
+    delete this;
   }
 });

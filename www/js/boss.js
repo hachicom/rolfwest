@@ -1,5 +1,5 @@
-// BatSniper Enemy
-var BatSniperEnemy = Class.create(Sprite, {
+// Bosses
+/* var MadBatBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
   initialize: function(x,y,xTarget,level,batsniperGenKey,moveLimit,moveHideout) {
     // Call superclass constructor
@@ -64,7 +64,7 @@ var BatSniperEnemy = Class.create(Sprite, {
       this.hp-=1;
       if(this.hp<0){
         this.parentNode.parentNode.batsniperGenerator.rearrangeBatSnipers(this.batsniperGenKey);
-        var batsniperk = new BatsniperKilled(this.x,this.y);
+        var batsniperk = new BossKilled(this.x,this.y);
         this.parentNode.parentNode.addChild(batsniperk);
         this.parentNode.removeChild(this);
         delete this;
@@ -208,19 +208,19 @@ var BatSniperEnemy = Class.create(Sprite, {
         }
       }
       
-      /*START ANIMATION BLOCK*/
+      //START ANIMATION BLOCK//
       this.animationDuration += 0.05;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
         this.animationDuration -= this.animationSpeed;
       }
-      /*END ANIMATION BLOCK*/
+      //END ANIMATION BLOCK//
     }
   }
 });
 
-var BatsniperKilled = Class.create(Sprite, {
+var BossKilled = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
   initialize: function(x,y) {
     // Call superclass constructor
@@ -246,110 +246,4 @@ var BatsniperKilled = Class.create(Sprite, {
       delete this;
     }
   }
-});
-
-//BatSniper Generator
-var BatSniperGenerator = Class.create(Sprite, {
-  // The windows that will create the batsnipers
-  initialize: function(x,y,lvlBatSniperEnemyMap,level) {
-    // Call superclass constructor
-    Sprite.apply(this,[32, 32]);
-    //this.image  = Game.instance.assets['res/Ice.png'];      
-
-    //controle vars
-    this.x = x;
-    this.y = y;
-    //this.genpoint = x + (this.width/2);
-    this.batsnipers = [];
-    this.createBatSniperTime = 10;
-    //this.createBatSniperSide = getRandom(0,1); //0=on the same position; 1=on the other side;
-    this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
-    this.batsniperIdx = 0;
-    //this.batsniperIdy = 0;
-    this.level = level;
-    
-    //movement vars
-    this.modeStart = false;
-    this.readyToFight = false;
-    this.defeated = false;
-    this.modeMove = 'asc'; //asc ou desc
-    
-    //level map loading
-    parsedMap = JSON.parse(JSON.stringify(lvlBatSniperEnemyMap));
-    if(Object.keys(parsedMap).length>0){
-      this.batsniperEnemyMap = parsedMap.startAt;
-      this.moveLimit = parsedMap.limit;
-      this.moveHideout = parsedMap.hideout;
-    }else this.defeated = true;
-    
-    this.addEventListener(Event.ENTER_FRAME, this.update);
-  },
-  
-  update: function(evt) { 
-    var game = Game.instance;
-    if (!this.parentNode.paused && this.modeStart && !this.defeated){
-      //console.log(this.parentNode.batsniperGroup.childNodes.length);
-      if (this.batsniperIdx < this.batsniperEnemyMap.length){
-        this.createBatSniperTime -= 1;
-        if (this.createBatSniperTime <= 0) {
-          //console.log("creating batsnipers");
-          for(var j=0; j<this.batsniperEnemyMap.length; j++){
-            this.x = this.batsniperEnemyMap[this.batsniperIdx][0];
-            this.y = this.batsniperEnemyMap[this.batsniperIdx][1];
-            var batsniper = new BatSniperEnemy(this.x,this.y,this.batsniperIdx,this.level,this.batsnipers.length,this.moveLimit,this.moveHideout);
-            this.batsnipers.push(batsniper);
-            this.parentNode.batsniperGroup.addChild(batsniper);
-            this.createBatSniperTime = 8;
-            this.createBatSniperSide = getRandom(0,1);
-            this.batsniperIdx+=1;
-            if(this.batsniperIdx >= this.batsniperEnemyMap.length){
-              this.readyToFight = true;
-            }
-          }
-          //console.dir(this.parentNode.batsniperGroup);
-        }
-      }else{
-        if(!this.parentNode.gotHit){
-          this.sendBatSniperTime-=1;
-          if(this.sendBatSniperTime<=0 && this.batsnipers.length>0){
-            var idbatsniper = getRandom(1,this.batsnipers.length) - 1;
-            if(this.batsnipers[idbatsniper].mode == 'idle') {
-              this.batsnipers[idbatsniper].setTarget(this.parentNode.batGenerator.bats.length);
-              this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
-            }
-          }
-        }
-      }
-    }
-  },
-  
-  rearrangeBatSnipers: function(batsniperGenKey) {
-    this.batsnipers.splice(batsniperGenKey,1);
-    if(this.batsnipers.length<=0) this.defeated = true;
-    for(var i=batsniperGenKey; i<this.batsnipers.length; i++){
-      this.batsnipers[i].batsniperGenKey-=1;
-    }
-  },
-  
-  loadNewLevel: function(lvlBatSniperEnemyMap,level) {
-    //reseting vars
-    this.batsnipers = [];
-    this.createBatSniperTime = 0;
-    this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
-    this.batsniperIdx = 0;
-    this.level = level;
-    
-    this.modeStart = false;
-    this.readyToFight = false;
-    this.defeated = false;
-    this.modeMove = 'asc';
-    
-    //loading new map
-    parsedMap = JSON.parse(JSON.stringify(lvlBatSniperEnemyMap));
-    if(Object.keys(parsedMap).length>0){
-      this.batsniperEnemyMap = parsedMap.startAt;
-      this.moveLimit = parsedMap.limit;
-      this.moveHideout = parsedMap.hideout;
-    }else this.defeated = true;
-  }
-});
+}); */

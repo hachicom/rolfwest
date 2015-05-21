@@ -49,9 +49,6 @@ var globalBatKidMap = {
 
 var globalBatSniperMap = {
   stage1: {
-    startAt: [[64,64],[224,64]],
-    limit: [32,256],
-    hideout: [96,224]
   },
   stage2: {
     startAt: [[64,96],[224,96]],

@@ -242,15 +242,11 @@ var Rolf = Class.create(Sprite, {
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   
-  shopping: function(){     
-    if(this.lane==2){
-      //this.tl.moveTo(252, this.y, 200, enchant.Easing.QUAD_EASEINOUT).then(function(){
-        // this.frame = 4;
-        // this.iniFrame = 4;
-        // this.endFrame = 4;
-      //});
-      this.nextpos = 252;
-      this.movespeed = 5;
+  incHealth: function(playerObj){     
+    this.health += this.healthStartFrame;
+    if(this.health>=this.healthMax) {
+      this.health=this.healthMax;
+      playerObj.lives+=1;
     }
   },
   

@@ -74,8 +74,7 @@ window.onload = function() {
 	game.preload('res/rolfSheet.png',
                'res/bulletSheet.png',
                'res/fingerSheet.png',
-               'res/IceFrag.png',
-               'res/heart.png',
+               'res/itemSheet.png',
                'res/batSheet.png',
                'res/batkidSheet.png',
                'res/batsniperSheet.png',
@@ -380,6 +379,9 @@ window.onload = function() {
       evilShotGroup = new Group();
       this.evilShotGroup = evilShotGroup;
       
+      itemGroup = new Group();
+      this.itemGroup = itemGroup;
+      
       // Player Instance
       this.hachiplayer = hachiplayer;
       
@@ -421,6 +423,7 @@ window.onload = function() {
       this.addChild(lvlFrontLayer);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
+      this.addChild(itemGroup);      
       this.addChild(rolf);
       this.addChild(gui);
       this.addChild(ammoLabel);
@@ -770,6 +773,16 @@ window.onload = function() {
                   if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                   //this.bgm.stop();
                 }
+                break;
+              }
+            }
+            
+            /*==== PLAYER vs ITEMS ====*/
+            for (var i = this.itemGroup.childNodes.length - 1; i >= 0; i--) {
+              var item;
+              item = this.itemGroup.childNodes[i];
+              if (item.within(this.rolf,16) && this.rolf.isVulnerable()){
+                item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
                 break;
               }
             }
