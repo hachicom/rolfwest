@@ -113,8 +113,7 @@ var CoinItem = Class.create(Item, {
   
   gotHit: function(playerObj,hero) {
     playerObj.score+=50;
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });
 
