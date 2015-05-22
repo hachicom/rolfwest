@@ -17,6 +17,7 @@ var Rolf = Class.create(Sprite, {
       this.bullets = 6;
       this.healthStartFrame = 3;
       this.health = this.healthStartFrame;
+      this.healthMax = 6;
       //this.reload = false;
       this.reloadTime = 0;
       this.vulnerableTime = 60;
@@ -160,8 +161,15 @@ var Rolf = Class.create(Sprite, {
       this.animationDuration = 0;
       shotGroup = this.parentNode.shotGroup;
       //this.reload = false;
-      var s = new PlayerShot(this.x+9, this.y);
-      this.parentNode.shotGroup.addChild(s);
+      if(this.health>3){
+        var s1 = new PlayerShot(this.x+6, this.y);
+        var s2 = new PlayerShot(this.x+12, this.y);
+        this.parentNode.shotGroup.addChild(s1);
+        this.parentNode.shotGroup.addChild(s2);
+      }else{
+        var s = new PlayerShot(this.x+9, this.y);
+        this.parentNode.shotGroup.addChild(s);
+      }
       this.bullets-=1;
       //this.reloadTime = 20;
       /* if(this.bullets<=0) {
@@ -189,9 +197,9 @@ var Rolf = Class.create(Sprite, {
   },
   
   wonStage: function(){
-    this.frame = 7;
-    this.iniFrame = 7;
-    this.endFrame = 7;
+    //this.frame = 7;
+    //this.iniFrame = 7;
+    //this.endFrame = 7;
     this.animationDuration = 0;
     this.winPose = true;
   },
@@ -223,9 +231,9 @@ var Rolf = Class.create(Sprite, {
     this.health-=this.healthStartFrame;    
     if(this.health<0) {
       this.alive = false;
-      this.frame = 6;
-      this.iniFrame = 6;
-      this.endFrame = 6;
+      this.frame = 9;
+      this.iniFrame = 9;
+      this.endFrame = 9;
     }else{
       if(this.moving == 0){
         this.frame = 2 + this.health;
@@ -244,9 +252,20 @@ var Rolf = Class.create(Sprite, {
   
   incHealth: function(playerObj){     
     this.health += this.healthStartFrame;
-    if(this.health>=this.healthMax) {
+    if(this.health>this.healthMax) {
       this.health=this.healthMax;
       playerObj.lives+=1;
+    }else{
+      if(this.moving == 0){
+        this.frame = 2 + this.health;
+        this.iniFrame = 2 + this.health;
+        this.endFrame = 2 + this.health;    
+      } else {      
+        this.frame = 0 + this.health;
+        this.iniFrame = 0 + this.health;
+        this.endFrame = 1 + this.health;
+      }
+      this.animationDuration = 0;
     }
   },
   

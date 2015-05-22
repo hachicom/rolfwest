@@ -56,16 +56,23 @@ var BatSniperEnemy = Class.create(Sprite, {
   gotHit: function(playerObj) {
     if (!this.isHidden() || this.mode=='shoot' || this.mode=='offguard'){
       switch(this.mode){
-        case 'idle'   : playerObj.score+=20; break;
-        case 'shoot'  : playerObj.score+=70; break;
-        case 'fly'    : playerObj.score+=60; break;
-        case 'crazy'  : playerObj.score+=200; break;
+        case 'idle'    : playerObj.score+=20; break;
+        case 'shoot'   : playerObj.score+=70; break;
+        case 'offguard': playerObj.score+=500; break;
+        case 'fly'     : playerObj.score+=200; break;
       }
       this.hp-=1;
       if(this.hp<0){
         this.parentNode.parentNode.batsniperGenerator.rearrangeBatSnipers(this.batsniperGenKey);
         var batsniperk = new BatsniperKilled(this.x,this.y);
         this.parentNode.parentNode.addChild(batsniperk);
+    
+        var coinchance = getRandom(1,2);
+        if(coinchance == 2){
+          var diamond = new DiamondItem(this.x,this.y);
+          this.parentNode.parentNode.itemGroup.addChild(diamond);
+        }
+        
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -73,7 +80,12 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
-        this.endFrame = 4;
+        this.endFrame = 4;        
+    
+        if(this.hp == 0){
+          var hat = new HatItem(this.x,this.y);
+          this.parentNode.parentNode.itemGroup.addChild(hat);
+        }
       }
       return true;
     }

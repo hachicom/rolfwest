@@ -52,9 +52,12 @@ var BatKidEnemy = Class.create(Sprite, {
     this.parentNode.parentNode.addChild(batkidk);
     
     var coinchance = getRandom(1,3);
-    if(coinchance == 2){
-      var coin = new CoinItem(this.x,this.y);
-      this.parentNode.parentNode.itemGroup.addChild(coin);
+    if(coinchance == 3){
+      var bars = new GoldBarsItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(bars);
+    }else if(coinchance == 2){
+      var cup = new GoldCupItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(cup);
     }
     this.parentNode.removeChild(this);
     delete this;

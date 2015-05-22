@@ -1,4 +1,4 @@
-var version = '0.3.0';
+var version = '0.4.0';
 
 var hiscore = 10000;
 var paused = false;
@@ -72,6 +72,7 @@ window.onload = function() {
 	var game = new Core(320, 569);
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
+               'res/melodySheet.png',
                'res/bulletSheet.png',
                'res/fingerSheet.png',
                'res/itemSheet.png',
@@ -232,7 +233,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(1,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(2,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -298,7 +299,7 @@ window.onload = function() {
       this.fpslabel = fpslabel;
       //END GUI BLOCK
       
-      msgLabel = new FontSprite('sega24', 256, 28, 'SHOOT ALL BANDITS!');
+      msgLabel = new FontSprite('sega24', 256, 28, '');
       msgLabel.x = 32;
       msgLabel.y = 140;
       this.msgLabel = msgLabel;
@@ -360,8 +361,8 @@ window.onload = function() {
       batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batsniperGenerator = batsniperGenerator;
       
-      /* yuki = new Yuki(272,288,levelUpAt);
-      this.yuki = yuki; */
+      /* melody = new Melody(272,288,levelUpAt);
+      this.melody = melody; */
       
       // Bats group
       batGroup = new Group();
@@ -547,7 +548,7 @@ window.onload = function() {
     setCoins: function (value) {
       hachiplayer.coins = hachiplayer.coins + value;
       //this.igloo.turnLights(hachiplayer.coins);
-      //this.yuki.smile(hachiplayer.coins);
+      //this.melody.smile(hachiplayer.coins);
     },
     
     setHearts: function (value) {
@@ -602,27 +603,28 @@ window.onload = function() {
         /******************************
          ****  LOADING NEXT LEVEL  ****
          ******************************/
+        game.replaceScene(new SceneInterlude());
         // Reload tilemaps and bgcolor
-        this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
-        this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
-        this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
+        // this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
+        // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
+        // this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
         
-        // Reset Stage Variables      
-        this.startLevelMsg = 60;
-        this.gotHit = false;
-        this.hitDuration = 0;
-        this.endLevel = false;
-        this.endLevelDuration = 0; 
-        this.bonusMode = false;
-        this.bonusDuration = 0;
+        //Reset Stage Variables      
+        // this.startLevelMsg = 60;
+        // this.gotHit = false;
+        // this.hitDuration = 0;
+        // this.endLevel = false;
+        // this.endLevelDuration = 0; 
+        // this.bonusMode = false;
+        // this.bonusDuration = 0;
         
-        // Reset Hero Position
-        this.rolf.resetPosition();
+        //Reset Hero Position
+        // this.rolf.resetPosition();
         
-        // Reload Enemy Generators
-        this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
-        this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
-        this.batsniperGenerator.loadNewLevel(globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
+        //Reload Enemy Generators
+        // this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
+        // this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
+        // this.batsniperGenerator.loadNewLevel(globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       }
     },
     
@@ -651,7 +653,7 @@ window.onload = function() {
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
-            this.msgLabel.text = '    WORLD '+ hachiplayer.world + '-' + hachiplayer.round;// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
+            this.msgLabel.text = '      READY!';// +'_'+ glossary.text.colete[language] + this.levelUpAt + glossary.text.peixes[language];
             
             /* Starts enemy generators: First is the bat generator.
              * After finishing creation, it will call batkid generator
@@ -796,7 +798,7 @@ window.onload = function() {
             for (var i = this.itemGroup.childNodes.length - 1; i >= 0; i--) {
               var item;
               item = this.itemGroup.childNodes[i];
-              if (item.within(this.rolf,16) && this.rolf.isVulnerable()){
+              if (item.within(this.rolf,16)){
                 item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
                 break;
               }
@@ -866,135 +868,78 @@ window.onload = function() {
     }
   });
   
+  // SceneInterlude
+  var SceneInterlude = Class.create(Scene, {
+    initialize: function() {
+      var TitleLabel, scoreLabel;
+      Scene.apply(this);
+      //this.backgroundColor = '#0026FF';
+      
+      // Background
+      // title = new Sprite(256,160);
+      // title.x = 32;
+      // title.y = 32;
+      // title.image = game.assets['res/title.png'];      
+      this.backgroundColor = '#0000FF';
+      this.timeToStart = 120;
+      
+      label = new FontSprite('sega24', 320, 60, '');
+      label.x = 80;
+      label.y = 72;
+      
+      label.text = ' WORLD '+ hachiplayer.world + '-' + hachiplayer.round;
+            
+      // this.addChild(map);
+      // this.addChild(igloo);
+      // this.addChild(igloo2);
+      // this.addChild(snow);
+      // this.addChild(melody);
+      this.addChild(label);
+      
+      // Listen for taps
+      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+    },
+    
+    update: function(evt) {
+      this.timeToStart -= 1;
+      if(this.timeToStart<=0)
+        game.replaceScene(new SceneGame());
+    },
+    
+    touchToStart: function(evt) {
+      var game = Game.instance;
+      game.replaceScene(new SceneGame());
+    }
+  });
+  
   // SceneGameOver  
   var SceneGameOver = Class.create(Scene, {
-    initialize: function(score,coin,level,life,hiscorelb,winGame) {
+    initialize: function() {
       var gameOverLabel, scoreLabel;
       Scene.apply(this);    
       this.backgroundColor = '#0000FF';
-      this.winGame = winGame;
+      this.timeToStart = 120;
       
-      // Background
-      bg = new Sprite(320,128);
-      bg.y = 193;
-      //bg.scale(2,2);
-      //bg.image = game.assets['res/mountain.png'];
-      //map = new Map(32, 32);
-      //map.image = game.assets['res/western1Sheet.png'];
+      label = new FontSprite('sega24', 320, 60, '');
+      label.x = 80;
+      label.y = 72;
       
-      if(winGame>=1){
-        //map.loadData(arrMap2Top,arrMap2Sub);
-        //map.y = 16;
-      }//else map.loadData(arrMap1Top,arrMap1Sub);
-      
-      playerData.scoretable.hiscore = hiscore;
-      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
-      
-      // UI labels
-      gui = new Sprite(320,56);
-      gui.backgroundColor = '#000000';
-      
-      scoreLabel = score;
+      label.text = glossary.text.gameover[language]+'_FINAL SCORE: '+hachiplayer.score;
             
-      this.textbook = [
-        glossary.text.gameoverHint1[language],
-        glossary.text.gameoverHint2[language],
-        glossary.text.gameoverHint3[language],
-        glossary.text.gameoverHint4[language],
-        glossary.text.gameoverHint5[language],
-        glossary.text.gameoverHint6[language],
-        glossary.text.gameoverHint7[language]
-      ];
-            
-      // Game Over label
-      gameOverLabel = new FontSprite('sega24', 320, 320, glossary.text.gameover[language]);
-      gameOverLabel.x = 0;
-      gameOverLabel.y = 140;
-      
-      if(winGame==1) gameovertxt = glossary.text.wingame1[language];
-      else if(winGame==2) gameovertxt = glossary.text.wingame2[language];
-      else gameovertxt = this.textbook[getRandom(0,this.textbook.length-1)];
-      hintLabel = new FontSprite('sega12', 320, 320, gameovertxt);
-      hintLabel.x = 0;
-      hintLabel.y = 170;
-      
-      this.timeToRestart = 0;
-      
-      // Add labels
-      //this.addChild(bg);
-      //if(winGame>=1)this.addChild(map);
-      this.addChild(gui);
-      this.addChild(gameOverLabel);
-      this.addChild(scoreLabel);
-      this.addChild(hintLabel);
-      
-      if(winGame>=1){
-        this.backgroundColor = '#6844fc';
-        heart = new Sprite(32,32);
-        heart.x = 144;
-        heart.y = 240;
-        heart.image = game.assets['res/heart.png']; 
-      
-        snow = new Sprite(32,32);
-        snow.x = 134;
-        snow.y = 280;
-        snow.frame = [4];
-        snow.image = game.assets['res/penguinSheet.png'];
-        snow.scaleX = -1;
-        
-        yuki = new Sprite(32,32);
-        yuki.x = 156;
-        yuki.y = 280;
-        yuki.frame = [3];
-        yuki.image = game.assets['res/yukiSheet.png']; 
-        yuki.scaleX = -1;
-        
-        this.addChild(heart);
-        this.addChild(snow);
-        this.addChild(yuki);
-        
-        if( isAndroid ) {
-          if(soundOn) {
-            /* ending.seekTo(1);
-            ending.play(); */
-            currentBGM = 'end';
-            window.plugins.LowLatencyAudio.play(currentBGM);
-          }
-        }
-      }
-      
-      if(winGame==2){
-        var heartsArr = [[112,224],[176,224],[80,240],[208,240],[64,272],[224,272],
-                         [80,304],[208,304],[112,336],[176,336],[144,368]];
-        this.backgroundColor = '#6844fc';
-        for(var i=0;i<=10;i++){
-          var hearttmp = new Sprite(32,32);
-          hearttmp.x = heartsArr[i][0];
-          hearttmp.y = heartsArr[i][1];
-          hearttmp.image = game.assets['res/heart.png'];
-          this.addChild(hearttmp);
-        }
-      }
-      
-      if( isAndroid ) {
-        if(AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
-        //admob.showBanner(admob.BannerSize.BANNER, admob.Position.TOP_APP,admobParam);
-      }
+      this.addChild(label);
       
       // Listen for taps
       this.addEventListener(Event.TOUCH_START, this.touchToRestart);
-      if(winGame<1) // Update
-        this.addEventListener(Event.ENTER_FRAME, this.update);
+      this.addEventListener(Event.ENTER_FRAME, this.update);
     },
     
     touchToRestart: function(evt) {
       var game = Game.instance;
       
       // Reset player
-      hachiplayer.reset();
-      
-      if(this.winGame>=1) game.replaceScene(new SceneCredits());
-      else game.replaceScene(new SceneTitle(0));
+      hachiplayer.reset();      
+      game.replaceScene(new SceneTitle(0));
     },
     
     update: function(evt){
@@ -1002,8 +947,6 @@ window.onload = function() {
       if(this.timeToRestart>=200){
         // Reset player
         hachiplayer.reset();
-        
-        var game = Game.instance;
         game.replaceScene(new SceneTitle(0));        
       }
     }
@@ -1022,60 +965,66 @@ window.onload = function() {
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
       this.backgroundColor = '#000000';
-      map = new Map(32, 32);
-      map.image = game.assets['res/western1Sheet.png'];
-      map.loadData(arrMap2Top,arrMap2Sub);
-      map.y = 16;
+      // map = new Map(32, 32);
+      // map.image = game.assets['res/western1Sheet.png'];
+      // map.loadData(arrMap2Top,arrMap2Sub);
+      // map.y = 16;
       
-      igloo = new Sprite(48,48);
-      igloo.x = 98;
-      igloo.y = 416;
-      igloo.image = game.assets['res/iglooSheet.png']; 
+      // igloo = new Sprite(48,48);
+      // igloo.x = 98;
+      // igloo.y = 416;
+      // igloo.image = game.assets['res/iglooSheet.png']; 
       
-      igloo2 = new Sprite(48,48);
-      igloo2.x = 146;
-      igloo2.y = 416;
-      igloo2.scaleX = -1;
-      igloo2.image = game.assets['res/iglooSheet.png']; 
+      // igloo2 = new Sprite(48,48);
+      // igloo2.x = 146;
+      // igloo2.y = 416;
+      // igloo2.scaleX = -1;
+      // igloo2.image = game.assets['res/iglooSheet.png']; 
       
-      snow = new Sprite(32,32);
-      snow.x = 224;
-      snow.y = 464;
-      snow.frame = [4,4,4,4,4,4,4,4,4,4,4,1,1,1,1,1,1];
-      snow.image = game.assets['res/penguinSheet.png']; 
+      // snow = new Sprite(32,32);
+      // snow.x = 224;
+      // snow.y = 464;
+      // snow.frame = [4,4,4,4,4,4,4,4,4,4,4,1,1,1,1,1,1];
+      // snow.image = game.assets['res/penguinSheet.png']; 
       
-      yuki = new Sprite(32,32);
-      yuki.x = 192;
-      yuki.y = 432;
-      yuki.frame = [1,1,1,1,1,1,1,2,2,2,2,2,2,2,2];
-      yuki.image = game.assets['res/yukiSheet.png']; 
+      // melody = new Sprite(32,32);
+      // melody.x = 192;
+      // melody.y = 432;
+      // melody.frame = [1,1,1,1,1,1,1,2,2,2,2,2,2,2,2];
+      // melody.image = game.assets['res/melodySheet.png']; 
       
-      label = new FontSprite('sega12', 320, 440, '');
+      label = new FontSprite('sega24', 320, 640, '');
       label.x = 0;
-      label.y = 8;
+      label.y = game.height;
+      this.label = label;
       
-      label.text = '   ==ROLF WEST==__CODE, ART & DESIGN_'
-                  +'Adinan Batista Alves___'
-                  //+'ENCHANT.JS TUTORIAL_Thongrop Rodsavas_(raywenderlich.com)___'
-                  +'8BIT TRACKS BY_'
-                  +'Wonderboy(demoscene)___'
-                  +'BMFONT PLUGIN BY_'
-                  +'COFFEE DOG GAMES___'
-                  +'SOUND EFFECTS_'
-                  +'CREATED IN BFXR.NET___'
-                  +'THANKS FOR PLAYING!';
+      label.text = '   *ROLF WEST*__CODE, ART & DESIGN__'
+                  +'Adinan Batista Alves_______'
+                  +'CHIPTUNE MUSIC__'
+                  +'Wonderboy(demoscene)_______'
+                  +'BMFONT PLUGIN__'
+                  +'COFFEE DOG GAMES_______'
+                  +'SOUND EFFECTS__'
+                  +'CREATED IN BFXR.NET_______'
+                  +'THANKS FOR PLAYING!____    SEE YOU IN_  THE NEXT GAME!';
             
       // Add labels  
-      //this.addChild(title);
-      this.addChild(map);
-      this.addChild(igloo);
-      this.addChild(igloo2);
-      this.addChild(snow);
-      this.addChild(yuki);
+      // this.addChild(map);
+      // this.addChild(igloo);
+      // this.addChild(igloo2);
+      // this.addChild(snow);
+      // this.addChild(melody);
       this.addChild(label);
       
       // Listen for taps
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+      // Listen for taps
       this.addEventListener(Event.TOUCH_START, this.touchToStart);
+    },
+    
+    update: function(evt) {
+      this.label.y -= 2;
+      if(this.label.y<= -this.label.height) this.label.y = game.height;
     },
     
     touchToStart: function(evt) {
@@ -1133,7 +1082,7 @@ window.onload = function() {
       shot.visible = false;
       this.shot = shot;
       
-      finger = new Sprite(32,32);
+      finger = new Sprite(32,42);
       finger.x = dpad.width/2;
       finger.y = 460;
       finger.frame = 0;
@@ -1241,7 +1190,7 @@ window.onload = function() {
             //if(soundOn && endingstatus==2)//ending.stop();
             if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
           }
-          game.replaceScene(new SceneGame());
+          game.replaceScene(new SceneInterlude());
         break;
       }
       
@@ -1284,7 +1233,7 @@ window.onload = function() {
         //if(soundOn && endingstatus==2)//ending.stop();
         if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
       }
-      game.replaceScene(new SceneGame());
+      game.replaceScene(new SceneInterlude());
     }
   });
   
@@ -1309,11 +1258,11 @@ window.onload = function() {
       // snow.frame = 4;
       // snow.image = game.assets['res/penguinSheet.png']; 
       
-      // yuki = new Sprite(32,32);
-      // yuki.x = 192;
-      // yuki.y = 288;
-      // yuki.frame = 2;
-      // yuki.image = game.assets['res/yukiSheet.png']; 
+      // melody = new Sprite(32,32);
+      // melody.x = 192;
+      // melody.y = 288;
+      // melody.frame = 2;
+      // melody.image = game.assets['res/melodySheet.png']; 
       
       label = new FontSprite('sega24', 320, 200, glossary.UI.optionsTxt[language]);
       label.x = 0;
@@ -1407,7 +1356,7 @@ window.onload = function() {
       // Add labels
       // this.addChild(map);
       // this.addChild(snow);
-      // this.addChild(yuki);
+      // this.addChild(melody);
       this.addChild(label);
       this.addChild(SoundOnLabel);
       this.addChild(SoundOffLabel);

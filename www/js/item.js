@@ -1,6 +1,6 @@
 // Item Class
 var Item = Class.create(Sprite, {
-  initialize: function(x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed){
+  initialize: function(x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears){
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     this.image = game.assets['res/itemSheet.png'];
@@ -12,6 +12,8 @@ var Item = Class.create(Sprite, {
     this.ySpeed = ySpeed;
     this.xAccel = xAccel;
     this.yAccel = yAccel;
+    this.timeToDestroy = 150;
+    this.disappears = disappears;
     
     // Animate
     this.frame = 0;
@@ -29,6 +31,11 @@ var Item = Class.create(Sprite, {
     game = Game.instance;
     
     if (!this.parentNode.parentNode.paused){//todo item deve pertencer ao grupo correspondente (Item Group)
+      if (this.disappears){
+        this.timeToDestroy -= 1;
+        if (this.timeToDestroy <= 0) this.remove();
+      }
+      
       /*START MOVEMENT BLOCK*/
       this.x += this.moveSpeed * Math.cos(this.direction);
       this.y += this.moveSpeed * Math.sin(this.direction);
@@ -37,6 +44,7 @@ var Item = Class.create(Sprite, {
         this.remove();
       }
       this.ySpeed += this.yAccel;
+      //if (this.ySpeed <= 10) this.ySpeed = 10;
       this.xSpeed += this.xAccel;
       this.y += this.ySpeed;
       this.x += this.xSpeed;
@@ -62,8 +70,8 @@ var Item = Class.create(Sprite, {
 // HatItem class
 var HatItem = Class.create(Item, {
   initialize: function(x, y){
-    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
-    Item.call(this, x, y, 0, 0, 2, -20, 0, 2, 0, 0, 0);
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 0, 0, 0, true);
     this.frame = 0;
     this.itemId = 'hat';
   },
@@ -88,10 +96,35 @@ var HatItem = Class.create(Item, {
 // CoinItem class
 var CoinItem = Class.create(Item, {
   initialize: function(x, y, playerSprite, level, author){
-    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
-    Item.call(this, x, y, 0, 0, 0, 3, 0, 0, 1, 4, 0.25);
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 1, 4, 0.25, true);
     this.frame = 1;
     this.itemId = 'coin';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
+    if (!this.parentNode.parentNode.paused){
+      if(this.y >= 360){
+        this.y = 360;
+      }
+    }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    playerObj.score+=50;
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
+// GoldCupItem class
+var GoldCupItem = Class.create(Item, {
+  initialize: function(x, y, playerSprite, level, author){
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 6, 6, 0, true);
+    this.frame = 6;
+    this.itemId = 'cup';
   },
   
   update: function(){
@@ -110,10 +143,60 @@ var CoinItem = Class.create(Item, {
   }
 });
 
+// GoldBarsItem class
+var GoldBarsItem = Class.create(Item, {
+  initialize: function(x, y, playerSprite, level, author){
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 7, 7, 0, true);
+    this.frame = 7;
+    this.itemId = 'bars';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
+    if (!this.parentNode.parentNode.paused){
+      if(this.y >= 360){
+        this.y = 360;
+      }
+    }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    playerObj.score+=500;
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
+// DiamondItem class
+var DiamondItem = Class.create(Item, {
+  initialize: function(x, y, playerSprite, level, author){
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 8, 9, 0.1, true);
+    this.frame = 8;
+    this.itemId = 'diamond';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
+    if (!this.parentNode.parentNode.paused){
+      if(this.y >= 360){
+        this.y = 360;
+      }
+    }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    playerObj.score+=1000;
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
 var SandubaItem = Class.create(Item, {
   initialize: function(x, y, playerSprite, level, author){
-    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
-    Item.call(this, x, y, 0, 0, 1, -16, 0, 1, 5, 5, 0);
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
+    Item.call(this, x, y, 0, 0, 1, -10, 0, 1, 5, 5, 0, false);
     this.frame = 5;
     this.itemId = 'sanduba';
   },

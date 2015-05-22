@@ -44,6 +44,16 @@ var BatEnemy = Class.create(Sprite, {
     }
     var batk = new BatKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batk);
+    
+    var coinchance = getRandom(1,4);
+    if(coinchance == 3){
+      var coin = new CoinItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(coin);
+    }else if(coinchance == 2){
+      var cup = new GoldCupItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(cup);
+    }
+        
     this.parentNode.removeChild(this);
     delete this;
   },
