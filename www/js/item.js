@@ -2,7 +2,7 @@
 var Item = Class.create(Sprite, {
   initialize: function(x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed){
     // Call superclass constructor
-    Sprite.apply(this,[24, 24]);
+    Sprite.apply(this,[32, 32]);
     this.image = game.assets['res/itemSheet.png'];
     this.x = x;
     this.y = y;
@@ -61,7 +61,6 @@ var Item = Class.create(Sprite, {
 
 // HatItem class
 var HatItem = Class.create(Item, {
-  // Succeeds bullet class
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
     Item.call(this, x, y, 0, 0, 2, -20, 0, 2, 0, 0, 0);
@@ -88,10 +87,10 @@ var HatItem = Class.create(Item, {
 
 // CoinItem class
 var CoinItem = Class.create(Item, {
-  // Succeeds bullet class
   initialize: function(x, y, playerSprite, level, author){
-    Item.call(this, x, y, 0, 0, 0, 3, 0, 0, 0, 0, 0.25);
-    this.frame = 0;
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
+    Item.call(this, x, y, 0, 0, 0, 3, 0, 0, 1, 4, 0.25);
+    this.frame = 1;
     this.itemId = 'coin';
   },
   
@@ -106,6 +105,34 @@ var CoinItem = Class.create(Item, {
   
   gotHit: function(playerObj,hero) {
     playerObj.score+=100;
+    this.parentNode.removeChild(this);
+    delete this;
+  }
+});
+
+var SandubaItem = Class.create(Item, {
+  initialize: function(x, y, playerSprite, level, author){
+    //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed
+    Item.call(this, x, y, 0, 0, 1, -16, 0, 1, 5, 5, 0);
+    this.frame = 5;
+    this.itemId = 'sanduba';
+  },
+  
+  update: function(){
+    Item.prototype.update.call(this);
+    if (!this.parentNode.parentNode.paused){
+      if(this.y >= 360){
+        this.y = 360;
+        this.xSpeed = 0;
+        this.ySpeed = 0;
+        this.yAccel = 0;
+      }
+    }
+  },
+  
+  gotHit: function(playerObj,hero) {
+    playerObj.score+=500;
+    this.parentNode.parentNode.endLevel = true;
     this.parentNode.removeChild(this);
     delete this;
   }
