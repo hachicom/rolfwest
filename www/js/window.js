@@ -42,12 +42,12 @@ var PauseWindow = Class.create(GuiWindow, {
     resumelable = new FontSprite('sega24', 144, 28, glossary.UI.continuar[language]);
     resumelable.x = this.bgwindow.x + 16;
     resumelable.y = this.bgwindow.y + 60;
-    resumelable.addEventListener(Event.TOUCH_START,this.handleResume);
+    resumelable.addEventListener(Event.TOUCH_END,this.handleResume);
     
     quitlable = new FontSprite('sega24', 144, 28, glossary.UI.sair[language]);
     quitlable.x = this.bgwindow.x + 16;
     quitlable.y = this.bgwindow.y + 110;
-    quitlable.addEventListener(Event.TOUCH_START,this.handleQuit);
+    quitlable.addEventListener(Event.TOUCH_END,this.handleQuit);
     
     this.addChild(resumelable);
     this.addChild(quitlable);

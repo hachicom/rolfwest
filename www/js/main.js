@@ -320,21 +320,21 @@ window.onload = function() {
       dpad.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
       this.dpad = dpad;
       
-      shootBtn = new Sprite(64,64);
+      shootBtn = new Sprite(64,128);
       shootBtn.x = game.width - 64;
-      shootBtn.y = game.height - 64;
+      shootBtn.y = game.height - 128;
       shootBtn.opacity = 0.8;
       shootBtn.image = game.assets['res/shootbtn.png'];       
       shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
       this.shootBtn = shootBtn;
       
-      reloadBtn = new Sprite(64,64);
-      reloadBtn.x = game.width - 64;
-      reloadBtn.y = game.height - 128;
-      reloadBtn.opacity = 0.8;
-      reloadBtn.image = game.assets['res/reloadbtn.png'];       
-      reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
-      this.reloadBtn = reloadBtn;
+      // reloadBtn = new Sprite(64,64);
+      // reloadBtn.x = game.width - 64;
+      // reloadBtn.y = game.height - 192;
+      // reloadBtn.opacity = 0.8;
+      // reloadBtn.image = game.assets['res/reloadbtn.png'];       
+      // reloadBtn.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
+      // this.reloadBtn = reloadBtn;
       
       pauseBtn = new Sprite(64, 64);
       pauseBtn.image = game.assets['res/pause.png'];
@@ -342,6 +342,7 @@ window.onload = function() {
       pauseBtn.y = 70;
       pauseBtn.opacity = 0.6;
       pauseBtn.addEventListener(Event.TOUCH_START,this.pauseGame);
+      this.pauseBtn = pauseBtn;
       
       pausewin = new PauseWindow(80,200);
       pausewin.setVisibility(false);
@@ -435,14 +436,15 @@ window.onload = function() {
       this.addChild(hiscoreLabel);
       this.addChild(dpad);
       this.addChild(shootBtn);
-      this.addChild(reloadBtn);
+      //this.addChild(reloadBtn);
       this.addChild(pauseBtn);
       this.addChild(fpslabel);
       this.addChild(pausewin);
             
-      // this.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
+      this.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
       // this.addEventListener(Event.TOUCH_MOVE,this.handleTouchMoveControl);
       // this.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
+      
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
     },
@@ -517,9 +519,9 @@ window.onload = function() {
     },
     
     handleTouchReloadControl: function (evt) {
-      if(!this.parentNode.paused){
-        if(this.parentNode.startLevelMsg<=0){
-          this.parentNode.rolf.reloadBullets();
+      if(!this.paused){
+        if(this.startLevelMsg<=0){
+          if(evt.y < this.dpad.y && evt.y > this.pauseBtn.y + 64) this.rolf.reloadBullets();
         }
       }
       // evt.stopPropagation();
@@ -555,6 +557,14 @@ window.onload = function() {
     goToTitleScreen: function (value) {
       hachiplayer.reset();
       game.replaceScene(new SceneTitle(0));
+    },
+    
+    checkLevelComplete: function () {
+      if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ //if all enemy generators were defeated
+        //this.endLevel = true;
+        var sanduba = new SandubaItem(145,320);
+        this.itemGroup.addChild(sanduba);
+      }
     },
     
     incLevelUp: function(){
@@ -684,7 +694,7 @@ window.onload = function() {
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.within(bat,14)){
+                if (shot.within(bat,16)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -692,7 +702,8 @@ window.onload = function() {
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   this.shotGroup.removeChild(shot);
-                  bat.gotHit(hachiplayer); //if the bat shot is the last one, batGenerator will be defeated
+                  bat.gotHit(hachiplayer); 
+                  this.checkLevelComplete();//if the bat shot is the last one, batGenerator will be defeated
                   break;
                 }
               }
@@ -701,7 +712,7 @@ window.onload = function() {
               for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
                 var batkid;
                 batkid = this.batkidGroup.childNodes[j];
-                if (shot.within(batkid,14)){
+                if (shot.within(batkid,16)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -709,7 +720,8 @@ window.onload = function() {
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   this.shotGroup.removeChild(shot);
-                  batkid.gotHit(hachiplayer); //if the batkid shot is the last one, batkidGenerator will be defeated
+                  batkid.gotHit(hachiplayer); 
+                  this.checkLevelComplete();//if the batkid shot is the last one, batkidGenerator will be defeated
                   break;
                 }
               }
@@ -718,15 +730,18 @@ window.onload = function() {
               for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
                 var batsniper;
                 batsniper = this.batsniperGroup.childNodes[j];
-                if (shot.intersect(batsniper,16)){
+                if (shot.intersect(batsniper,18)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  var ks = batsniper.gotHit(hachiplayer); //if the batsniper shot is the last one, batkidGenerator will be defeated
-                  if(ks) this.shotGroup.removeChild(shot);
+                  var ks = batsniper.gotHit(hachiplayer); 
+                  if(ks) {
+                    this.shotGroup.removeChild(shot);
+                    this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
+                  }
                   break;
                 }
               }
@@ -785,11 +800,7 @@ window.onload = function() {
                 item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
                 break;
               }
-            }
-            
-            if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ //if all enemy generators were defeated
-              this.endLevel = true;
-            }
+            }            
             
           }//end startLevelMsg if
         }
@@ -1129,18 +1140,18 @@ window.onload = function() {
       finger.image = game.assets['res/fingerSheet.png']; 
       this.finger = finger;
       
-      shootBtn = new Sprite(64,64);
+      shootBtn = new Sprite(64,128);
       shootBtn.x = game.width - 64;
-      shootBtn.y = dpad.y + 64;
+      shootBtn.y = dpad.y;
       //shootBtn.opacity = 0.5;
       shootBtn.image = game.assets['res/shootbtn.png'];
       this.shootBtn = shootBtn;
       
       reloadBtn = new Sprite(64,64);
       reloadBtn.x = game.width - 64;
-      reloadBtn.y = dpad.y;
+      reloadBtn.y = dpad.y - 64;
       //reloadBtn.opacity = 0.5;
-      reloadBtn.image = game.assets['res/reloadbtn.png'];
+      //reloadBtn.image = game.assets['res/reloadbtn.png'];
       this.reloadBtn = reloadBtn;
       
       this.fingerAddX = 0;
@@ -1447,7 +1458,7 @@ window.onload = function() {
       PressStart = new FontSprite('sega24', 192, 24, glossary.UI.start[language]);
       PressStart.x = 64;
       PressStart.y = 264;
-      PressStart.addEventListener(Event.TOUCH_START, function(e){
+      PressStart.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
           //if(soundOn && introstatus==2)intro.stop();
           if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
@@ -1467,7 +1478,7 @@ window.onload = function() {
       optionLabel = new FontSprite('sega24', 160, 24, glossary.UI.settings[language]);
       optionLabel.x = 64;
       optionLabel.y = 304;
-      optionLabel.addEventListener(Event.TOUCH_START, function(e){
+      optionLabel.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
           //if(soundOn && introstatus==2)intro.stop();
           if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
@@ -1480,7 +1491,7 @@ window.onload = function() {
       creditLabel = new FontSprite('sega24', 160, 24, glossary.UI.credits[language]);
       creditLabel.x = 64;
       creditLabel.y = 344;
-      creditLabel.addEventListener(Event.TOUCH_START, function(e){
+      creditLabel.addEventListener(Event.TOUCH_END, function(e){
         game.replaceScene(new SceneCredits());
       });
       
