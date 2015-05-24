@@ -48,6 +48,11 @@ var Item = Class.create(Sprite, {
       this.xSpeed += this.xAccel;
       this.y += this.ySpeed;
       this.x += this.xSpeed;
+      
+      if(this.y >= 360){
+        this.y = 360;
+        this.xSpeed = 0;
+      }
       /*END MOVEMENT BLOCK*/
       
       /*START ANIMATION BLOCK*/
@@ -67,6 +72,8 @@ var Item = Class.create(Sprite, {
   }
 });
 
+//***************** CHILD ITEMS *****************
+
 // HatItem class
 var HatItem = Class.create(Item, {
   initialize: function(x, y){
@@ -76,20 +83,9 @@ var HatItem = Class.create(Item, {
     this.itemId = 'hat';
   },
   
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-        this.xSpeed = 0;
-      }
-    }
-  },
-  
   gotHit: function(playerObj,hero) {
     hero.incHealth(playerObj);
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });
 
@@ -100,15 +96,6 @@ var CoinItem = Class.create(Item, {
     Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 1, 4, 0.25, true);
     this.frame = 1;
     this.itemId = 'coin';
-  },
-  
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-      }
-    }
   },
   
   gotHit: function(playerObj,hero) {
@@ -126,19 +113,9 @@ var GoldCupItem = Class.create(Item, {
     this.itemId = 'cup';
   },
   
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-      }
-    }
-  },
-  
   gotHit: function(playerObj,hero) {
     playerObj.score+=100;
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });
 
@@ -151,19 +128,9 @@ var GoldBarsItem = Class.create(Item, {
     this.itemId = 'bars';
   },
   
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-      }
-    }
-  },
-  
   gotHit: function(playerObj,hero) {
     playerObj.score+=500;
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });
 
@@ -176,19 +143,9 @@ var DiamondItem = Class.create(Item, {
     this.itemId = 'diamond';
   },
   
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-      }
-    }
-  },
-  
   gotHit: function(playerObj,hero) {
     playerObj.score+=1000;
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });
 
@@ -200,22 +157,9 @@ var SandubaItem = Class.create(Item, {
     this.itemId = 'sanduba';
   },
   
-  update: function(){
-    Item.prototype.update.call(this);
-    if (!this.parentNode.parentNode.paused){
-      if(this.y >= 360){
-        this.y = 360;
-        this.xSpeed = 0;
-        this.ySpeed = 0;
-        this.yAccel = 0;
-      }
-    }
-  },
-  
   gotHit: function(playerObj,hero) {
     playerObj.score+=500;
     this.parentNode.parentNode.endLevel = true;
-    this.parentNode.removeChild(this);
-    delete this;
+    this.remove();
   }
 });

@@ -919,13 +919,13 @@ window.onload = function() {
       var gameOverLabel, scoreLabel;
       Scene.apply(this);    
       this.backgroundColor = '#0000FF';
-      this.timeToStart = 120;
+      this.timeToStart = 200;
       
       label = new FontSprite('sega24', 320, 60, '');
-      label.x = 80;
+      label.x = 20;
       label.y = 72;
       
-      label.text = glossary.text.gameover[language]+'_FINAL SCORE: '+hachiplayer.score;
+      label.text = glossary.text.gameover[language]+'_  FINAL SCORE: '+hachiplayer.score;
             
       this.addChild(label);
       
@@ -943,8 +943,8 @@ window.onload = function() {
     },
     
     update: function(evt){
-      this.timeToRestart += 1;
-      if(this.timeToRestart>=200){
+      this.timeToStart -= 1;
+      if(this.timeToStart<=0){
         // Reset player
         hachiplayer.reset();
         game.replaceScene(new SceneTitle(0));        

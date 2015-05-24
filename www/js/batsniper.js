@@ -67,8 +67,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         var batsniperk = new BatsniperKilled(this.x,this.y);
         this.parentNode.parentNode.addChild(batsniperk);
     
-        var coinchance = getRandom(1,2);
-        if(coinchance == 2){
+        if(this.mode == 'fly'){
           var diamond = new DiamondItem(this.x,this.y);
           this.parentNode.parentNode.itemGroup.addChild(diamond);
         }
