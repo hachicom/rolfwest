@@ -16,7 +16,7 @@ var Rolf = Class.create(Sprite, {
       // 2 - Player Status
       this.bullets = 6;
       this.healthStartFrame = 3;
-      this.health = this.healthStartFrame;
+      this.health = hachiplayer.health;
       this.healthMax = 6;
       //this.reload = false;
       this.reloadTime = 0;
@@ -205,7 +205,7 @@ var Rolf = Class.create(Sprite, {
   },
   
   resetPosition: function(){
-    this.health=this.healthStartFrame;
+    this.health=hachiplayer.health;
     this.alive = true;
     this.winPose = false;
     this.vulnerableTime = 60;
@@ -228,12 +228,14 @@ var Rolf = Class.create(Sprite, {
   },
   
   gotHit: function(){
-    this.health-=this.healthStartFrame;    
+    this.health-=this.healthStartFrame;
+    hachiplayer.health = this.health;
     if(this.health<0) {
       this.alive = false;
       this.frame = 9;
       this.iniFrame = 9;
       this.endFrame = 9;
+      hachiplayer.health = this.healthStartFrame;
     }else{
       if(this.moving == 0){
         this.frame = 2 + this.health;
@@ -252,6 +254,7 @@ var Rolf = Class.create(Sprite, {
   
   incHealth: function(playerObj){     
     this.health += this.healthStartFrame;
+    hachiplayer.health = this.health;
     if(this.health>this.healthMax) {
       this.health=this.healthMax;
       playerObj.lives+=1;

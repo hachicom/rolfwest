@@ -1,6 +1,7 @@
 var Hachiplayer = Class.create({
   initialize: function(level,levellimit) {    
     this.lives = 3;
+    this.health = 3;
     this.score = 0;
     this.coins = 0;
     this.level = level;
@@ -17,6 +18,7 @@ var Hachiplayer = Class.create({
 
   reset: function() {
     this.lives = 3;
+    this.health = 3;
     this.score = 0;
     this.coins = 0;
     this.world = 1;
