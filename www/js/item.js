@@ -85,6 +85,7 @@ var HatItem = Class.create(Item, {
   
   gotHit: function(playerObj,hero) {
     hero.incHealth(playerObj);
+    playerObj.score+=1000;
     this.remove();
   }
 });

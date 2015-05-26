@@ -54,6 +54,7 @@ var BatSniperEnemy = Class.create(Sprite, {
   },
   
   gotHit: function(playerObj) {
+    if (this.gotHitTime>0) return false;
     if (!this.isHidden() || this.mode=='shoot' || this.mode=='offguard'){
       switch(this.mode){
         case 'idle'    : playerObj.score+=20; break;

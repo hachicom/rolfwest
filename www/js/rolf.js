@@ -1,7 +1,7 @@
 // Penguin
 var Rolf = Class.create(Sprite, {
   // The player character.     
-  initialize: function(x,y) {
+  initialize: function(x,y,playerObj) {
       // 1 - Call superclass constructor
       Sprite.apply(this,[24, 24]);
       this.image = Game.instance.assets['res/rolfSheet.png'];
@@ -16,7 +16,7 @@ var Rolf = Class.create(Sprite, {
       // 2 - Player Status
       this.bullets = 6;
       this.healthStartFrame = 3;
-      this.health = hachiplayer.health;
+      this.health = playerObj.health;
       this.healthMax = 6;
       //this.reload = false;
       this.reloadTime = 0;
@@ -204,8 +204,8 @@ var Rolf = Class.create(Sprite, {
     this.winPose = true;
   },
   
-  resetPosition: function(){
-    this.health=hachiplayer.health;
+  resetPosition: function(playerObj){
+    this.health=playerObj.health;
     this.alive = true;
     this.winPose = false;
     this.vulnerableTime = 60;
@@ -227,15 +227,15 @@ var Rolf = Class.create(Sprite, {
     this.movespeed = 20;
   },
   
-  gotHit: function(){
+  gotHit: function(playerObj){
     this.health-=this.healthStartFrame;
-    hachiplayer.health = this.health;
+    playerObj.health = this.health;
     if(this.health<0) {
       this.alive = false;
       this.frame = 9;
       this.iniFrame = 9;
       this.endFrame = 9;
-      hachiplayer.health = this.healthStartFrame;
+      playerObj.health = this.healthStartFrame;
     }else{
       if(this.moving == 0){
         this.frame = 2 + this.health;
@@ -254,10 +254,9 @@ var Rolf = Class.create(Sprite, {
   
   incHealth: function(playerObj){     
     this.health += this.healthStartFrame;
-    hachiplayer.health = this.health;
     if(this.health>this.healthMax) {
       this.health=this.healthMax;
-      playerObj.lives+=1;
+      //playerObj.lives+=1;
     }else{
       if(this.moving == 0){
         this.frame = 2 + this.health;
@@ -270,6 +269,7 @@ var Rolf = Class.create(Sprite, {
       }
       this.animationDuration = 0;
     }
+    playerObj.health = this.health;
   },
   
   isVulnerable: function(){

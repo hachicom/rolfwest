@@ -1,4 +1,4 @@
-var version = '0.4.0';
+var version = '0.5.0';
 
 var hiscore = 10000;
 var paused = false;
@@ -233,7 +233,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(2,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(1,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -350,7 +350,7 @@ window.onload = function() {
       this.pausewin = pausewin;
       
       // Hero
-      rolf = new Rolf(145,360);
+      rolf = new Rolf(145,360,hachiplayer);
       this.rolf = rolf;
       
       // Enemy Generators
@@ -360,6 +360,9 @@ window.onload = function() {
       this.batkidGenerator = batkidGenerator;
       batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batsniperGenerator = batsniperGenerator;
+      bossGenerator = new BossGenerator(0,280,hachiplayer.world,hachiplayer.round);
+      this.bossGenerator = bossGenerator;
+      
       
       /* melody = new Melody(272,288,levelUpAt);
       this.melody = melody; */
@@ -373,6 +376,9 @@ window.onload = function() {
       //Batsnipers group
       batsniperGroup = new Group();
       this.batsniperGroup = batsniperGroup;
+      //Boss group
+      bossGroup = new Group();
+      this.bossGroup = bossGroup;
       
       // Player Shots group
       shotGroup = new Group();
@@ -419,6 +425,8 @@ window.onload = function() {
       this.addChild(batGenerator);
       this.addChild(batkidGenerator);
       this.addChild(batsniperGenerator);
+      this.addChild(bossGenerator);
+      this.addChild(bossGroup);
       this.addChild(batGroup);
       this.addChild(batkidGroup);
       this.addChild(batsniperGroup);
@@ -561,6 +569,7 @@ window.onload = function() {
     },
     
     checkLevelComplete: function () {
+      //if(hachiplayer.round == 4 && this.bossGenerator.defeated == true) //create Melody; else...
       if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ //if all enemy generators were defeated
         //this.endLevel = true;
         var sanduba = new SandubaItem(145,320);
@@ -569,6 +578,8 @@ window.onload = function() {
     },
     
     incLevelUp: function(){
+      var worldcomplete = false;
+      if(hachiplayer.round==hachiplayer.levellimit) worldcomplete = true;
       hachiplayer.levelUp(1);
       /* if(hachiplayer.level%4==0){
         //this.sabbath++;
@@ -603,7 +614,8 @@ window.onload = function() {
         /******************************
          ****  LOADING NEXT LEVEL  ****
          ******************************/
-        game.replaceScene(new SceneInterlude());
+        if(worldcomplete) game.replaceScene(new SceneBonus());
+        else game.replaceScene(new SceneInterlude());
         // Reload tilemaps and bgcolor
         // this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
         // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
@@ -619,7 +631,7 @@ window.onload = function() {
         // this.bonusDuration = 0;
         
         //Reset Hero Position
-        // this.rolf.resetPosition();
+        // this.rolf.resetPosition(hachiplayer);
         
         //Reload Enemy Generators
         // this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
@@ -644,7 +656,7 @@ window.onload = function() {
         
         this.scoreLabel.text = 'SCORE ' + hachiplayer.score;// + '_x' + this.multiplier;
         this.ammoLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6'; //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
-        this.levelLabel.text = 'LEVEL_  ' + hachiplayer.level;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
+        this.levelLabel.text = 'WORLD_  ' + hachiplayer.world + '-' + hachiplayer.round;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
         this.livesLabel.text = 'ROLF_ ' + hachiplayer.lives;
         this.hiscoreLabel.text = 'TOP '+hiscore;
         if(this.bonusMode == true) this.ammoLabel.text = 'BONUS_STAGE';
@@ -658,8 +670,11 @@ window.onload = function() {
             /* Starts enemy generators: First is the bat generator.
              * After finishing creation, it will call batkid generator
              * and so on until batsniper generator is done
+             *
+             * TODO: UNCOMMENT LINE ABOVE NEXT IF TO CREATE BOSSES
              */
             if(this.startLevelMsg<=0) this.batGenerator.modeStart=true;
+              //if(hachiplayer.round == 4) this.bossGenerator.createBoss();
           }
           //else if(this.rolf.bullets <= 0) this.msgLabel.text = glossary.text.alertaReload[language];
           else this.msgLabel.text = '';
@@ -762,7 +777,7 @@ window.onload = function() {
                 } */
                 //bat.crashToPieces();
                 this.gotHit = true; 
-                this.rolf.gotHit();
+                this.rolf.gotHit(hachiplayer);
                 if( isAndroid ) {
                   if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                   //this.bgm.stop();
@@ -785,7 +800,7 @@ window.onload = function() {
                 //bat.crashToPieces();
                 this.evilShotGroup.removeChild(evilshot);
                 this.gotHit = true; 
-                this.rolf.gotHit();
+                this.rolf.gotHit(hachiplayer);
                 if( isAndroid ) {
                   if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                   //this.bgm.stop();
@@ -802,7 +817,7 @@ window.onload = function() {
                 item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
                 break;
               }
-            }            
+            }
             
           }//end startLevelMsg if
         }
@@ -819,7 +834,7 @@ window.onload = function() {
                 }
                 game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
               }else{
-                this.rolf.resetPosition();
+                this.rolf.resetPosition(hachiplayer);
                 this.gotHit=false;
                 this.hitDuration=0;
               }
@@ -837,11 +852,6 @@ window.onload = function() {
           if(this.endLevelDuration >= 90){
             this.incLevelUp();
           }
-        }
-        
-        // Bonus Stage Mode
-        if(this.bonusMode == true){
-          //TODO: Bonus mode code
         }
         
         // Loop BGM
@@ -865,6 +875,206 @@ window.onload = function() {
         //this.fpslabel.text = 'PAUSE';
       }
       
+    }
+  });
+  
+  // SceneBonus
+  var SceneBonus = Class.create(Scene, {
+    initialize: function() {
+      Scene.apply(this);      
+      this.backgroundColor = '#0000FF';
+      
+      /**
+       * SCENE ANIMATION
+       * pg0  (10 frames)  - shows World Complete! message and starts animation of Rolf and Melody
+       * pg1  (60 frames)  - show boxes and message Watch! and the star in a random position
+       * pg2  (180 frames) - show star in another random position //3 sec
+       * pg3  (270 frames) - show star in another random position //3 sec
+       * pg4  (360 frames) - show star in another random position //3 sec
+       * pg5  (420 frames) - show star in another random position //2 sec
+       * pg6  (480 frames) - show star in another random position //2 sec
+       * pg7  (510 frames) - show star in another random position //1 sec
+       * pg8  (540 frames) - show star in another random position //1 sec
+       * pg9  (555 frames) - show star in another random position //0.5 sec
+       * pg10 (570 frames) - show star in another random position //0.5 sec
+       * pg11 (578 frames) - show star in another random position //0.25 sec
+       * pg12 (586 frames) - show star in another random position //0.25 sec
+       * pg13 (589 frames) - show star in another random position //0.1 sec
+       * pg14 (592 frames) - show star in another random position //0.1 sec
+       * pg15 (595 frames) - hide the star and showa message Select!
+       */
+      
+      this.sceneAnimationTime = 0;
+      this.endSceneTime = 120;
+      this.mode = 'watch'; //watch/choose/end
+      this.starposition = 0;
+            
+      star = new Sprite(32,32);
+      star.x = 0;
+      star.y = game.height - 160;
+      star.image = game.assets['res/itemSheet.png'];
+      star.frame = 14;
+      star.visible = false;
+      this.star = star;
+      
+      this.boxes = new Array();
+      box1 = new Sprite(32,32);
+      box1.x = game.width/2 - 132;
+      box1.y = game.height - 160;
+      box1.frame = 10;
+      box1.image = game.assets['res/itemSheet.png'];
+      box1.visible = false;
+      box1.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(1);});
+      this.boxes[1] = box1;
+      
+      box2 = new Sprite(32,32);
+      box2.x = box1.x + 80;
+      box2.y = game.height - 160;
+      box2.frame = 10;
+      box2.image = game.assets['res/itemSheet.png']; 
+      box2.visible = false;
+      box2.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(2);});
+      this.boxes[2] = box2;
+      
+      box3 = new Sprite(32,32);
+      box3.x = box2.x + 80;
+      box3.y = game.height - 160;
+      box3.frame = 10;
+      box3.image = game.assets['res/itemSheet.png']; 
+      box3.visible = false;
+      box3.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(3);});
+      this.boxes[3] = box3;
+      
+      box4 = new Sprite(32,32);
+      box4.x = box3.x + 80;
+      box4.y = game.height - 160;
+      box4.frame = 10;
+      box4.image = game.assets['res/itemSheet.png']; 
+      box4.visible = false;
+      box4.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(4);});
+      this.boxes[4] = box4;
+      
+      titleLabel = new FontSprite('sega24', 320, 40, 'WORLD COMPLETE!');
+      titleLabel.x = 60;
+      titleLabel.y = 8;
+      this.titleLabel = titleLabel;
+      
+      msgLabel = new FontSprite('sega24', 320, 40, '  WATCH!');
+      msgLabel.x = 80;
+      msgLabel.y = game.height-100;
+      msgLabel.visible = false;
+      this.msgLabel = msgLabel;
+
+      this.addChild(box1);
+      this.addChild(box2);
+      this.addChild(box3);
+      this.addChild(box4);
+      this.addChild(star);
+      this.addChild(titleLabel);
+      this.addChild(msgLabel);
+      
+      // Update
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+    },
+
+    chooseBox: function(boxnum) {
+      //console.log("event activated!");
+      if(this.mode == 'choose'){
+        this.boxes[boxnum].visible = false;
+        if(boxnum == this.starposition){
+          this.msgLabel.text = 'NICE! 1-UP!!!';
+        }else this.msgLabel.text = '  NO BONUS!';
+        this.mode = 'end';
+        this.star.visible = true;
+      }
+    },
+    
+    changePage: function(page){
+      this.page = page;
+      switch(this.page){
+        case 0: break;
+        case 1: 
+          this.boxes[1].visible = true;
+          this.boxes[2].visible = true;
+          this.boxes[3].visible = true;
+          this.boxes[4].visible = true;
+          this.msgLabel.visible = true;
+          break;
+        case 2: 
+          this.star.visible = true;
+          this.starposition = getRandom(1,4);
+          this.star.x = this.boxes[this.starposition].x;
+          break;
+        default: 
+          var newpos = getRandom(1,4);
+          if (newpos == this.starposition){
+            newpos+=1;
+            if (newpos > 4) newpos = 1;
+          }
+          this.starposition = newpos;
+          this.star.x = this.boxes[this.starposition].x;
+          break;
+      }
+    },
+    
+    update: function(evt) {
+      this.sceneAnimationTime += 1;
+      switch(this.sceneAnimationTime){
+        case 10:  this.changePage(0); break;
+        case 60:  this.changePage(1); break;
+        case 90:  this.changePage(2); break; 
+        case 120: this.changePage(3); break; 
+        case 150: this.changePage(3); break;
+        case 180: this.changePage(3); break;
+        case 210: this.changePage(3); break;
+        case 240: this.changePage(3); break;
+        case 270: this.changePage(3); break;
+        case 300: this.changePage(3); break;
+        case 320: this.changePage(3); break;
+        case 340: this.changePage(3); break
+        case 360: this.changePage(3); break;
+        case 380: this.changePage(3); break;
+        case 400: this.changePage(3); break;
+        case 410: this.changePage(3); break;
+        case 420: this.changePage(3); break;
+        case 430: this.changePage(3); break;
+        case 440: this.changePage(3); break;
+        case 450: this.changePage(3); break;
+        case 455: this.changePage(3); break;
+        case 460: this.changePage(3); break;
+        case 465: this.changePage(3); break;
+        case 470: this.changePage(3); break;
+        case 472: this.changePage(3); break;
+        case 474: this.changePage(3); break;
+        case 476: this.changePage(3); break;
+        case 478: this.changePage(3); break;
+        case 480: this.changePage(3); break;
+        case 481: this.changePage(3); break;
+        case 482: this.changePage(3); break;
+        case 483: this.changePage(3); break;
+        case 484: this.changePage(3); break;
+        case 485: this.changePage(3); break;
+        case 486: this.changePage(3); break;
+        case 487: this.changePage(3); break;
+        case 488: this.changePage(3); break;
+        case 489: this.changePage(3); break;
+        case 490: this.changePage(3); break;
+        case 491: this.changePage(3); break;
+        case 492: this.changePage(3); break;
+        case 493: this.changePage(3); break;
+        case 494: this.changePage(3); break;
+        case 495:  
+          this.msgLabel.text = 'CHOOSE ONE!';
+          this.mode = 'choose';
+          this.star.visible = false;
+        break;
+      }
+      
+      if(this.mode == 'end'){
+        this.endSceneTime-=1;
+        if(this.endSceneTime<=0)
+          game.replaceScene(new SceneInterlude());
+      }
     }
   });
   
@@ -956,42 +1166,8 @@ window.onload = function() {
   var SceneCredits = Class.create(Scene, {
     initialize: function() {
       var TitleLabel, scoreLabel;
-      Scene.apply(this);
-      //this.backgroundColor = '#0026FF';
-      
-      // Background
-      // title = new Sprite(256,160);
-      // title.x = 32;
-      // title.y = 32;
-      // title.image = game.assets['res/title.png'];      
+      Scene.apply(this);     
       this.backgroundColor = '#000000';
-      // map = new Map(32, 32);
-      // map.image = game.assets['res/western1Sheet.png'];
-      // map.loadData(arrMap2Top,arrMap2Sub);
-      // map.y = 16;
-      
-      // igloo = new Sprite(48,48);
-      // igloo.x = 98;
-      // igloo.y = 416;
-      // igloo.image = game.assets['res/iglooSheet.png']; 
-      
-      // igloo2 = new Sprite(48,48);
-      // igloo2.x = 146;
-      // igloo2.y = 416;
-      // igloo2.scaleX = -1;
-      // igloo2.image = game.assets['res/iglooSheet.png']; 
-      
-      // snow = new Sprite(32,32);
-      // snow.x = 224;
-      // snow.y = 464;
-      // snow.frame = [4,4,4,4,4,4,4,4,4,4,4,1,1,1,1,1,1];
-      // snow.image = game.assets['res/penguinSheet.png']; 
-      
-      // melody = new Sprite(32,32);
-      // melody.x = 192;
-      // melody.y = 432;
-      // melody.frame = [1,1,1,1,1,1,1,2,2,2,2,2,2,2,2];
-      // melody.image = game.assets['res/melodySheet.png']; 
       
       label = new FontSprite('sega24', 320, 640, '');
       label.x = 0;
@@ -1007,13 +1183,7 @@ window.onload = function() {
                   +'SOUND EFFECTS__'
                   +'CREATED IN BFXR.NET_______'
                   +'THANKS FOR PLAYING!____    SEE YOU IN_  THE NEXT GAME!';
-            
-      // Add labels  
-      // this.addChild(map);
-      // this.addChild(igloo);
-      // this.addChild(igloo2);
-      // this.addChild(snow);
-      // this.addChild(melody);
+                  
       this.addChild(label);
       
       // Listen for taps

@@ -1,37 +1,28 @@
 // Bosses
-/* var MadBatBoss = Class.create(Sprite, {
+var MadBatBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,xTarget,level,batsniperGenKey,moveLimit,moveHideout) {
+  initialize: function(x,y,level) {
     // Call superclass constructor
-    Sprite.apply(this,[32, 32]);
+    Sprite.apply(this,[64, 64]);
     this.image  = Game.instance.assets['res/batsniperSheet.png'];
     this.x = x;
     this.y = y;
     this.originX = x;
     this.originY = y;
-    this.batsniperGenKey = batsniperGenKey;
 
     // 2 - Status
     this.level = level;
-    this.position = xTarget;
-    this.nextposX = xTarget;
     this.nextposY = y;
     this.direction = findAngle(x,y,this.nextposX,y);
-    this.mode = 'start'; //start, idle, fly, hit
-    if(this.x< Game.instance.width/2)
-      this.modeMove = 'desc';
-    else this.modeMove = 'asc';
-    this.moveSpeed = 2;    
-    this.moveLeftLimit = moveLimit[0];
-    this.moveRightLimit = moveLimit[1];
-    this.hideoutStart = moveHideout[0];
-    this.hideoutEnd = moveHideout[1];
-    this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.mode = 'start'; //start, fly, hit
+    this.moveSpeed = 2;
+    this.ySpeed = 0;
+    this.yAccel = 0.5;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
-    this.hp = 2; //after two shots, goes crazy
+    this.verticalDir = getRandom(1,2); //up/down
+    this.hp = 10; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -46,26 +37,16 @@
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  isHidden: function() {
-    if(this.hideoutStart==0 && this.hideoutEnd==0) return false; //there's no place to hide in this stage
-    if(this.mode=='start' || this.mode=='hiding') return true; //is behind hideout
-    else if(this.x>this.hideoutStart && (this.x+32)<this.hideoutEnd) return true; //is behind hideout
-    else return false; //is exposed
-  },
-  
   gotHit: function(playerObj) {
-    if (!this.isHidden() || this.mode=='shoot' || this.mode=='offguard'){
+    if (this.gotHitTime>0) return false;
+    if (this.mode=='fly'){
       switch(this.mode){
-        case 'idle'   : playerObj.score+=20; break;
-        case 'shoot'  : playerObj.score+=70; break;
-        case 'fly'    : playerObj.score+=60; break;
-        case 'crazy'  : playerObj.score+=200; break;
+        case 'fly'    : playerObj.score+=10; break;
       }
       this.hp-=1;
       if(this.hp<0){
-        this.parentNode.parentNode.batsniperGenerator.rearrangeBatSnipers(this.batsniperGenKey);
-        var batsniperk = new BossKilled(this.x,this.y);
-        this.parentNode.parentNode.addChild(batsniperk);
+        var madbatk = new BossKilled(this.x,this.y);
+        this.parentNode.parentNode.addChild(madbatk);
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -82,20 +63,13 @@
   
   setTarget: function(batqty) {
     var game = Game.instance;
-    var addBullet = 0;
-    if(batqty <=6) addBullet = 1;
     //alert(addBullet);
-    if(this.hp>1) {
+    if(this.hp>4) {
       this.shootTime = 10;
-      this.mode = 'shoot';
-      this.bullets = 0 + addBullet;
-    }else if(this.hp>0) {
+      this.bullets = 4;
+    }else if(this.hp>1) {
       this.shootTime = 5;
-      this.mode = 'shoot';
-      this.bullets = 3 + addBullet*2;
-    }else if(this.hp<=0) {
-      this.startTime = 20;
-      this.mode = 'hiding';
+      this.bullets = 8;
     }
     //this.moveSpeed = 6;
     //this.direction = findAngle(this.x,this.y,this.parentNode.parentNode.rolf.x,this.parentNode.parentNode.rolf.y);
@@ -105,7 +79,7 @@
   update: function(evt) {
     var game = Game.instance;
     //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!
-    this.nextposX = this.parentNode.parentNode.batsniperGenerator.batsniperEnemyMap[this.position][0];
+    this.nextposX = this.parentNode.parentNode.madbatGenerator.madbatEnemyMap[this.position][0];
     
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
@@ -115,86 +89,52 @@
         }else this.visible=true;
         if(this.startTime<=0){
           this.visible = true;
-          this.mode = 'idle';
+          this.mode = 'fly';
           //this.y = this.nextposY;
           //this.x = this.nextposX;
         }
       }
-      if(this.mode == 'idle'){
-        //this.y = this.nextposY;
-        if(this.modeMove == 'desc'){
-          this.x -= this.moveSpeed;
-          if(this.x<this.moveLeftLimit) {
-            this.x = this.moveLeftLimit;
-            this.modeMove = 'asc';
-          }
-        }else{
-          this.x += this.moveSpeed;
-          if(this.x>this.moveRightLimit) {
-            this.x = this.moveRightLimit;
-            this.modeMove = 'desc';
-          }
-        }
-      }
-      if(this.mode == 'shoot'){
-        //shoot at player
-        this.shootTime-=1;
-        if(this.bullets>=0 && this.shootTime<=0){
-          if(this.isHidden()) this.y=this.originY - 16;
-          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
-          this.parentNode.parentNode.evilShotGroup.addChild(s);
-          this.bullets-=1;
-          if(this.bullets<=0){
-            this.mode = 'offguard';
-            this.shootTime = 20; 
-          }else this.shootTime = 2;
-        }
-      }
-      if(this.mode == 'offguard'){
-        //shoot at player
-        this.shootTime-=1;
-        if(this.shootTime<=0){
-         this.mode = 'idle';
-         if(this.isHidden()) this.y=this.originY;        
-        }
-      }      
-      if(this.mode == 'hiding'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
-        if(this.startTime<=0){
-          this.visible = true;
-          this.bullets = 5;
-          this.shootTime = 16;
-          this.y = 248;
-          this.x = -32;
-          this.moveSpeed = 5;
-          this.mode = 'fly';
-        }
-      }
       if(this.mode == 'fly'){
         //movement
-        this.x += this.moveSpeed;
+        if(this.y <= this.originY){
+          if(this.y<=this.originY - 32) this.verticalDir=2;
+        } else {
+          if(this.y>=this.originY + 32) this.verticalDir=1;
+        }
+        if(this.verticalDir==1){ //up
+          this.ySpeed -= this.yAccel;
+          if(this.ySpeed<=-7)this.ySpeed=-7;
+        }else{ //down
+          this.ySpeed += this.yAccel;
+          if(this.ySpeed>=7)this.ySpeed=7;
+        }
+        this.y += this.ySpeed;
+        if(this.horizontalDir==1){ //left
+          this.x -= this.moveSpeed;
+          if (this.x <= 0) {
+            this.x = 0;
+            this.horizontalDir = 2;
+          }
+        }else{ //right
+          this.x -= this.moveSpeed;
+          if (this.x >= game.width-this.width) {
+            this.x = game.width-this.width;
+            this.horizontalDir = 1;
+          }
+        }
+        
         this.shootTime-=1;
         if(this.bullets>=0 && this.shootTime<=0){
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 16;
-        }
-        if(this.x >= game.width){
-          this.startTime = 30;
-          this.moveSpeed = 2;
-          this.mode = 'start';
-          this.x = this.originX;
-          this.y = this.originY;
         }
       }
       if(this.gotHitTime>0){
         this.gotHitTime-=1;
         if(this.gotHitTime<=0) {
-          if(this.hp>0){
+          if(this.hp>2){
             this.animationDuration = 0;
             this.frame = 0;
             this.iniFrame = 0;
@@ -224,11 +164,11 @@ var BossKilled = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
   initialize: function(x,y) {
     // Call superclass constructor
-    Sprite.apply(this,[32, 32]);
+    Sprite.apply(this,[64, 64]);
     this.image  = Game.instance.assets['res/batsniperSheet.png'];
     this.x = x;
     this.y = y;
-    this.aboutToDieTime = 10;
+    this.aboutToDieTime = 30;
     
     // 3 - Animate
     this.frame = 9;
@@ -242,8 +182,42 @@ var BossKilled = Class.create(Sprite, {
       this.visible=false;
     }else this.visible=true;
     if(this.aboutToDieTime<=0){
+      this.parentNode.bossGenerator.defeated = true;
+      this.parentNode.checkLevelComplete();
       this.parentNode.removeChild(this);
       delete this;
     }
   }
-}); */
+});
+
+//Boss Generator
+var BossGenerator = Class.create(Sprite, {
+  // The windows that will create the batsnipers
+  initialize: function(x,y,world,round) {
+    // Call superclass constructor
+    Sprite.apply(this,[32, 32]);
+    //this.image  = Game.instance.assets['res/Ice.png'];      
+
+    //controle vars
+    this.x = x;
+    this.y = y;
+    this.createBossTime = 10;
+    this.sendBossTime = 90 + (10 * getRandom(1,4));
+    this.batsniperIdx = 0;
+    this.world = world;
+    this.round = round;
+    this.defeated = false;
+    
+    //this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+    
+  createBoss: function() {
+    var game = Game.instance;
+    switch(this.world){
+      case 1: 
+        var boss = new MadBatBoss(game.width/2 - 32);
+        break;
+    }
+    this.parentNode.bossGroup.addChild(boss);
+  }
+});
