@@ -38,8 +38,6 @@ var globalBatKidMap = {
     limit: [64,256]
   },
   stage4: {
-    startAt: [[68,128],[96,128],[124,128],[152,128]],
-    limit: [64,256]
   },
   stage5: {
     startAt: [[68,168],[96,168],[180,168],[208,168]],
@@ -56,14 +54,11 @@ var globalBatSniperMap = {
     hideout: [0,0]
   },
   stage3: {
-    startAt: [[64,64],[96,64],[192,64]],
+    startAt: [[64,64],[224,64]],
     limit: [32,256],
     hideout: [96,224]
   },
   stage4: {
-    startAt: [[64,64],[224,64]],
-    limit: [32,256],
-    hideout: [96,224]
   },
   stage5: {
     startAt: [[64,96],[224,96]],

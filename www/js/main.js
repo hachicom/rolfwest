@@ -79,6 +79,7 @@ window.onload = function() {
                'res/batSheet.png',
                'res/batkidSheet.png',
                'res/batsniperSheet.png',
+               'res/madbatSheet.png',
                'res/western1Sheet.png',
                'res/title.png',
                'res/dpad.png',
@@ -233,7 +234,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(1,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(4,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -360,7 +361,7 @@ window.onload = function() {
       this.batkidGenerator = batkidGenerator;
       batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       this.batsniperGenerator = batsniperGenerator;
-      bossGenerator = new BossGenerator(0,280,hachiplayer.world,hachiplayer.round);
+      bossGenerator = new BossGenerator(120,136,hachiplayer.world,hachiplayer.round);
       this.bossGenerator = bossGenerator;
       
       
@@ -426,11 +427,11 @@ window.onload = function() {
       this.addChild(batkidGenerator);
       this.addChild(batsniperGenerator);
       this.addChild(bossGenerator);
-      this.addChild(bossGroup);
       this.addChild(batGroup);
       this.addChild(batkidGroup);
       this.addChild(batsniperGroup);
       this.addChild(lvlFrontLayer);
+      this.addChild(bossGroup);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
       this.addChild(itemGroup);      
@@ -569,9 +570,25 @@ window.onload = function() {
     },
     
     checkLevelComplete: function () {
-      //if(hachiplayer.round == 4 && this.bossGenerator.defeated == true) //create Melody; else...
-      if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ //if all enemy generators were defeated
-        //this.endLevel = true;
+      if(hachiplayer.round == hachiplayer.levellimit && this.bossGenerator.defeated == true){
+        //Destroy all enemies
+        for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
+          var bat;
+          bat = this.batGroup.childNodes[j];          
+          bat.gotKilled(hachiplayer);
+        }
+        
+        for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
+          var batkid;
+          batkid = this.batkidGroup.childNodes[j];          
+          batkid.gotKilled(hachiplayer);
+        }
+        
+        //TODO: create Melody; else...        
+        var sanduba = new SandubaItem(145,320);
+        this.itemGroup.addChild(sanduba);
+      }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
+        //if all enemy generators were defeated
         var sanduba = new SandubaItem(145,320);
         this.itemGroup.addChild(sanduba);
       }
@@ -581,19 +598,6 @@ window.onload = function() {
       var worldcomplete = false;
       if(hachiplayer.round==hachiplayer.levellimit) worldcomplete = true;
       hachiplayer.levelUp(1);
-      /* if(hachiplayer.level%4==0){
-        //this.sabbath++;
-        //this.bonusMode = true;
-        
-        //deal with music change
-        if( soundOn ) {
-          if(isAndroid) {
-            window.plugins.LowLatencyAudio.stop(currentBGM);
-            currentBGM = 'bonus';
-            window.plugins.LowLatencyAudio.loop(currentBGM);            
-          }
-        }
-      } */
       if (hachiplayer.level == 35) this.winGame = 1;
       if (this.winGame == 2) {
         if( soundOn ) {
@@ -673,8 +677,10 @@ window.onload = function() {
              *
              * TODO: UNCOMMENT LINE ABOVE NEXT IF TO CREATE BOSSES
              */
-            if(this.startLevelMsg<=0) this.batGenerator.modeStart=true;
-              //if(hachiplayer.round == 4) this.bossGenerator.createBoss();
+            if(this.startLevelMsg<=0) {
+              this.batGenerator.modeStart=true;
+              if(hachiplayer.round == 4) this.bossGenerator.createBoss();
+            }
           }
           //else if(this.rolf.bullets <= 0) this.msgLabel.text = glossary.text.alertaReload[language];
           else this.msgLabel.text = '';
@@ -758,6 +764,26 @@ window.onload = function() {
                   if(ks) {
                     this.shotGroup.removeChild(shot);
                     this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
+                  }
+                  break;
+                }
+              }
+              
+              //BOSS
+              for (var j = this.bossGroup.childNodes.length - 1; j >= 0; j--) {
+                var boss;
+                boss = this.bossGroup.childNodes[j];
+                if (shot.intersect(boss,18)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = boss.gotHit(hachiplayer); 
+                  if(ks) {
+                    this.shotGroup.removeChild(shot);
+                    //if the boss shot is the last one, batkidGenerator will be defeated
                   }
                   break;
                 }

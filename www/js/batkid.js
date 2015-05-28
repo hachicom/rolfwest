@@ -40,14 +40,34 @@ var BatKidEnemy = Class.create(Sprite, {
   },
   
   gotHit: function(playerObj) {
+    if(this.mode=='start') return false;
     this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     switch(this.mode){
-      case 'start'  : playerObj.score+=120; break;
+      //case 'start'  : playerObj.score+=120; break;
       case 'idle'   : playerObj.score+=30; break;
       case 'fly'    : playerObj.score+=40; break;
       case 'shoot'  : playerObj.score+=50; break;
       case 'retreat': playerObj.score+=80; break;
     }
+    var batkidk = new BatkidKilled(this.x,this.y);
+    this.parentNode.parentNode.addChild(batkidk);
+    
+    if(this.mode == 'retreat' || this.mode=='shoot'){
+      var bars = new GoldBarsItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(bars);
+    }else{ 
+      var coinchance = getRandom(1,3);
+      if(coinchance == 2){
+        var cup = new GoldCupItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(cup);
+      }
+    }
+    this.parentNode.removeChild(this);
+    delete this;
+  },
+  
+  gotKilled: function(playerObj) {
+    this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     var batkidk = new BatkidKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batkidk);
     
@@ -233,7 +253,7 @@ var BatKidGenerator = Class.create(Sprite, {
   
   update: function(evt) { 
     var game = Game.instance;
-    if (!this.parentNode.paused && this.modeStart){
+    if (!this.parentNode.paused && this.modeStart && !this.defeated){
       //console.log(this.parentNode.batkidGroup.childNodes.length);
       if (this.batkidIdx < this.batkidEnemyMap.length){
         this.createBatKidTime -= 1;

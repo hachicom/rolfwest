@@ -4,7 +4,7 @@ var MadBatBoss = Class.create(Sprite, {
   initialize: function(x,y,level) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
-    this.image  = Game.instance.assets['res/batsniperSheet.png'];
+    this.image  = Game.instance.assets['res/madbatSheet.png'];
     this.x = x;
     this.y = y;
     this.originX = x;
@@ -30,9 +30,9 @@ var MadBatBoss = Class.create(Sprite, {
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
-    this.frame = 0;
-    this.iniFrame = 0;
-    this.endFrame = 3;
+    this.frame = 10;
+    this.iniFrame = 10;
+    this.endFrame = 10;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -45,16 +45,17 @@ var MadBatBoss = Class.create(Sprite, {
       }
       this.hp-=1;
       if(this.hp<0){
-        var madbatk = new BossKilled(this.x,this.y);
+        //alert("i'm dead");
+        var madbatk = new BossKilled(this.x,this.y, 'madbat');
         this.parentNode.parentNode.addChild(madbatk);
         this.parentNode.removeChild(this);
         delete this;
       }else{
         this.gotHitTime = 10;
         this.animationDuration = 0;
-        this.frame = 4;
-        this.iniFrame = 4;
-        this.endFrame = 4;
+        this.frame = 10;
+        this.iniFrame = 10;
+        this.endFrame = 10;
       }
       return true;
     }
@@ -78,9 +79,7 @@ var MadBatBoss = Class.create(Sprite, {
   
   update: function(evt) {
     var game = Game.instance;
-    //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!
-    this.nextposX = this.parentNode.parentNode.madbatGenerator.madbatEnemyMap[this.position][0];
-    
+    //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
         this.startTime-=1;
@@ -97,9 +96,9 @@ var MadBatBoss = Class.create(Sprite, {
       if(this.mode == 'fly'){
         //movement
         if(this.y <= this.originY){
-          if(this.y<=this.originY - 32) this.verticalDir=2;
+          if(this.y<=this.originY - 8) this.verticalDir=2;
         } else {
-          if(this.y>=this.originY + 32) this.verticalDir=1;
+          if(this.y>=this.originY + 8) this.verticalDir=1;
         }
         if(this.verticalDir==1){ //up
           this.ySpeed -= this.yAccel;
@@ -111,24 +110,24 @@ var MadBatBoss = Class.create(Sprite, {
         this.y += this.ySpeed;
         if(this.horizontalDir==1){ //left
           this.x -= this.moveSpeed;
-          if (this.x <= 0) {
+          if (this.x < 0) {
             this.x = 0;
             this.horizontalDir = 2;
           }
         }else{ //right
-          this.x -= this.moveSpeed;
-          if (this.x >= game.width-this.width) {
+          this.x += this.moveSpeed;
+          if (this.x > game.width-this.width) {
             this.x = game.width-this.width;
             this.horizontalDir = 1;
           }
         }
         
         this.shootTime-=1;
-        if(this.bullets>=0 && this.shootTime<=0){
+        if(this.shootTime<=0){
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
-          this.shootTime = 16;
+          this.shootTime = 30;
         }
       }
       if(this.gotHitTime>0){
@@ -136,14 +135,14 @@ var MadBatBoss = Class.create(Sprite, {
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
-            this.frame = 0;
-            this.iniFrame = 0;
-            this.endFrame = 3;
+            this.frame = 10;
+            this.iniFrame = 10;
+            this.endFrame = 10;
           }else{
             this.animationDuration = 0;
-            this.frame = 5;
-            this.iniFrame = 5;
-            this.endFrame = 8;
+            this.frame = 10;
+            this.iniFrame = 10;
+            this.endFrame = 10;
           }
         }
       }
@@ -162,16 +161,19 @@ var MadBatBoss = Class.create(Sprite, {
 
 var BossKilled = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y) {
+  initialize: function(x,y,enemy) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
-    this.image  = Game.instance.assets['res/batsniperSheet.png'];
+    this.image  = Game.instance.assets['res/madbatSheet.png'];
     this.x = x;
     this.y = y;
+    this.id = enemy;
     this.aboutToDieTime = 30;
     
     // 3 - Animate
-    this.frame = 9;
+    switch(enemy){ //madbat, chiefbatoh, bartho, agilewest
+      default: this.frame = 9; break;
+    }
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -215,7 +217,7 @@ var BossGenerator = Class.create(Sprite, {
     var game = Game.instance;
     switch(this.world){
       case 1: 
-        var boss = new MadBatBoss(game.width/2 - 32);
+        var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world);
         break;
     }
     this.parentNode.bossGroup.addChild(boss);

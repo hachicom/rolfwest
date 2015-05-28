@@ -153,7 +153,7 @@ var DiamondItem = Class.create(Item, {
 var SandubaItem = Class.create(Item, {
   initialize: function(x, y, playerSprite, level, author){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 1, -10, 0, 1, 5, 5, 0, false);
+    Item.call(this, x, y, 0, 0, 1, -5, 0, 0.1, 5, 5, 0, false);
     this.frame = 5;
     this.itemId = 'sanduba';
   },
