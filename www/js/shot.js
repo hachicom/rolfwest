@@ -54,7 +54,9 @@ var EnemyShot = Class.create(Shot, {
       case 'bat': this.frame = 1; this.moveSpeed = 4 + level; break;
       case 'batkid': this.frame = 2; this.moveSpeed = 6 + level; break;
       case 'batsniper': this.frame = 3; this.moveSpeed = 6 + level; break;
-      case 'boss': this.frame = 0; this.moveSpeed = 16 + level; break;
+      case 'boss1': this.frame = 0; this.moveSpeed = 16 + level; break;
+      case 'boss2': this.frame = 0; this.moveSpeed = 16 + level; break;
+      case 'boss3': this.frame = 0; this.moveSpeed = 16 + level; break;
       default: this.frame = 1; this.moveSpeed = 4 + level; break;
     }
   }

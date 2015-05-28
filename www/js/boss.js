@@ -124,7 +124,7 @@ var MadBatBoss = Class.create(Sprite, {
         
         this.shootTime-=1;
         if(this.shootTime<=0){
-          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
+          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'boss1');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 30;

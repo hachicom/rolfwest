@@ -1009,6 +1009,7 @@ window.onload = function() {
         this.boxes[boxnum].visible = false;
         if(boxnum == this.starposition){
           this.msgLabel.text = 'NICE! 1-UP!!!';
+          hachiplayer.lives+=1;
         }else this.msgLabel.text = '  NO BONUS!';
         this.mode = 'end';
         this.star.visible = true;
