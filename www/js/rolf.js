@@ -162,12 +162,12 @@ var Rolf = Class.create(Sprite, {
       shotGroup = this.parentNode.shotGroup;
       //this.reload = false;
       if(this.health>3){
-        var s1 = new PlayerShot(this.x+6, this.y);
-        var s2 = new PlayerShot(this.x+12, this.y);
+        var s1 = new PlayerShot(this.x+6, this.y, 2);
         this.parentNode.shotGroup.addChild(s1);
-        this.parentNode.shotGroup.addChild(s2);
+        //var s2 = new PlayerShot(this.x+12, this.y);
+        //this.parentNode.shotGroup.addChild(s2);
       }else{
-        var s = new PlayerShot(this.x+9, this.y);
+        var s = new PlayerShot(this.x+9, this.y, 1);
         this.parentNode.shotGroup.addChild(s);
       }
       this.bullets-=1;

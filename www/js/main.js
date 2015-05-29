@@ -1,4 +1,4 @@
-var version = '0.5.0';
+var version = '0.6.0';
 
 var hiscore = 10000;
 var paused = false;
@@ -74,6 +74,8 @@ window.onload = function() {
 	game.preload('res/rolfSheet.png',
                'res/melodySheet.png',
                'res/bulletSheet.png',
+               'res/bulletDoubleSheet.png',
+               'res/bulletBossSheet.png',
                'res/fingerSheet.png',
                'res/itemSheet.png',
                'res/batSheet.png',
@@ -81,6 +83,9 @@ window.onload = function() {
                'res/batsniperSheet.png',
                'res/madbatSheet.png',
                'res/western1Sheet.png',
+               'res/western2Sheet.png',
+               'res/western3Sheet.png',
+               'res/western4Sheet.png',
                'res/title.png',
                'res/dpad.png',
                'res/shootbtn.png',
@@ -234,7 +239,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(4,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(3,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -254,13 +259,13 @@ window.onload = function() {
       
       lvlMap = new Map(32, 32);
       //map.y = 315;
-      lvlMap.image = game.assets['res/western1Sheet.png'];
+      lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
       lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
       this.lvlMap = lvlMap;
       
       lvlFrontLayer = new Map(32, 32);
       //map.y = 315;
-      lvlFrontLayer.image = game.assets['res/western1Sheet.png'];
+      lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
       lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
       this.lvlFrontLayer = lvlFrontLayer;
             
@@ -355,11 +360,11 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(0,280,globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
+      batGenerator = new BatGenerator(0,280,globalBatMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batGenerator = batGenerator;
-      batkidGenerator = new BatKidGenerator(96,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
+      batkidGenerator = new BatKidGenerator(96,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batkidGenerator = batkidGenerator;
-      batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
+      batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batsniperGenerator = batsniperGenerator;
       bossGenerator = new BossGenerator(120,136,hachiplayer.world,hachiplayer.round);
       this.bossGenerator = bossGenerator;
@@ -570,23 +575,25 @@ window.onload = function() {
     },
     
     checkLevelComplete: function () {
-      if(hachiplayer.round == hachiplayer.levellimit && this.bossGenerator.defeated == true){
-        //Destroy all enemies
-        for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
-          var bat;
-          bat = this.batGroup.childNodes[j];          
-          bat.gotKilled(hachiplayer);
+      if(hachiplayer.round == hachiplayer.levellimit){
+        if(this.bossGenerator.defeated == true){
+          //Destroy all enemies
+          for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
+            var bat;
+            bat = this.batGroup.childNodes[j];          
+            bat.gotKilled(hachiplayer);
+          }
+          
+          for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
+            var batkid;
+            batkid = this.batkidGroup.childNodes[j];          
+            batkid.gotKilled(hachiplayer);
+          }
+          
+          //TODO: create Melody; else...        
+          var sanduba = new SandubaItem(145,320);
+          this.itemGroup.addChild(sanduba);
         }
-        
-        for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
-          var batkid;
-          batkid = this.batkidGroup.childNodes[j];          
-          batkid.gotKilled(hachiplayer);
-        }
-        
-        //TODO: create Melody; else...        
-        var sanduba = new SandubaItem(145,320);
-        this.itemGroup.addChild(sanduba);
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
         //if all enemy generators were defeated
         var sanduba = new SandubaItem(145,320);
@@ -624,6 +631,8 @@ window.onload = function() {
         // this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
         // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
         // this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
+        // this.lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
+        // this.lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
         
         //Reset Stage Variables      
         // this.startLevelMsg = 60;
@@ -717,7 +726,7 @@ window.onload = function() {
               for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
                 var bat;
                 bat = this.batGroup.childNodes[j];
-                if (shot.within(bat,16)){
+                if (shot.intersect(bat)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -735,7 +744,7 @@ window.onload = function() {
               for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
                 var batkid;
                 batkid = this.batkidGroup.childNodes[j];
-                if (shot.within(batkid,16)){
+                if (shot.intersect(batkid)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -753,7 +762,7 @@ window.onload = function() {
               for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
                 var batsniper;
                 batsniper = this.batsniperGroup.childNodes[j];
-                if (shot.intersect(batsniper,18)){
+                if (shot.intersect(batsniper)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -773,7 +782,7 @@ window.onload = function() {
               for (var j = this.bossGroup.childNodes.length - 1; j >= 0; j--) {
                 var boss;
                 boss = this.bossGroup.childNodes[j];
-                if (shot.intersect(boss,18)){
+                if (shot.intersect(boss)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');

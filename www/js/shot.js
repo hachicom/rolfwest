@@ -1,12 +1,20 @@
 // Shot
 var Shot = Class.create(Sprite, {
-  initialize: function(x, y, direction){
+  initialize: function(x, y, direction, size){
     // Call superclass constructor
-    Sprite.apply(this,[5, 8]);
-    this.image = game.assets['res/bulletSheet.png'];
+    var bulletfile = 'res/bulletSheet.png'; 
+    var spritesize = 5;
+    switch(size){
+      case 1: bulletfile = 'res/bulletSheet.png'; spritesize = 5; break;
+      case 2: bulletfile = 'res/bulletDoubleSheet.png'; spritesize = 15; break;
+      case 3: bulletfile = 'res/bulletBossSheet.png'; spritesize = 24; break;
+      default: bulletfile = 'res/bulletSheet.png'; spritesize = 5; break;
+    }
+    Sprite.apply(this,[spritesize, 8]);
+    this.image = game.assets[bulletfile];
     this.x = x;
     this.y = y;
-    this.direction = direction;    
+    this.direction = direction;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -34,9 +42,9 @@ var Shot = Class.create(Sprite, {
 // PlayerShot class
 var PlayerShot = Class.create(Shot, {
   // Succeeds bullet class
-  initialize: function(x, y){
+  initialize: function(x, y, size){
     this.angle = Math.atan2(-1, 0); //shooting up (Ytarget-Ystart,Xtarget-Xstart)
-    Shot.call(this, x, y, this.angle);
+    Shot.call(this, x, y, this.angle, size);
     this.frame = 0;
     this.moveSpeed = 16;
   }
@@ -48,17 +56,19 @@ var EnemyShot = Class.create(Shot, {
   initialize: function(x, y, playerSprite, level, author){
     var playerRadius = playerSprite.width/2;
     this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
-    Shot.call(this, x, y, this.angle);
-    this.scaleY = -1;
     switch(author){
-      case 'bat': this.frame = 1; this.moveSpeed = 4 + level; break;
-      case 'batkid': this.frame = 2; this.moveSpeed = 6 + level; break;
-      case 'batsniper': this.frame = 3; this.moveSpeed = 6 + level; break;
-      case 'boss1': this.frame = 0; this.moveSpeed = 16 + level; break;
-      case 'boss2': this.frame = 0; this.moveSpeed = 16 + level; break;
-      case 'boss3': this.frame = 0; this.moveSpeed = 16 + level; break;
-      default: this.frame = 1; this.moveSpeed = 4 + level; break;
+      case 'bat': frame = 1; moveSpeed = 3 + level; this.size = 1; break;
+      case 'batkid': frame = 2; moveSpeed = 4 + level; this.size = 1; break;
+      case 'batsniper': frame = 3; moveSpeed = 5 + level; this.size = 1; break;
+      case 'boss1': frame = 0; moveSpeed = 6 + level; this.size = 3; break;
+      case 'boss2': frame = 1; moveSpeed = 7 + level; this.size = 3; break;
+      case 'boss3': frame = 2; moveSpeed = 8 + level; this.size = 3; break;
+      case 'boss4': frame = 0; moveSpeed = 16; this.size = 2; break;
+      default: frame = 1; moveSpeed = 4 + level; this.size = 1; break;
     }
+    Shot.call(this, x, y, this.angle, this.size);
+    this.scaleY = -1;
+    this.frame = frame; this.moveSpeed = moveSpeed;
   }
 });
 

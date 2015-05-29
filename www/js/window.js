@@ -6,7 +6,7 @@ var GuiWindow = Class.create(Group, {
     Group.apply(this);
     
     bg = new Sprite(w, h);
-    bg.backgroundColor = '#aaaaaa';
+    bg.backgroundColor = '#0000FF';
     bg.x = x;
     bg.y = y;
     this.bgwindow = bg;
