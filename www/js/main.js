@@ -81,6 +81,8 @@ window.onload = function() {
                'res/batSheet.png',
                'res/batkidSheet.png',
                'res/batsniperSheet.png',
+               'res/boxSheet.png',
+               'res/boxPiece.png',
                'res/madbatSheet.png',
                'res/western1Sheet.png',
                'res/western2Sheet.png',
@@ -239,7 +241,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(3,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(4,4); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -258,16 +260,14 @@ window.onload = function() {
       this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
       
       lvlMap = new Map(32, 32);
-      //map.y = 315;
-      lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
-      lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
+      lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
+      lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]['mainlayer']);
       this.lvlMap = lvlMap;
       
-      lvlFrontLayer = new Map(32, 32);
-      //map.y = 315;
-      lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
-      lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
-      this.lvlFrontLayer = lvlFrontLayer;
+      // lvlFrontLayer = new Map(32, 32);
+      // lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
+      // lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level]['toplayer']);
+      // this.lvlFrontLayer = lvlFrontLayer;
             
       // GUI
       gui = new Sprite(320,38);
@@ -346,7 +346,7 @@ window.onload = function() {
       pauseBtn = new Sprite(64, 64);
       pauseBtn.image = game.assets['res/pause.png'];
       pauseBtn.x = 246;
-      pauseBtn.y = 70;
+      pauseBtn.y = 40;
       pauseBtn.opacity = 0.6;
       pauseBtn.addEventListener(Event.TOUCH_START,this.pauseGame);
       this.pauseBtn = pauseBtn;
@@ -367,8 +367,7 @@ window.onload = function() {
       batsniperGenerator = new BatSniperGenerator(0,280,globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batsniperGenerator = batsniperGenerator;
       bossGenerator = new BossGenerator(120,136,hachiplayer.world,hachiplayer.round);
-      this.bossGenerator = bossGenerator;
-      
+      this.bossGenerator = bossGenerator;      
       
       /* melody = new Melody(272,288,levelUpAt);
       this.melody = melody; */
@@ -393,8 +392,15 @@ window.onload = function() {
       evilShotGroup = new Group();
       this.evilShotGroup = evilShotGroup;
       
+      //Item group
       itemGroup = new Group();
       this.itemGroup = itemGroup;
+      //Box group
+      boxGroup = new Group();
+      this.boxGroup = boxGroup;      
+      
+      boxGenerator = new BoxGenerator(120,136,globalTileMap['stage'+hachiplayer.level]['boxlayer'],boxGroup);
+      this.boxGenerator = boxGenerator;
       
       // Player Instance
       this.hachiplayer = hachiplayer;
@@ -432,14 +438,16 @@ window.onload = function() {
       this.addChild(batkidGenerator);
       this.addChild(batsniperGenerator);
       this.addChild(bossGenerator);
+      this.addChild(boxGenerator);
       this.addChild(batGroup);
       this.addChild(batkidGroup);
       this.addChild(batsniperGroup);
-      this.addChild(lvlFrontLayer);
+      //this.addChild(lvlFrontLayer);
       this.addChild(bossGroup);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
-      this.addChild(itemGroup);      
+      this.addChild(itemGroup);
+      this.addChild(boxGroup);
       this.addChild(rolf);
       this.addChild(gui);
       this.addChild(ammoLabel);
@@ -629,10 +637,10 @@ window.onload = function() {
         else game.replaceScene(new SceneInterlude());
         // Reload tilemaps and bgcolor
         // this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
-        // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]);
-        // this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level+'top']);
-        // this.lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
-        // this.lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level+'sheet']];
+        // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]['mainlayer']);
+        // this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level]['toplayer']);
+        // this.lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
+        // this.lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
         
         //Reset Stage Variables      
         // this.startLevelMsg = 60;
@@ -735,7 +743,8 @@ window.onload = function() {
                   } */
                   this.shotGroup.removeChild(shot);
                   bat.gotHit(hachiplayer); 
-                  this.checkLevelComplete();//if the bat shot is the last one, batGenerator will be defeated
+                  if(hachiplayer.round != hachiplayer.levellimit)
+                    this.checkLevelComplete();//if the bat shot is the last one, batGenerator will be defeated
                   break;
                 }
               }
@@ -753,7 +762,8 @@ window.onload = function() {
                   } */
                   this.shotGroup.removeChild(shot);
                   batkid.gotHit(hachiplayer); 
-                  this.checkLevelComplete();//if the batkid shot is the last one, batkidGenerator will be defeated
+                  if(hachiplayer.round != hachiplayer.levellimit)
+                    this.checkLevelComplete();//if the batkid shot is the last one, batkidGenerator will be defeated
                   break;
                 }
               }
@@ -772,7 +782,8 @@ window.onload = function() {
                   var ks = batsniper.gotHit(hachiplayer); 
                   if(ks) {
                     this.shotGroup.removeChild(shot);
-                    this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
+                    if(hachiplayer.round != hachiplayer.levellimit)
+                      this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
                   }
                   break;
                 }
@@ -793,6 +804,25 @@ window.onload = function() {
                   if(ks) {
                     this.shotGroup.removeChild(shot);
                     //if the boss shot is the last one, batkidGenerator will be defeated
+                  }
+                  break;
+                }
+              }
+              
+              //BOXES
+              for (var j = this.boxGroup.childNodes.length - 1; j >= 0; j--) {
+                var box;
+                box = this.boxGroup.childNodes[j];
+                if (shot.intersect(box)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = box.gotHit(hachiplayer); 
+                  if(ks) {
+                    this.shotGroup.removeChild(shot);
                   }
                   break;
                 }
@@ -821,10 +851,12 @@ window.onload = function() {
               }
             }
             
-            /*==== PLAYER vs ENEMY SHOTS ====*/
+            /*==== PLAYER/BOXES vs ENEMY SHOTS ====*/
             for (var i = this.evilShotGroup.childNodes.length - 1; i >= 0; i--) {
               var evilshot;
               evilshot = this.evilShotGroup.childNodes[i];
+              
+              //PLAYER
               if (evilshot.within(this.rolf,16) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
@@ -841,6 +873,25 @@ window.onload = function() {
                   //this.bgm.stop();
                 }
                 break;
+              }
+              
+              //BOXES
+              for (var j = this.boxGroup.childNodes.length - 1; j >= 0; j--) {
+                var box;
+                box = this.boxGroup.childNodes[j];
+                if (evilshot.intersect(box)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = box.gotHit(hachiplayer); 
+                  if(ks) {
+                    this.evilShotGroup.removeChild(evilshot);
+                  }
+                  break;
+                }
               }
             }
             
@@ -948,7 +999,7 @@ window.onload = function() {
       star.x = 0;
       star.y = game.height - 160;
       star.image = game.assets['res/itemSheet.png'];
-      star.frame = 14;
+      star.frame = 15;
       star.visible = false;
       this.star = star;
       
@@ -956,7 +1007,7 @@ window.onload = function() {
       box1 = new Sprite(32,32);
       box1.x = game.width/2 - 132;
       box1.y = game.height - 160;
-      box1.frame = 10;
+      box1.frame = 11;
       box1.image = game.assets['res/itemSheet.png'];
       box1.visible = false;
       box1.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(1);});
@@ -965,7 +1016,7 @@ window.onload = function() {
       box2 = new Sprite(32,32);
       box2.x = box1.x + 80;
       box2.y = game.height - 160;
-      box2.frame = 10;
+      box2.frame = 11;
       box2.image = game.assets['res/itemSheet.png']; 
       box2.visible = false;
       box2.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(2);});
@@ -974,7 +1025,7 @@ window.onload = function() {
       box3 = new Sprite(32,32);
       box3.x = box2.x + 80;
       box3.y = game.height - 160;
-      box3.frame = 10;
+      box3.frame = 11;
       box3.image = game.assets['res/itemSheet.png']; 
       box3.visible = false;
       box3.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(3);});
@@ -983,7 +1034,7 @@ window.onload = function() {
       box4 = new Sprite(32,32);
       box4.x = box3.x + 80;
       box4.y = game.height - 160;
-      box4.frame = 10;
+      box4.frame = 11;
       box4.image = game.assets['res/itemSheet.png']; 
       box4.visible = false;
       box4.addEventListener(Event.TOUCH_START, function(){this.parentNode.chooseBox(4);});

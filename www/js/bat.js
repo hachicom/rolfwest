@@ -59,7 +59,7 @@ var BatEnemy = Class.create(Sprite, {
   },
   
   gotKilled: function(playerObj) {
-    this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
+    //this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
     var batk = new BatKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batk);
     

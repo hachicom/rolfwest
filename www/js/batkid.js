@@ -40,7 +40,7 @@ var BatKidEnemy = Class.create(Sprite, {
   },
   
   gotHit: function(playerObj) {
-    if(this.mode=='start') return false;
+    //if(this.mode=='start') return false;
     this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     switch(this.mode){
       //case 'start'  : playerObj.score+=120; break;
@@ -67,7 +67,7 @@ var BatKidEnemy = Class.create(Sprite, {
   },
   
   gotKilled: function(playerObj) {
-    this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
+    //this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     var batkidk = new BatkidKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batkidk);
     
@@ -221,15 +221,15 @@ var BatKidGenerator = Class.create(Sprite, {
   initialize: function(x,y,lvlBatKidEnemyMap,level) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
-    //this.image  = Game.instance.assets['res/Ice.png'];      
+    //this.image  = Game.instance.assets['res/doorgen.png'];      
 
     //controle vars
     this.x = x;
     this.y = y;
-    //this.genpoint = x + (this.width/2);
+    this.genpoint = -64;
     this.batkids = [];
     this.createBatKidTime = 0;
-    //this.createBatKidSide = getRandom(0,1); //0=on the same position; 1=on the other side;
+    this.createBatKidSide = getRandom(0,1); //0=on the same position; 1=on the other side;
     this.sendBatKidTime = 90 + (10 * getRandom(1,4));
     this.batkidIdx = 0;
     //this.batkidIdy = 0;
@@ -260,7 +260,7 @@ var BatKidGenerator = Class.create(Sprite, {
         if (this.createBatKidTime <= 0) {
           //console.log("creating batkid");
           this.y = this.batkidEnemyMap[this.batkidIdx][1];
-          var batkid = new BatKidEnemy(this.x,this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit);
+          var batkid = new BatKidEnemy(this.genpoint+this.createBatKidSide*(game.width+64),this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit);
           this.batkids.push(batkid);
           this.parentNode.batkidGroup.addChild(batkid);
           this.createBatKidTime = 8;

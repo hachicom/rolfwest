@@ -30,15 +30,15 @@ var MadBatBoss = Class.create(Sprite, {
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
-    this.frame = 10;
-    this.iniFrame = 10;
-    this.endFrame = 10;
+    this.frame = 0;
+    this.iniFrame = 0;
+    this.endFrame = 3;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
   gotHit: function(playerObj) {
-    if (this.gotHitTime>0) return false;
+    //if (this.gotHitTime>0) return false;
     if (this.mode=='fly'){
       switch(this.mode){
         case 'fly'    : playerObj.score+=10; break;
@@ -46,6 +46,7 @@ var MadBatBoss = Class.create(Sprite, {
       this.hp-=1;
       if(this.hp<0){
         //alert("i'm dead");
+        this.parentNode.parentNode.bossGenerator.defeated = true;
         var madbatk = new BossKilled(this.x,this.y, 'madbat');
         this.parentNode.parentNode.addChild(madbatk);
         this.parentNode.removeChild(this);
@@ -53,9 +54,9 @@ var MadBatBoss = Class.create(Sprite, {
       }else{
         this.gotHitTime = 10;
         this.animationDuration = 0;
-        this.frame = 10;
-        this.iniFrame = 10;
-        this.endFrame = 10;
+        this.frame = 4;
+        this.iniFrame = 4;
+        this.endFrame = 5;
       }
       return true;
     }
@@ -124,7 +125,7 @@ var MadBatBoss = Class.create(Sprite, {
         
         this.shootTime-=1;
         if(this.shootTime<=0){
-          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'boss1');
+          var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 30;
@@ -135,14 +136,14 @@ var MadBatBoss = Class.create(Sprite, {
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
-            this.frame = 10;
-            this.iniFrame = 10;
-            this.endFrame = 10;
+            this.frame = 0;
+            this.iniFrame = 0;
+            this.endFrame = 3;
           }else{
             this.animationDuration = 0;
-            this.frame = 10;
-            this.iniFrame = 10;
-            this.endFrame = 10;
+            this.frame = 0;
+            this.iniFrame = 0;
+            this.endFrame = 3;
           }
         }
       }
@@ -172,7 +173,7 @@ var BossKilled = Class.create(Sprite, {
     
     // 3 - Animate
     switch(enemy){ //madbat, chiefbatoh, bartho, agilewest
-      default: this.frame = 9; break;
+      default: this.frame = 5; break;
     }
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -184,7 +185,6 @@ var BossKilled = Class.create(Sprite, {
       this.visible=false;
     }else this.visible=true;
     if(this.aboutToDieTime<=0){
-      this.parentNode.bossGenerator.defeated = true;
       this.parentNode.checkLevelComplete();
       this.parentNode.removeChild(this);
       delete this;

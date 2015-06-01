@@ -4,13 +4,14 @@ var Shot = Class.create(Sprite, {
     // Call superclass constructor
     var bulletfile = 'res/bulletSheet.png'; 
     var spritesize = 5;
+    var spriteheight = 8;
     switch(size){
-      case 1: bulletfile = 'res/bulletSheet.png'; spritesize = 5; break;
-      case 2: bulletfile = 'res/bulletDoubleSheet.png'; spritesize = 15; break;
-      case 3: bulletfile = 'res/bulletBossSheet.png'; spritesize = 24; break;
-      default: bulletfile = 'res/bulletSheet.png'; spritesize = 5; break;
+      case 1: bulletfile = 'res/bulletSheet.png'; spritesize = 5; spriteheight = 8; break;
+      case 2: bulletfile = 'res/bulletDoubleSheet.png'; spritesize = 15; spriteheight = 8; break;
+      case 3: bulletfile = 'res/bulletBossSheet.png'; spritesize = 24; spriteheight = 24; break;
+      default: bulletfile = 'res/bulletSheet.png'; spritesize = 5; spriteheight = 8; break;
     }
-    Sprite.apply(this,[spritesize, 8]);
+    Sprite.apply(this,[spritesize, spriteheight]);
     this.image = game.assets[bulletfile];
     this.x = x;
     this.y = y;
@@ -60,8 +61,8 @@ var EnemyShot = Class.create(Shot, {
       case 'bat': frame = 1; moveSpeed = 3 + level; this.size = 1; break;
       case 'batkid': frame = 2; moveSpeed = 4 + level; this.size = 1; break;
       case 'batsniper': frame = 3; moveSpeed = 5 + level; this.size = 1; break;
-      case 'boss1': frame = 0; moveSpeed = 6 + level; this.size = 3; break;
-      case 'boss2': frame = 1; moveSpeed = 7 + level; this.size = 3; break;
+      case 'boss1': frame = 0; moveSpeed = 4 + level; this.size = 3; break;
+      case 'boss2': frame = 1; moveSpeed = 6 + level; this.size = 3; break;
       case 'boss3': frame = 2; moveSpeed = 8 + level; this.size = 3; break;
       case 'boss4': frame = 0; moveSpeed = 16; this.size = 2; break;
       default: frame = 1; moveSpeed = 4 + level; this.size = 1; break;

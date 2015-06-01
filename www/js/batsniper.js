@@ -47,15 +47,13 @@ var BatSniperEnemy = Class.create(Sprite, {
   },
   
   isHidden: function() {
-    if(this.hideoutStart==0 && this.hideoutEnd==0) return false; //there's no place to hide in this stage
-    if(this.mode=='start' || this.mode=='hiding') return true; //is behind hideout
-    else if(this.x>this.hideoutStart && (this.x+32)<this.hideoutEnd) return true; //is behind hideout
+    if(this.mode=='start' || this.mode=='hiding') return true; //is teleporting
     else return false; //is exposed
   },
   
   gotHit: function(playerObj) {
     if (this.gotHitTime>0) return false;
-    if (!this.isHidden() || this.mode=='shoot' || this.mode=='offguard'){
+    if (!this.isHidden()){
       switch(this.mode){
         case 'idle'    : playerObj.score+=20; break;
         case 'shoot'   : playerObj.score+=70; break;
@@ -152,7 +150,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         //shoot at player
         this.shootTime-=1;
         if(this.bullets>=0 && this.shootTime<=0){
-          if(this.isHidden()) this.y=this.originY - 16;
+          //if(this.isHidden()) this.y=this.originY - 16;
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
@@ -167,7 +165,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.shootTime-=1;
         if(this.shootTime<=0){
          this.mode = 'idle';
-         if(this.isHidden()) this.y=this.originY;        
+         //if(this.isHidden()) this.y=this.originY;        
         }
       }      
       if(this.mode == 'hiding'){
