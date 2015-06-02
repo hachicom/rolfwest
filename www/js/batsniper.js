@@ -55,10 +55,10 @@ var BatSniperEnemy = Class.create(Sprite, {
     if (this.gotHitTime>0) return false;
     if (!this.isHidden()){
       switch(this.mode){
-        case 'idle'    : playerObj.score+=20; break;
-        case 'shoot'   : playerObj.score+=70; break;
-        case 'offguard': playerObj.score+=500; break;
-        case 'fly'     : playerObj.score+=200; break;
+        case 'idle'    : playerObj.addScore(20,false); break;
+        case 'shoot'   : playerObj.addScore(50,false); break;
+        case 'offguard': playerObj.addScore(500,false); break;
+        case 'fly'     : playerObj.addScore(250,false); break;
       }
       this.hp-=1;
       if(this.hp<0){
@@ -78,9 +78,9 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
-        this.endFrame = 4;        
-    
-        if(this.hp == 0){
+        this.endFrame = 4;
+        
+        if(this.hp == 0 && this.mode != 'idle'){
           var hat = new HatItem(this.x,this.y);
           this.parentNode.parentNode.itemGroup.addChild(hat);
         }
@@ -99,10 +99,12 @@ var BatSniperEnemy = Class.create(Sprite, {
       this.shootTime = 10;
       this.mode = 'shoot';
       this.bullets = 0 + addBullet;
+      if(this.level>=5) this.bullets = 3 + addBullet;
     }else if(this.hp>0) {
       this.shootTime = 5;
       this.mode = 'shoot';
       this.bullets = 3 + addBullet*2;
+      if(this.level>=5) this.bullets = 3 + addBullet * getRandom(3,6);
     }else if(this.hp<=0) {
       this.startTime = 20;
       this.mode = 'hiding';
@@ -151,7 +153,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.shootTime-=1;
         if(this.bullets>=0 && this.shootTime<=0){
           //if(this.isHidden()) this.y=this.originY - 16;
-          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
+          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           if(this.bullets<=0){
@@ -175,8 +177,8 @@ var BatSniperEnemy = Class.create(Sprite, {
         }else this.visible=true;
         if(this.startTime<=0){
           this.visible = true;
-          this.bullets = 5;
-          this.shootTime = 16;
+          this.bullets = 10;
+          this.shootTime = getRandom(5,10);
           this.y = 248;
           this.x = -32;
           this.moveSpeed = 5;
@@ -188,10 +190,10 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.x += this.moveSpeed;
         this.shootTime-=1;
         if(this.bullets>=0 && this.shootTime<=0){
-          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper');
+          var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
-          this.shootTime = 16;
+          this.shootTime = 10;
         }
         if(this.x >= game.width){
           this.startTime = 30;

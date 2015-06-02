@@ -37,10 +37,10 @@ var BatEnemy = Class.create(Sprite, {
   gotHit: function(playerObj) {
     this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
     switch(this.mode){
-      case 'start'  : playerObj.score+=20; break;
-      case 'idle'   : playerObj.score+=10; break;
-      case 'fly'    : playerObj.score+=40; break;
-      case 'retreat': playerObj.score+=80; break;
+      case 'start'  : playerObj.addScore(20,false); break;
+      case 'idle'   : playerObj.addScore(10,false); break;
+      case 'fly'    : playerObj.addScore(30,false); break;
+      case 'retreat': playerObj.addScore(50,false); break;
     }
     var batk = new BatKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batk);
@@ -144,7 +144,9 @@ var BatEnemy = Class.create(Sprite, {
         //shoot at player
         this.shootTime-=1;
         if(this.bullets>0 && this.shootTime<=0){
-          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'bat');
+          var shootdown = true;
+          if(this.level>=3) shootdown = false;
+          var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'bat', shootdown);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 5 + getRandom(0,5);          

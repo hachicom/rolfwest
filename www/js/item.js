@@ -49,8 +49,8 @@ var Item = Class.create(Sprite, {
       this.y += this.ySpeed;
       this.x += this.xSpeed;
       
-      if(this.y >= 360){
-        this.y = 360;
+      if(this.y >= 424){
+        this.y = 424;
         this.xSpeed = 0;
       }
       /*END MOVEMENT BLOCK*/
@@ -85,14 +85,15 @@ var HatItem = Class.create(Item, {
   
   gotHit: function(playerObj,hero) {
     hero.incHealth(playerObj);
-    playerObj.score+=1000;
+    playerObj.addScore(1000,false);
+    this.parentNode.parentNode.showReward(this.x,this.y,1000);
     this.remove();
   }
 });
 
 // CoinItem class
 var CoinItem = Class.create(Item, {
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
     Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 1, 4, 0.25, true);
     this.frame = 1;
@@ -100,14 +101,15 @@ var CoinItem = Class.create(Item, {
   },
   
   gotHit: function(playerObj,hero) {
-    playerObj.score+=50;
+    playerObj.addScore(50,false);
+    this.parentNode.parentNode.showReward(this.x,this.y,50);
     this.remove();
   }
 });
 
 // GoldCupItem class
 var GoldCupItem = Class.create(Item, {
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
     Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 6, 6, 0, true);
     this.frame = 6;
@@ -115,14 +117,15 @@ var GoldCupItem = Class.create(Item, {
   },
   
   gotHit: function(playerObj,hero) {
-    playerObj.score+=100;
+    playerObj.addScore(100,false);
+    this.parentNode.parentNode.showReward(this.x,this.y,100);
     this.remove();
   }
 });
 
 // GoldBarsItem class
 var GoldBarsItem = Class.create(Item, {
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
     Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 7, 7, 0, true);
     this.frame = 7;
@@ -130,14 +133,15 @@ var GoldBarsItem = Class.create(Item, {
   },
   
   gotHit: function(playerObj,hero) {
-    playerObj.score+=500;
+    playerObj.addScore(250,false);
+    this.parentNode.parentNode.showReward(this.x,this.y,250);
     this.remove();
   }
 });
 
 // DiamondItem class
 var DiamondItem = Class.create(Item, {
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
     Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 8, 9, 0.1, true);
     this.frame = 8;
@@ -145,21 +149,29 @@ var DiamondItem = Class.create(Item, {
   },
   
   gotHit: function(playerObj,hero) {
-    playerObj.score+=1000;
+    playerObj.addScore(500,false);
+    this.parentNode.parentNode.showReward(this.x,this.y,500);
     this.remove();
   }
 });
 
 var SandubaItem = Class.create(Item, {
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 1, -5, 0, 0.1, 5, 5, 0, false);
+    Item.call(this, x, y, 0, 0, 1, -4, 0, 0.1, 5, 5, 0, false);
     this.frame = 5;
     this.itemId = 'sanduba';
   },
   
   gotHit: function(playerObj,hero) {
-    playerObj.score+=500;
+    playerObj.addScore(this.parentNode.parentNode.bonusReward,false);
+    for (var i = this.parentNode.childNodes.length - 1; i >= 0; i--) {
+      var item;
+      item = this.parentNode.childNodes[i];
+      if (item.itemId!='sanduba'){
+        item.gotHit(playerObj,hero); //collect all itens
+      }
+    }
     this.parentNode.parentNode.endLevel = true;
     this.remove();
   }

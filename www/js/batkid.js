@@ -44,10 +44,10 @@ var BatKidEnemy = Class.create(Sprite, {
     this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     switch(this.mode){
       //case 'start'  : playerObj.score+=120; break;
-      case 'idle'   : playerObj.score+=30; break;
-      case 'fly'    : playerObj.score+=40; break;
-      case 'shoot'  : playerObj.score+=50; break;
-      case 'retreat': playerObj.score+=80; break;
+      case 'idle'   : playerObj.addScore(30,false); break;
+      case 'fly'    : playerObj.addScore(40,false); break;
+      case 'shoot'  : playerObj.addScore(50,false); break;
+      case 'retreat': playerObj.addScore(100,false); break;
     }
     var batkidk = new BatkidKilled(this.x,this.y);
     this.parentNode.parentNode.addChild(batkidk);
@@ -104,8 +104,8 @@ var BatKidEnemy = Class.create(Sprite, {
         this.x += this.moveSpeed * Math.cos(this.direction);
         this.y += this.moveSpeed * Math.sin(this.direction);
         if(this.nextposX < this.originX){//to the left
-          this.iniFrame = 2;
-          this.endFrame = 3;
+          this.iniFrame = 4;
+          this.endFrame = 7;
           if(this.nextposX >= this.x){
             this.mode = 'idle';
             this.y = this.nextposY;
@@ -116,8 +116,8 @@ var BatKidEnemy = Class.create(Sprite, {
           }
         } else {//to the right
           //this.scaleX = 1;
-          this.iniFrame = 0;
-          this.endFrame = 1;
+          this.iniFrame = 4;
+          this.endFrame = 7;
           if(this.nextposX <= this.x){
             this.mode = 'idle';
             this.y = this.nextposY;
@@ -144,7 +144,8 @@ var BatKidEnemy = Class.create(Sprite, {
         if(this.y >= 220){
           this.mode = 'shoot';
           this.shootTime = 10;
-          this.bullets = 3;
+          this.bullets = 2;
+          if(this.level>=4) this.bullets = getRandom(3,this.level);
           this.moveSpeed = 2;
           this.y = 220;
           //this.x = this.nextposX;
@@ -154,7 +155,7 @@ var BatKidEnemy = Class.create(Sprite, {
         //shoot at player
         this.shootTime-=1;
         if(this.bullets>0 && this.shootTime<=0){
-          var s = new EnemyShot(this.x+12, this.y+12, this.parentNode.parentNode.rolf, this.level, 'batkid');
+          var s = new EnemyShot(this.x+12, this.y+12, this.parentNode.parentNode.rolf, this.level, 'batkid', false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           if(this.bullets<=0){

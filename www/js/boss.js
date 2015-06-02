@@ -22,7 +22,7 @@ var MadBatBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 10; //after 10 shots, goes crazy
+    this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -49,6 +49,7 @@ var MadBatBoss = Class.create(Sprite, {
         this.parentNode.parentNode.bossGenerator.defeated = true;
         var madbatk = new BossKilled(this.x,this.y, 'madbat');
         this.parentNode.parentNode.addChild(madbatk);
+        playerObj.score+=1000;
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -63,20 +64,16 @@ var MadBatBoss = Class.create(Sprite, {
     else return false;
   },
   
-  setTarget: function(batqty) {
-    var game = Game.instance;
-    //alert(addBullet);
-    if(this.hp>4) {
-      this.shootTime = 10;
-      this.bullets = 4;
-    }else if(this.hp>1) {
-      this.shootTime = 5;
-      this.bullets = 8;
-    }
-    //this.moveSpeed = 6;
-    //this.direction = findAngle(this.x,this.y,this.parentNode.parentNode.rolf.x,this.parentNode.parentNode.rolf.y);
-    //this.mode = 'fly';
-  },
+  // setTarget: function(batqty) {
+    // var game = Game.instance;
+    // if(this.hp>10) {
+      // this.shootTime = 20;
+      // this.bullets = 4;
+    // }else if(this.hp>5) {
+      // this.shootTime = 10;
+      // this.bullets = 8;
+    // }
+  // },
   
   update: function(evt) {
     var game = Game.instance;
@@ -125,10 +122,11 @@ var MadBatBoss = Class.create(Sprite, {
         
         this.shootTime-=1;
         if(this.shootTime<=0){
-          var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1');
+          var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1', false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
-          this.shootTime = 30;
+          this.shootTime = 60;
+          if(this.level>=4) this.shootTime = 30;
         }
       }
       if(this.gotHitTime>0){

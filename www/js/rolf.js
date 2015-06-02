@@ -256,8 +256,8 @@ var Rolf = Class.create(Sprite, {
     this.health += this.healthStartFrame;
     if(this.health>this.healthMax) {
       this.health=this.healthMax;
-      //playerObj.lives+=1;
     }else{
+      this.vulnerableTime = 30;
       if(this.moving == 0){
         this.frame = 2 + this.health;
         this.iniFrame = 2 + this.health;

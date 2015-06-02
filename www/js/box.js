@@ -1,23 +1,30 @@
 // Box Sprite
 var BoxSprite = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y) {
+  initialize: function(x,y,frame) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     this.image  = Game.instance.assets['res/boxSheet.png'];
     this.x = x;
     this.y = y;
-
-    // 2 - Status
-    this.hp = 3;
     
-    // 3 - Animate
+    // 0=normal (3hits); 1=iron (6hits); 2=tnt (3hits); 3=powerup (2hits)
+    this.frame = frame;
+    this.mode = frame;
+    switch(frame){
+      case 0: this.hp = 3; break;
+      case 1: this.hp = 6; break;
+      case 2: this.hp = 4; break;
+      case 3: this.hp = 2; break;
+      default: this.hp = 1; break;
+    }
+    
+    // Animate
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
-    this.frame = 0;
-    this.iniFrame = 0;
-    this.endFrame = 0;
+    // this.iniFrame = 0;
+    // this.endFrame = 0;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -34,6 +41,10 @@ var BoxSprite = Class.create(Sprite, {
       this.parentNode.parentNode.addChild(arrFrag[i]);
     }
     if(this.hp<=0){
+      if(this.mode == 3){
+        var hat = new HatItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(hat);
+      }
       this.parentNode.removeChild(this);
       delete this;
     }
@@ -103,7 +114,7 @@ var BoxGenerator = Class.create(Sprite, {
     //this.boxes = [];
     
     for(var i=0; i<lvlBoxMap.length; i++){
-      var box = new BoxSprite(lvlBoxMap[i][0],lvlBoxMap[i][1]);
+      var box = new BoxSprite(lvlBoxMap[i][0],lvlBoxMap[i][1],lvlBoxMap[i][2]);
       boxGroup.addChild(box);
     }
   }

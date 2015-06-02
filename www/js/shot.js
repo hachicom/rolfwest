@@ -44,7 +44,7 @@ var Shot = Class.create(Sprite, {
 var PlayerShot = Class.create(Shot, {
   // Succeeds bullet class
   initialize: function(x, y, size){
-    this.angle = Math.atan2(-1, 0); //shooting up (Ytarget-Ystart,Xtarget-Xstart)
+    this.angle = Math.atan2(-1, 0); //shooting up (Y-0,X-0)
     Shot.call(this, x, y, this.angle, size);
     this.frame = 0;
     this.moveSpeed = 16;
@@ -54,9 +54,10 @@ var PlayerShot = Class.create(Shot, {
 // EnemyShot class
 var EnemyShot = Class.create(Shot, {
   // Succeeds bullet class
-  initialize: function(x, y, playerSprite, level, author){
+  initialize: function(x, y, playerSprite, level, author, shootdown){
     var playerRadius = playerSprite.width/2;
-    this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
+    if(!shootdown)this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
+    else this.angle = Math.atan2(1, 0); //shooting up
     switch(author){
       case 'bat': frame = 1; moveSpeed = 3 + level; this.size = 1; break;
       case 'batkid': frame = 2; moveSpeed = 4 + level; this.size = 1; break;

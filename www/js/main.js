@@ -1,17 +1,18 @@
-var version = '0.6.0';
+var version = '0.7.0';
 
-var hiscore = 10000;
+var hiscore = 30000;
 var paused = false;
 var oldTime = new Date();
+var maxbonusDecTime = 30;
 var fpscount = 0;
 var currentBGM;
 var isAndroid = isMobile();
-var scoreRewards = [5000,10000,20000,40000,80000];
+var scoreRewards = [20000,40000,80000,160000];
 var soundOn = true;
 var language = 'en_US'; //ou en_US
 var playerData = {
   scoretable: {
-		hiscore: 10000
+		hiscore: 30000
 	},
   settings: {
 		sound: true,
@@ -73,6 +74,7 @@ window.onload = function() {
 	// 4 - Preload resources
 	game.preload('res/rolfSheet.png',
                'res/melodySheet.png',
+               'res/scoreSheet.png',
                'res/bulletSheet.png',
                'res/bulletDoubleSheet.png',
                'res/bulletBossSheet.png',
@@ -241,7 +243,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(4,4); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -319,7 +321,7 @@ window.onload = function() {
       
       dpad = new Sprite(200,128);
       dpad.x = 0;
-      dpad.y = game.height - 128;
+      dpad.y = game.height - 110;
       dpad.opacity = 0.8;
       dpad.image = game.assets['res/dpad.png'];       
       dpad.addEventListener(Event.TOUCH_START,this.handleTouchStartControl);
@@ -329,7 +331,7 @@ window.onload = function() {
       
       shootBtn = new Sprite(64,128);
       shootBtn.x = game.width - 64;
-      shootBtn.y = game.height - 128;
+      shootBtn.y = game.height - 110;
       shootBtn.opacity = 0.8;
       shootBtn.image = game.assets['res/shootbtn.png'];       
       shootBtn.addEventListener(Event.TOUCH_START,this.handleTouchShootControl);
@@ -356,7 +358,7 @@ window.onload = function() {
       this.pausewin = pausewin;
       
       // Hero
-      rolf = new Rolf(145,360,hachiplayer);
+      rolf = new Rolf(145,424,hachiplayer);
       this.rolf = rolf;
       
       // Enemy Generators
@@ -395,6 +397,9 @@ window.onload = function() {
       //Item group
       itemGroup = new Group();
       this.itemGroup = itemGroup;
+      //NPC group
+      npcGroup = new Group;
+      this.npcGroup = npcGroup;
       //Box group
       boxGroup = new Group();
       this.boxGroup = boxGroup;      
@@ -413,9 +418,8 @@ window.onload = function() {
       this.endLevel = false;
       this.endLevelDuration = 0; 
       this.sabbath = 0;
-      this.bonusMode = false;
-      this.bonusDuration = 0; 
-      this.scoreTarget = 0; //posição de scoreRewards que aumenta ao ser atingida
+      this.bonusReward = 5000;
+      this.bonusDecTime = maxbonusDecTime;
       this.winGame = 0; //ao passar do level 34, considera o jogo ganho e apresenta uma mensagem de parabéns no SceneGameOver
       
       // Background music
@@ -446,8 +450,9 @@ window.onload = function() {
       this.addChild(bossGroup);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
-      this.addChild(itemGroup);
       this.addChild(boxGroup);
+      this.addChild(npcGroup);
+      this.addChild(itemGroup);
       this.addChild(rolf);
       this.addChild(gui);
       this.addChild(ammoLabel);
@@ -492,6 +497,11 @@ window.onload = function() {
       //paused = this.parentNode.paused;
       // this.parentNode.batGenerator.defeated = true;
       // this.parentNode.batkidGenerator.defeated = true;
+    },
+  
+    showReward: function(x,y,scoreval){
+      var sc = new ScoreSprite(x,y,scoreval);
+      this.addChild(sc);
     },
     
     handleTouchStartControl: function (evt) {
@@ -551,22 +561,6 @@ window.onload = function() {
       // evt.preventDefault();
     },
     
-    setScore: function (value,multi) {
-      if (multi) hachiplayer.score = hachiplayer.score + (value * this.multiplier);
-      else hachiplayer.score = hachiplayer.score + value;
-      if (hachiplayer.score >= scoreRewards[this.scoreTarget]){
-        if(this.scoreTarget<=scoreRewards.length){
-          hachiplayer.lives+=1;
-          this.scoreTarget+=1;
-        }
-      }
-      if (hachiplayer.score >= 99999) {
-        hachiplayer.score = 99999;
-        this.winGame = 2;
-      }
-      if (hachiplayer.score >= hiscore) hiscore = hachiplayer.score;
-    },
-    
     setCoins: function (value) {
       hachiplayer.coins = hachiplayer.coins + value;
       //this.igloo.turnLights(hachiplayer.coins);
@@ -599,12 +593,12 @@ window.onload = function() {
           }
           
           //TODO: create Melody; else...        
-          var sanduba = new SandubaItem(145,320);
-          this.itemGroup.addChild(sanduba);
+          var melody = new Melody(game.width,424);
+          this.npcGroup.addChild(melody);
         }
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
         //if all enemy generators were defeated
-        var sanduba = new SandubaItem(145,320);
+        var sanduba = new SandubaItem(145,384);
         this.itemGroup.addChild(sanduba);
       }
     },
@@ -677,12 +671,12 @@ window.onload = function() {
         
         this.scoreLabel.text = 'SCORE ' + hachiplayer.score;// + '_x' + this.multiplier;
         this.ammoLabel.text = glossary.text.municao[language]+'_' + this.rolf.bullets + '/6'; //+ levelupstr + this.levelUpAt;//+ '<br>' + this.generateFishTimer;
-        this.levelLabel.text = 'WORLD_  ' + hachiplayer.world + '-' + hachiplayer.round;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
+        this.levelLabel.text = 'BONUS_ ' + this.bonusReward;// + ' - ' + this.iceTimer+ '<br>' + this.generateIceTimer;
         this.livesLabel.text = 'ROLF_ ' + hachiplayer.lives;
-        this.hiscoreLabel.text = 'TOP '+hiscore;
-        if(this.bonusMode == true) this.ammoLabel.text = 'BONUS_STAGE';
+        this.hiscoreLabel.text = 'TOP '+hachiplayer.hiscore;
+        //if(this.bonusMode == true) this.ammoLabel.text = 'BONUS_STAGE';
         
-        if(this.gotHit!=true && this.endLevel!=true && this.bonusMode!=true){
+        if(this.gotHit!=true && this.endLevel!=true){
           // Deal with start message        
           if(this.startLevelMsg>0) {
             this.startLevelMsg-=1;
@@ -704,6 +698,12 @@ window.onload = function() {
         
           // Deals with showing the reload message when needed
           if(this.startLevelMsg<=0) {
+            this.bonusDecTime-=1;
+            if (this.bonusDecTime<=0){
+              if(this.bonusReward>0) this.bonusReward-=100;
+              this.bonusDecTime = maxbonusDecTime;
+            }
+            
             if(this.rolf.bullets <= 0){
               this.reloadLabelTime-=1;
               if(this.reloadLabelTime <= 0) 
@@ -905,6 +905,16 @@ window.onload = function() {
               }
             }
             
+            /**///npcGroup
+            /*==== PLAYER vs NPCs ====*/
+            for (var i = this.npcGroup.childNodes.length - 1; i >= 0; i--) {
+              var npc;
+              npc = this.npcGroup.childNodes[i];
+              if (npc.within(this.rolf,16)){
+                npc.interact(hachiplayer,this.rolf); //here the item collected will grant some reward
+                break;
+              }
+            }
           }//end startLevelMsg if
         }
         
@@ -1223,6 +1233,9 @@ window.onload = function() {
       label.y = 72;
       
       label.text = glossary.text.gameover[language]+'_  FINAL SCORE: '+hachiplayer.score;
+      
+      playerData.scoretable.hiscore = hachiplayer.hiscore;
+      localStorage["playerData"] = JSON.encode(playerData);
             
       this.addChild(label);
       
@@ -1592,10 +1605,10 @@ window.onload = function() {
       saveLabel.x = 160;
       saveLabel.y = 256;
       saveLabel.addEventListener(Event.TOUCH_START, function(e){
-        if(resetHiscore) hiscore = 0;
+        if(resetHiscore) hachiplayer.hiscore = 30000;
         soundOn = tmpSound;
         language = tmpLanguage;
-        playerData.scoretable.hiscore = hiscore;
+        playerData.scoretable.hiscore = hachiplayer.hiscore;
         playerData.settings.sound = soundOn;
         playerData.settings.language = language;
         
@@ -1650,7 +1663,7 @@ window.onload = function() {
       scoreLabel.y = 0;
       this.scoreLabel = scoreLabel;
             
-      hiscoreLabel = new FontSprite('sega12', 144, 12, 'TOP '+hiscore);
+      hiscoreLabel = new FontSprite('sega12', 144, 12, 'TOP '+hachiplayer.hiscore);
       hiscoreLabel.x = 160;
       hiscoreLabel.y = 0;
       this.hiscoreLabel = hiscoreLabel;
