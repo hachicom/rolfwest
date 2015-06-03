@@ -71,38 +71,52 @@ var EnemyShot = Class.create(Shot, {
     Shot.call(this, x, y, this.angle, this.size);
     this.scaleY = -1;
     this.frame = frame; this.moveSpeed = moveSpeed;
+    this.typeId = 'bullet';
   }
 });
 
-// Axe shot (machadinha)
-/* var Axe = Class.create(Sprite, {
+// Explosion Object
+var Explosion = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,vx) {
+  initialize: function(x,y,hurt) {
     // Call superclass constructor
-    Sprite.apply(this,[16, 16]);
-    this.image  = Game.instance.assets['res/IceFrag.png'];      
-    this.rotationSpeed = Math.random() * 100 - 50;
-    this.ySpeed = -10;
-    this.yAccel = 1;
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/explosionSheet.png'];      
     this.x = x;
     this.y = y;
-    this.xSpeed = vx;
+    this.hurt = hurt;
+    this.typeId = 'explosion';
+    //if(hurt) this.scale(4,4);
+    
+    // Animate
+    this.frame = 0;
+    this.iniFrame = 0;
+    this.endFrame = 6;
+    this.animationDuration = 0;
+    this.animationSpeed = 0.1;
+    
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
   update: function(evt) { 
-    if (!this.parentNode.paused){
-      var game;
-     
-      game = Game.instance;
-      
-      this.ySpeed += this.yAccel;
-      this.y += this.ySpeed;
-      this.x += this.xSpeed;
-      this.rotation += this.rotationSpeed * evt.elapsed * 0.001;           
-      if (this.y > game.height || this.x < 0 || this.x > game.width) {
-        this.parentNode.removeChild(this);        
+    var paused = false;
+    if(this.hurt) {
+      paused = this.parentNode.parentNode.paused; //está no grupo de tiro pra machucar o jogador      
+    } else {
+      paused = this.parentNode.paused;      
+    }  //explosão normal
+    if (!paused){
+      this.animationDuration += 0.05;
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.remove();
+        this.animationDuration -= this.animationSpeed;
       }
     }
+  },
+  
+  remove: function(){
+    this.parentNode.removeChild(this);
+    delete this;
   }
-}); */
+});

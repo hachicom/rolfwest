@@ -167,7 +167,7 @@ var BossKilled = Class.create(Sprite, {
     this.x = x;
     this.y = y;
     this.id = enemy;
-    this.aboutToDieTime = 30;
+    this.aboutToDieTime = 90;
     
     // 3 - Animate
     switch(enemy){ //madbat, chiefbatoh, bartho, agilewest
@@ -182,6 +182,10 @@ var BossKilled = Class.create(Sprite, {
     if(this.aboutToDieTime%2==0){
       this.visible=false;
     }else this.visible=true;
+    if(this.aboutToDieTime%5==0){
+      var explosion = new Explosion(getRandom(this.x-12,this.x+this.width+12),getRandom(this.y-12,this.y+this.height+12),false);
+      this.parentNode.addChild(explosion);
+    }
     if(this.aboutToDieTime<=0){
       this.parentNode.checkLevelComplete();
       this.parentNode.removeChild(this);

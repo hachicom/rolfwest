@@ -86,6 +86,7 @@ window.onload = function() {
                'res/boxSheet.png',
                'res/boxPiece.png',
                'res/madbatSheet.png',
+               'res/explosionSheet.png',
                'res/western1Sheet.png',
                'res/western2Sheet.png',
                'res/western3Sheet.png',
@@ -243,7 +244,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(4,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -329,8 +330,8 @@ window.onload = function() {
       dpad.addEventListener(Event.TOUCH_END,this.handleTouchEndControl);
       this.dpad = dpad;
       
-      shootBtn = new Sprite(64,128);
-      shootBtn.x = game.width - 64;
+      shootBtn = new Sprite(120,128);
+      shootBtn.x = game.width - 120;
       shootBtn.y = game.height - 110;
       shootBtn.opacity = 0.8;
       shootBtn.image = game.assets['res/shootbtn.png'];       
@@ -386,6 +387,9 @@ window.onload = function() {
       //Boss group
       bossGroup = new Group();
       this.bossGroup = bossGroup;
+      //Explosion group
+      explosionGroup = new Group;
+      this.explosionGroup = explosionGroup;
       
       // Player Shots group
       shotGroup = new Group();
@@ -443,14 +447,14 @@ window.onload = function() {
       this.addChild(batsniperGenerator);
       this.addChild(bossGenerator);
       this.addChild(boxGenerator);
+      this.addChild(boxGroup);
       this.addChild(batGroup);
       this.addChild(batkidGroup);
       this.addChild(batsniperGroup);
-      //this.addChild(lvlFrontLayer);
       this.addChild(bossGroup);
+      this.addChild(explosionGroup);
       this.addChild(evilShotGroup);
       this.addChild(shotGroup);
-      this.addChild(boxGroup);
       this.addChild(npcGroup);
       this.addChild(itemGroup);
       this.addChild(rolf);
@@ -803,7 +807,6 @@ window.onload = function() {
                   var ks = boss.gotHit(hachiplayer); 
                   if(ks) {
                     this.shotGroup.removeChild(shot);
-                    //if the boss shot is the last one, batkidGenerator will be defeated
                   }
                   break;
                 }
@@ -850,6 +853,7 @@ window.onload = function() {
                 break;
               }
             }
+                        
             
             /*==== PLAYER/BOXES vs ENEMY SHOTS ====*/
             for (var i = this.evilShotGroup.childNodes.length - 1; i >= 0; i--) {
@@ -890,6 +894,117 @@ window.onload = function() {
                   if(ks) {
                     this.evilShotGroup.removeChild(evilshot);
                   }
+                  break;
+                }
+              }
+            }
+            
+            /*==== PLAYER/ENEMY/BOX vs EXPLOSIONS ====*/
+            for (var i = this.explosionGroup.childNodes.length - 1; i >= 0; i--) {
+              var explosion;
+              explosion = this.explosionGroup.childNodes[i];
+              
+              //PLAYER
+              if (explosion.intersect(this.rolf) && this.rolf.isVulnerable()){
+                if( isAndroid ) {
+                  if(soundOn)
+                    window.plugins.LowLatencyAudio.play('hit');
+                }/* else{
+                  if(soundOn) game.assets['res/hit.wav'].play();
+                } */
+                this.gotHit = true; 
+                this.rolf.gotHit(hachiplayer);
+                if( isAndroid ) {
+                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                  //this.bgm.stop();
+                }
+                break;
+              }
+              
+              //BATS
+              for (var j = this.batGroup.childNodes.length - 1; j >= 0; j--) {
+                var bat;
+                bat = this.batGroup.childNodes[j];
+                if (explosion.intersect(bat)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  bat.gotHit(hachiplayer); 
+                  if(hachiplayer.round != hachiplayer.levellimit)
+                    this.checkLevelComplete();//if the bat shot is the last one, batGenerator will be defeated
+                  break;
+                }
+              }
+
+              //BATKIDS
+              for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
+                var batkid;
+                batkid = this.batkidGroup.childNodes[j];
+                if (explosion.intersect(batkid)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  batkid.gotHit(hachiplayer); 
+                  if(hachiplayer.round != hachiplayer.levellimit)
+                    this.checkLevelComplete();//if the batkid shot is the last one, batkidGenerator will be defeated
+                  break;
+                }
+              }
+
+              //BATSNIPERS
+              for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
+                var batsniper;
+                batsniper = this.batsniperGroup.childNodes[j];
+                if (explosion.intersect(batsniper)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = batsniper.gotHit(hachiplayer); 
+                  if(ks) {
+                    if(hachiplayer.round != hachiplayer.levellimit)
+                      this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
+                  }
+                  break;
+                }
+              }
+              
+              //BOSS
+              for (var j = this.bossGroup.childNodes.length - 1; j >= 0; j--) {
+                var boss;
+                boss = this.bossGroup.childNodes[j];
+                if (explosion.intersect(boss)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = boss.gotHit(hachiplayer);
+                  break;
+                }
+              }
+              
+              //BOXES
+              for (var j = this.boxGroup.childNodes.length - 1; j >= 0; j--) {
+                var box;
+                box = this.boxGroup.childNodes[j];
+                if (explosion.intersect(box)){
+                  if( isAndroid ) {
+                    if(soundOn)
+                      window.plugins.LowLatencyAudio.play('hit');
+                  }/* else{
+                    if(soundOn) game.assets['res/hit.wav'].play();
+                  } */
+                  var ks = box.gotHit(hachiplayer); 
                   break;
                 }
               }

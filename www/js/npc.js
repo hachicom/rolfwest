@@ -88,7 +88,7 @@ var Melody = Class.create(Sprite, {
     }
     // Animation
     if (!this.parentNode.paused){
-      this.animationDuration += evt.elapsed * 0.001;       
+      this.animationDuration += 0.05;
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;

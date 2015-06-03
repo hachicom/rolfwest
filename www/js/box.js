@@ -12,10 +12,10 @@ var BoxSprite = Class.create(Sprite, {
     this.frame = frame;
     this.mode = frame;
     switch(frame){
-      case 0: this.hp = 3; break;
+      case 0: this.hp = 2; break;
       case 1: this.hp = 6; break;
-      case 2: this.hp = 4; break;
-      case 3: this.hp = 2; break;
+      case 2: this.hp = 3; break;
+      case 3: this.hp = 4; break;
       default: this.hp = 1; break;
     }
     
@@ -23,8 +23,8 @@ var BoxSprite = Class.create(Sprite, {
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
-    // this.iniFrame = 0;
-    // this.endFrame = 0;
+    this.iniFrame = frame;
+    this.endFrame = frame;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -40,7 +40,27 @@ var BoxSprite = Class.create(Sprite, {
       arrFrag[i] = new BoxPiece(this.x+(this.width/2),this.y+this.height+arrHeight[i],arrSpeed[i]);
       this.parentNode.parentNode.addChild(arrFrag[i]);
     }
-    if(this.hp<=0){
+    if(this.hp<=0){      
+      if(this.mode == 2){
+        var s1 = new Explosion(this.x-20,this.y-20,true);
+        var s2 = new Explosion(this.x+4, this.y-20,true);
+        var s3 = new Explosion(this.x+28,this.y-20,true);
+        var s4 = new Explosion(this.x-20,this.y+4, true);
+        var s5 = new Explosion(this.x+4, this.y+4, true);
+        var s6 = new Explosion(this.x+28,this.y+4, true);
+        var s7 = new Explosion(this.x-20,this.y+28,true);
+        var s8 = new Explosion(this.x+4, this.y+28,true);
+        var s9 = new Explosion(this.x+28,this.y+28,true);
+        this.parentNode.parentNode.explosionGroup.addChild(s1);
+        this.parentNode.parentNode.explosionGroup.addChild(s2);
+        this.parentNode.parentNode.explosionGroup.addChild(s3);
+        this.parentNode.parentNode.explosionGroup.addChild(s4);
+        this.parentNode.parentNode.explosionGroup.addChild(s5);
+        this.parentNode.parentNode.explosionGroup.addChild(s6);
+        this.parentNode.parentNode.explosionGroup.addChild(s7);
+        this.parentNode.parentNode.explosionGroup.addChild(s8);
+        this.parentNode.parentNode.explosionGroup.addChild(s9);
+      }
       if(this.mode == 3){
         var hat = new HatItem(this.x,this.y);
         this.parentNode.parentNode.itemGroup.addChild(hat);
