@@ -85,7 +85,10 @@ window.onload = function() {
                'res/batsniperSheet.png',
                'res/boxSheet.png',
                'res/boxPiece.png',
-               'res/madbatSheet.png',
+               'res/bossMadbatSheet.png',
+               'res/bossChiefSheet.png',
+               'res/bossBarthoSheet.png',
+               'res/bossDefeatedSheet.png',
                'res/explosionSheet.png',
                'res/western1Sheet.png',
                'res/western2Sheet.png',
@@ -244,7 +247,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(4,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(12,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -620,7 +623,7 @@ window.onload = function() {
         game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
       }
       
-      if(hachiplayer.level>Object.keys(globalBatMap).length){
+      if(hachiplayer.level>Object.keys(globalTileMap).length){
         /******************************
          *******  ENDING GAME  ********
          ******************************/
@@ -695,6 +698,7 @@ window.onload = function() {
             if(this.startLevelMsg<=0) {
               this.batGenerator.modeStart=true;
               if(hachiplayer.round == 4) this.bossGenerator.createBoss();
+              else this.checkLevelComplete();
             }
           }
           //else if(this.rolf.bullets <= 0) this.msgLabel.text = glossary.text.alertaReload[language];
@@ -883,7 +887,7 @@ window.onload = function() {
               for (var j = this.boxGroup.childNodes.length - 1; j >= 0; j--) {
                 var box;
                 box = this.boxGroup.childNodes[j];
-                if (evilshot.intersect(box)){
+                if (evilshot.intersect(box) && box.y>=416){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');

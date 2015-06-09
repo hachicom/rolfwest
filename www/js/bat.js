@@ -225,14 +225,17 @@ var BatGenerator = Class.create(Sprite, {
     this.modeMove = 'desc'; //asc ou desc
     
     //level map loading
-    this.batEnemyMap = JSON.parse(JSON.stringify(lvlBatEnemyMap));
+    parsedMap = JSON.parse(JSON.stringify(lvlBatEnemyMap));
+    if(Object.keys(parsedMap).length>0){
+      this.batEnemyMap = parsedMap;
+    }else this.defeated = true;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
   update: function(evt) { 
     var game = Game.instance;
-    if (!this.parentNode.paused && this.modeStart){
+    if (!this.parentNode.paused && this.modeStart && !this.defeated){
     
       //ENEMY CREATION PROCESS
       if (this.batIdy < this.batEnemyMap.length){
