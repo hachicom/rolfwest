@@ -66,7 +66,7 @@ var EnemyShot = Class.create(Shot, {
       case 'boss2': frame = 1; moveSpeed = 6 + level; this.size = 3; break;
       case 'boss3': frame = 2; moveSpeed = 8 + level; this.size = 3; break;
       case 'boss3-2': frame = 3; moveSpeed = 10 + level; this.size = 2; break;
-      case 'boss4': frame = 0; moveSpeed = 16; this.size = 2; break;
+      case 'boss4': frame = 0; moveSpeed = 10; this.size = 2; break;
       default: frame = 1; moveSpeed = 4 + level; this.size = 1; break;
     }
     Shot.call(this, x, y, this.angle, this.size);

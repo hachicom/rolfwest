@@ -88,6 +88,7 @@ window.onload = function() {
                'res/bossMadbatSheet.png',
                'res/bossChiefSheet.png',
                'res/bossBarthoSheet.png',
+               'res/bossAgileSheet.png',
                'res/bossDefeatedSheet.png',
                'res/explosionSheet.png',
                'res/western1Sheet.png',
@@ -247,7 +248,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(12,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(23,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   

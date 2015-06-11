@@ -436,6 +436,183 @@ var BarthoBoss = Class.create(Sprite, {
   }
 });
 
+var AgileBoss = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x,y,level) {
+    // Call superclass constructor
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/bossAgileSheet.png'];
+    this.x = x;
+    this.y = y;
+    this.originX = x;
+    this.originY = y;
+
+    // 2 - Status
+    this.level = level;
+    this.nextposY = y;
+    this.direction = findAngle(x,y,this.nextposX,y);
+    this.mode = 'start'; //start, fly, hit
+    this.moveSpeed = 2;
+    this.xSpeed = 0;
+    this.xAccel = 0.5;
+    this.shootTime = 0;
+    this.bullets = 0;
+    this.horizontalDir = getRandom(1,2); //left/right
+    this.verticalDir = getRandom(1,2); //up/down
+    this.hp = 30; //after 10 shots, goes crazy
+    this.gotHitTime = 0;
+    this.startTime = 30;
+    this.modeTime = 90;
+    
+    // 3 - Animate
+    this.animationDuration = 0;
+    this.animationSpeed = 0.20;
+    this.idleTime=0;
+    this.frame = 0;
+    this.iniFrame = 0;
+    this.endFrame = 3;
+    
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  gotHit: function(playerObj) {
+    //if (this.gotHitTime>0) return false;
+    if (this.mode=='fly'){
+      switch(this.mode){
+        case 'fly'    : playerObj.score+=10; break;
+      }
+      this.hp-=1;
+      if(this.hp<0){
+        //alert("i'm dead");
+        this.parentNode.parentNode.bossGenerator.defeated = true;
+        var madbatk = new BossKilled(this.x,this.y, 'chief');
+        this.parentNode.parentNode.addChild(madbatk);
+        playerObj.score+=1000;
+        this.parentNode.removeChild(this);
+        delete this;
+      }else{
+        this.gotHitTime = 10;
+        this.animationDuration = 0;
+        this.frame = 4;
+        this.iniFrame = 4;
+        this.endFrame = 5;
+      }
+      return true;
+    }
+    else return false;
+  },
+  
+  update: function(evt) {
+    var game = Game.instance;
+    //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
+    if (!this.parentNode.parentNode.paused){
+      if(this.mode == 'start'){
+        this.startTime-=1;
+        if(this.startTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.startTime<=0){
+          this.visible = true;
+          this.mode = 'fly';
+          //this.y = this.nextposY;
+          //this.x = this.nextposX;
+        }
+      }
+      if(this.mode == 'fly'){
+        //movement
+        if(this.x <= this.parentNode.parentNode.rolf.x){
+          if(this.x<=this.parentNode.parentNode.rolf.x - 24) this.horizontalDir=2;
+        } else {
+          if(this.x>=this.parentNode.parentNode.rolf.x + 24) this.horizontalDir=1;
+        }
+        if(this.horizontalDir==1){
+          this.xSpeed -= this.xAccel;
+          if(this.xSpeed<=-7)this.xSpeed=-7;
+        }else{
+          this.xSpeed += this.xAccel;
+          if(this.xSpeed>=7)this.xSpeed=7;
+        }
+        this.x += this.xSpeed;
+        
+        this.shootTime-=1;
+        if(this.shootTime<=0){
+          var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
+          this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.bullets-=1;
+          this.shootTime = 10;
+        }
+        this.modeTime -= 1;
+        if(this.modeTime<=0) {this.mode = 'hide'; this.modeTime = 30;}
+      }            
+      if(this.mode == 'hide'){
+        this.modeTime-=1;
+        if(this.modeTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.modeTime<=0){
+          this.visible = true;
+          this.bullets = 6;
+          this.shootTime = 0;
+          this.y = this.parentNode.parentNode.rolf.y - 48;
+          this.x = this.parentNode.parentNode.rolf.x;
+          this.mode = 'surprise';
+        }
+      }
+      if(this.mode == 'surprise'){
+        this.shootTime-=1;
+        if(this.bullets>=0 && this.shootTime<=0){
+          var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
+          this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.bullets-=1;
+          if(this.bullets<=0){
+            this.mode = 'retreat';
+          }
+          this.shootTime = 10;
+        }
+      }
+      if(this.mode == 'retreat'){
+        this.startTime-=1;
+        if(this.startTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.startTime<=0){
+          this.visible = true;
+          this.y = this.originY;
+          this.x = this.originX;
+          this.modeTime = 90;
+          this.startTime = 30;
+          this.mode = 'start';
+        }
+      }
+      if(this.gotHitTime>0){
+        this.gotHitTime-=1;
+        if(this.gotHitTime<=0) {
+          if(this.hp>2){
+            this.animationDuration = 0;
+            this.frame = 0;
+            this.iniFrame = 0;
+            this.endFrame = 3;
+          }else{
+            this.animationDuration = 0;
+            this.frame = 0;
+            this.iniFrame = 0;
+            this.endFrame = 3;
+          }
+        }
+      }
+      
+      //START ANIMATION BLOCK//
+      this.animationDuration += 0.05;    
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
+      }
+      //END ANIMATION BLOCK//
+    }
+  }
+});
+
 var BossKilled = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
   initialize: function(x,y,enemy) {
@@ -515,9 +692,9 @@ var BossGenerator = Class.create(Sprite, {
       case 5: 
         var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world);
         break;
-      // case 6: 
-        // var boss = new AgileBoss(game.width/2 - 32,this.y,this.world);
-        // break;
+      case 6: 
+        var boss = new AgileBoss(game.width/2 - 32,this.y,this.world);
+        break;
     }
     this.parentNode.bossGroup.addChild(boss);
   }
