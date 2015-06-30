@@ -1,4 +1,4 @@
-var version = '0.7.0';
+var version = '0.8.0';
 
 var hiscore = 30000;
 var paused = false;
@@ -153,7 +153,7 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
         window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
         window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
-        window.plugins.LowLatencyAudio.preloadFX('jump', "res/jump.wav");
+        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
       }else{
         alert("erro plugin");
       }
@@ -200,7 +200,7 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.unload('item');
             window.plugins.LowLatencyAudio.unload('crash');
             window.plugins.LowLatencyAudio.unload('powerup');
-            window.plugins.LowLatencyAudio.unload('jump');
+            window.plugins.LowLatencyAudio.unload('shoot');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
@@ -367,7 +367,7 @@ window.onload = function() {
       this.rolf = rolf;
       
       // Enemy Generators
-      batGenerator = new BatGenerator(0,280,globalBatMap['stage'+hachiplayer.level],hachiplayer.world);
+      batGenerator = new BatGenerator(0,320,globalBatMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batGenerator = batGenerator;
       batkidGenerator = new BatKidGenerator(96,136,globalBatKidMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batkidGenerator = batkidGenerator;
@@ -436,12 +436,12 @@ window.onload = function() {
         if(soundOn) window.plugins.LowLatencyAudio.loop(currentBGM);
         //Hide Banner to avoid annoying player with lags from banner
         if(AdMob) AdMob.hideBanner();
-      }else{
+      }//else{
         //this.bgm = game.assets['res/bgm.mp3']; // Add this line
         //this.jumpSnd = game.assets['res/jump.wav'];
         // Start BGM
         //if(soundOn) this.bgm.play();
-      }
+      //}
       
       // 4 - Add child nodes
       // this.addChild(bg);
@@ -630,7 +630,7 @@ window.onload = function() {
          ******************************/
         //TODO: show an ending screen instead of title screen
         hachiplayer.reset();
-        game.replaceScene(new SceneTitle(0));
+        game.replaceScene(new SceneEnding(0));
       }else{
         /******************************
          ****  LOADING NEXT LEVEL  ****
@@ -888,7 +888,7 @@ window.onload = function() {
               for (var j = this.boxGroup.childNodes.length - 1; j >= 0; j--) {
                 var box;
                 box = this.boxGroup.childNodes[j];
-                if (evilshot.intersect(box) && box.y>=416){
+                if (evilshot.intersect(box) && (box.y>=384/*  || box.frame==2 */)){
                   if( isAndroid ) {
                     if(soundOn)
                       window.plugins.LowLatencyAudio.play('hit');
@@ -1340,6 +1340,51 @@ window.onload = function() {
     }
   });
   
+  // SceneEnding
+  var SceneEnding = Class.create(Scene, {
+    initialize: function() {
+      var TitleLabel, scoreLabel;
+      Scene.apply(this);
+      //this.backgroundColor = '#0026FF';
+      
+      // Background
+      // title = new Sprite(256,160);
+      // title.x = 32;
+      // title.y = 32;
+      // title.image = game.assets['res/title.png'];      
+      this.backgroundColor = '#0000FF';
+      this.timeToStart = 300;
+      
+      label = new FontSprite('sega12', 320, 120, '');
+      label.x = 0;
+      label.y = 10;
+      
+      label.text = glossary.text.wingame1[language];
+            
+      // this.addChild(map);
+      // this.addChild(igloo);
+      // this.addChild(igloo2);
+      // this.addChild(snow);
+      // this.addChild(melody);
+      this.addChild(label);
+      
+      // Listen for taps
+      this.addEventListener(Event.TOUCH_END, this.touchToStart);
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+    },
+    
+    update: function(evt) {
+      this.timeToStart -= 1;
+      if(this.timeToStart<=0)
+        game.replaceScene(new SceneCredits());
+    },
+    
+    touchToStart: function(evt) {
+      var game = Game.instance;
+      game.replaceScene(new SceneCredits());
+    }
+  });
+  
   // SceneGameOver  
   var SceneGameOver = Class.create(Scene, {
     initialize: function() {
@@ -1352,7 +1397,7 @@ window.onload = function() {
       label.x = 20;
       label.y = 72;
       
-      label.text = glossary.text.gameover[language]+'_  FINAL SCORE: '+hachiplayer.score;
+      label.text = glossary.text.gameover[language]+'___  FINAL SCORE: '+hachiplayer.score;
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
       localStorage["playerData"] = JSON.encode(playerData);

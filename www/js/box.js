@@ -51,6 +51,10 @@ var BoxSprite = Class.create(Sprite, {
         var s7 = new Explosion(this.x-20,this.y+28,true);
         var s8 = new Explosion(this.x+4, this.y+28,true);
         var s9 = new Explosion(this.x+28,this.y+28,true);
+        var s10 = new Explosion(this.x+4, this.y-44,true);
+        var s11 = new Explosion(this.x-44,this.y+4, true);
+        var s12 = new Explosion(this.x+52,this.y+4, true);
+        var s13 = new Explosion(this.x+4, this.y+52,true);
         this.parentNode.parentNode.explosionGroup.addChild(s1);
         this.parentNode.parentNode.explosionGroup.addChild(s2);
         this.parentNode.parentNode.explosionGroup.addChild(s3);
@@ -60,6 +64,10 @@ var BoxSprite = Class.create(Sprite, {
         this.parentNode.parentNode.explosionGroup.addChild(s7);
         this.parentNode.parentNode.explosionGroup.addChild(s8);
         this.parentNode.parentNode.explosionGroup.addChild(s9);
+        this.parentNode.parentNode.explosionGroup.addChild(s10);
+        this.parentNode.parentNode.explosionGroup.addChild(s11);
+        this.parentNode.parentNode.explosionGroup.addChild(s12);
+        this.parentNode.parentNode.explosionGroup.addChild(s13);
       }
       if(this.mode == 3){
         var hat = new HatItem(this.x,this.y);

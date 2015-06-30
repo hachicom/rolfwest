@@ -95,7 +95,7 @@ var Explosion = Class.create(Sprite, {
     this.iniFrame = 0;
     this.endFrame = 6;
     this.animationDuration = 0;
-    this.animationSpeed = 0.1;
+    this.animationSpeed = 0.15;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },

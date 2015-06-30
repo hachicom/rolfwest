@@ -22,7 +22,7 @@ var MadBatBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 30; //after 10 shots, goes crazy
+    this.hp = 20; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -183,7 +183,7 @@ var ChiefBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 30; //after 10 shots, goes crazy
+    this.hp = 20; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -265,7 +265,7 @@ var ChiefBoss = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.bullets-=1;
           this.shootTime = 25;
-          if(this.level>=4) this.shootTime = 15;
+          if(this.level>=4) this.shootTime = 20;
         }
       }
       if(this.gotHitTime>0){
@@ -320,7 +320,7 @@ var BarthoBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 60; //after 10 shots, goes crazy
+    this.hp = 15; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -459,7 +459,7 @@ var AgileBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 30; //after 10 shots, goes crazy
+    this.hp = 10; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     this.modeTime = 90;
@@ -477,7 +477,7 @@ var AgileBoss = Class.create(Sprite, {
   
   gotHit: function(playerObj) {
     //if (this.gotHitTime>0) return false;
-    if (this.mode=='fly'){
+    if (this.mode=='fly' || this.mode=='retreat'){
       switch(this.mode){
         case 'fly'    : playerObj.score+=10; break;
       }
@@ -485,7 +485,7 @@ var AgileBoss = Class.create(Sprite, {
       if(this.hp<0){
         //alert("i'm dead");
         this.parentNode.parentNode.bossGenerator.defeated = true;
-        var madbatk = new BossKilled(this.x,this.y, 'chief');
+        var madbatk = new BossKilled(this.x,this.y, 'agile');
         this.parentNode.parentNode.addChild(madbatk);
         playerObj.score+=1000;
         this.parentNode.removeChild(this);
@@ -533,6 +533,8 @@ var AgileBoss = Class.create(Sprite, {
           if(this.xSpeed>=7)this.xSpeed=7;
         }
         this.x += this.xSpeed;
+        //if(this.x <= 0) this.x = 0;
+        //else if(this.x >= 296) this.x = 296;
         
         this.shootTime-=1;
         if(this.shootTime<=0){
@@ -553,7 +555,7 @@ var AgileBoss = Class.create(Sprite, {
           this.visible = true;
           this.bullets = 6;
           this.shootTime = 0;
-          this.y = this.parentNode.parentNode.rolf.y - 48;
+          this.y = this.parentNode.parentNode.rolf.y - 96;
           this.x = this.parentNode.parentNode.rolf.x;
           this.mode = 'surprise';
         }
@@ -571,6 +573,19 @@ var AgileBoss = Class.create(Sprite, {
         }
       }
       if(this.mode == 'retreat'){
+        if(this.x<=(game.width/2)-12){
+          this.x -= 3;
+          if(this.x<=-24){
+            this.mode = 'restart';
+          }
+        }else{
+          this.x += 3;
+          if(this.x>=game.width){
+            this.mode = 'restart';
+          }
+        }
+      }
+      if(this.mode == 'restart'){
         this.startTime-=1;
         if(this.startTime%2==0){
           this.visible=false;
@@ -684,7 +699,7 @@ var BossGenerator = Class.create(Sprite, {
         var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world);
         break;
       case 3: 
-        var boss = new BarthoBoss(game.width/2 - 32,96,this.world);
+        var boss = new BarthoBoss(game.width/2 - 32,64,this.world);
         break;
       case 4: 
         var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world);
@@ -693,7 +708,7 @@ var BossGenerator = Class.create(Sprite, {
         var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world);
         break;
       case 6: 
-        var boss = new AgileBoss(game.width/2 - 32,this.y,this.world);
+        var boss = new AgileBoss(game.width/2,this.y,this.world);
         break;
     }
     this.parentNode.bossGroup.addChild(boss);

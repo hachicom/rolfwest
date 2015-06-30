@@ -49,7 +49,7 @@ var glossary = {
       en_US: '[  END  ]'
     },
     continuar :{ //glossary.UI.continuar[language]
-      pt_BR: '[CONTINUAR]',
+      pt_BR: '[RETOMAR]',
       en_US: '[RESUME]'
     },
     sair :{ //glossary.UI.sair[language]
@@ -143,8 +143,8 @@ var glossary = {
       en_US: "HINT: A good player_can clear 34 stages_in a match!"
     },
     wingame1: { //glossary.text.wingame1[language]
-      pt_BR: "      PARABÉNS!__Foi uma boa partida!____________ Até o próximo jogo",
-      en_US: "  CONGRATULATIONS!__It was a nice match!____________ See you next game!"
+      pt_BR: "A batalha chegou ao fim!__Rolf derrotou a temida Batgang,_restaurando a paz da cidade!___Parabéns!!!_Nos vemos no próximo jogo!",
+      en_US: "The battle is over!__Rolf defeated the feared Batgang,_restoring peace to the city!___Congratulations!!!_See you in the next game!"
     },
     wingame2: { //glossary.text.wingame2[language]
       pt_BR: "      PARABÉNS!__Você zerou o placar_ de Snow & Yuki!!!______________ Até o próximo jogo",

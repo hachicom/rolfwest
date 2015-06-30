@@ -58,6 +58,7 @@ var Melody = Class.create(Sprite, {
     this.endFrame = 1;
     this.animationDuration = 0;
     this.animationSpeed = 0.25;
+    this.keepmove = true;
     
     this.x = x;
     this.y = y;
@@ -75,16 +76,19 @@ var Melody = Class.create(Sprite, {
       item.gotHit(playerObj,hero); //collect all itens
     }
     this.parentNode.parentNode.endLevel = true;
+    this.keepmove = false;
   },
     
   update: function(evt) { 
     // Movement
-    if (this.x > 280) this.x-=1;
-    else {
-      this.x = 280;
-      this.frame = 0;
-      this.iniFrame = 0;
-      this.endFrame = 0;
+    if(this.keepmove==true){
+      if (this.x > 224) this.x-=1;
+      else {
+        this.x = 224;
+        this.frame = 0;
+        this.iniFrame = 0;
+        this.endFrame = 0;
+      }
     }
     // Animation
     if (!this.parentNode.paused){
