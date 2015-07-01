@@ -1,4 +1,4 @@
-var version = '0.8.0';
+var version = '0.9.0';
 
 var hiscore = 30000;
 var paused = false;
@@ -248,7 +248,7 @@ window.onload = function() {
   }
   
 	// 7 - Start 
-  var hachiplayer = new Hachiplayer(23,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   game.start();
   //window.scrollTo(0, 1);
   
@@ -599,6 +599,12 @@ window.onload = function() {
             batkid = this.batkidGroup.childNodes[j];          
             batkid.gotKilled(hachiplayer);
           }
+          
+          // for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
+            // var batsniper;
+            // batsniper = this.batsniperGroup.childNodes[j];          
+            // batsniper.gotKilled(hachiplayer);
+          // }
           
           //TODO: create Melody; else...        
           var melody = new Melody(game.width,424);
@@ -1310,12 +1316,15 @@ window.onload = function() {
       this.backgroundColor = '#0000FF';
       this.timeToStart = 120;
       
-      label = new FontSprite('sega24', 320, 60, '');
-      label.x = 80;
+      label = new FontSprite('sega24', 320, 320, '');
+      label.x = 0;
       label.y = 72;
       
-      label.text = ' WORLD '+ hachiplayer.world + '-' + hachiplayer.round;
-            
+      label.text = '       WORLD '+ hachiplayer.world + '-' + hachiplayer.round;
+      if(hachiplayer.level == 24){
+        label.text = glossary.text.finalstageMsg[language];
+      }
+
       // this.addChild(map);
       // this.addChild(igloo);
       // this.addChild(igloo2);
@@ -1879,10 +1888,28 @@ window.onload = function() {
         game.replaceScene(new SceneCredits());
       });
       
+      // Level Select label
+      levelLabel = new FontSprite('sega24', 160, 24, "[STAGE "+hachiplayer.level+"]");
+      levelLabel.x = 64;
+      levelLabel.y = 384;
+      levelLabel.addEventListener(Event.TOUCH_END, function(e){
+        if(hachiplayer.level>=24) hachiplayer.reset();
+        else hachiplayer.levelUp(1);
+        this.text = "[STAGE "+hachiplayer.level+"]";
+      });
+      levelLabel.visible = false;
+      this.levelLabel = levelLabel;
+      
       // Copyright label
+      this.cheatcodeCnt = 0;
       copyright = new FontSprite('sega12', 240, 14, "© 2015 HACHICOM");
       copyright.x = 120;
       copyright.y = game.height - 16 - 60;
+      copyright.addEventListener(Event.TOUCH_END, function(e){
+        this.parentNode.cheatcodeCnt++;
+        if (this.parentNode.cheatcodeCnt>=31) this.parentNode.levelLabel.visible = true;
+      });
+      
       
       // Hiscore label
       // scoreLabel = new Label('HISCORE: ' + score);
@@ -1902,6 +1929,7 @@ window.onload = function() {
       //this.addChild(tutorialLabel);
       this.addChild(optionLabel);
       this.addChild(creditLabel);
+      this.addChild(levelLabel);
       // this.addChild(scoreLabel);
       // this.addChild(hiscoreLabel);
       

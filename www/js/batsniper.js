@@ -90,6 +90,25 @@ var BatSniperEnemy = Class.create(Sprite, {
     else return false;
   },
   
+  gotKilled: function(playerObj) {
+    //this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
+    var batsniperk = new BatsniperKilled(this.x,this.y);
+    this.parentNode.parentNode.addChild(batsniperk);
+    
+    /* if(this.mode == 'fly'){
+      var diamond = new DiamondItem(this.x,this.y);
+      this.parentNode.parentNode.itemGroup.addChild(diamond);
+    }else{
+      var coinchance = getRandom(1,3);
+      if(coinchance == 2){
+        var hat = new HatItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(hat);
+      }
+    } */
+    this.parentNode.removeChild(this);
+    delete this;
+  },
+  
   setTarget: function(batqty) {
     var game = Game.instance;
     var addBullet = 0;

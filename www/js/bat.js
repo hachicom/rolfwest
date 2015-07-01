@@ -71,7 +71,7 @@ var BatEnemy = Class.create(Sprite, {
       var cup = new GoldCupItem(this.x,this.y);
       this.parentNode.parentNode.itemGroup.addChild(cup);
     }
-        
+
     this.parentNode.removeChild(this);
     delete this;
   },

@@ -134,17 +134,17 @@ var glossary = {
       pt_BR: 'DICA: A Cada 7 fases_o jogo fica mais_difícil, mas também_aumenta o bônus_ao fim da fase!',
       en_US: "HINT: Every 7 stages_game gets harder,_but also increases_round clear bonus!"
     },
-    gameoverHint6: { //glossary.text.gameoverHint5[language]
+    gameoverHint6: { //glossary.text.gameoverHint6[language]
       pt_BR: 'DICA: Piranhas não_atacam Snow depois_de coletar todos os_peixes necessários!',
       en_US: "HINT: Piranas don't_attack Snow after_all required fish_were collected!"
     },
-    gameoverHint7: { //glossary.text.gameoverHint5[language]
-      pt_BR: 'DICA: Um bom jogador_consegue completar_34 estágios em uma_partida!',
-      en_US: "HINT: A good player_can clear 34 stages_in a match!"
+    finalstageMsg: { //glossary.text.finalstageMsg[language]
+      pt_BR: 'Estou com a Melody!__Se quiser ela de volta_venha sozinho e me_encontre na antiga_delegacia...___Agile West',
+      en_US: "I have Melody!__If you want her back_come alone and find_me at the old sheriff_station...___Agile West"
     },
     wingame1: { //glossary.text.wingame1[language]
       pt_BR: "A batalha chegou ao fim!__Rolf derrotou a temida Batgang,_restaurando a paz da cidade!___Parabéns!!!_Nos vemos no próximo jogo!",
-      en_US: "The battle is over!__Rolf defeated the feared Batgang,_restoring peace to the city!___Congratulations!!!_See you in the next game!"
+      en_US: "The battle is over!__Rolf defeated the feared Batgang_and restored peace to the town!___Congratulations!!!_See you in the next game!"
     },
     wingame2: { //glossary.text.wingame2[language]
       pt_BR: "      PARABÉNS!__Você zerou o placar_ de Snow & Yuki!!!______________ Até o próximo jogo",
