@@ -102,7 +102,8 @@ window.onload = function() {
                'res/brackets.png',
                'res/pause.png',
                'res/sega16_0.png',
-               'res/sega22_0.png');
+               'res/sega22_0.png',
+               'res/interludeSheet.png');
   
 	// 5 - Game settings
 	game.fps = 30;
@@ -593,18 +594,21 @@ window.onload = function() {
             bat = this.batGroup.childNodes[j];          
             bat.gotKilled(hachiplayer);
           }
+          this.batGenerator.defeated = true;
           
           for (var j = this.batkidGroup.childNodes.length - 1; j >= 0; j--) {
             var batkid;
             batkid = this.batkidGroup.childNodes[j];          
             batkid.gotKilled(hachiplayer);
           }
+          this.batkidGenerator.defeated = true;
           
-          // for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
-            // var batsniper;
-            // batsniper = this.batsniperGroup.childNodes[j];          
-            // batsniper.gotKilled(hachiplayer);
-          // }
+          for (var j = this.batsniperGroup.childNodes.length - 1; j >= 0; j--) {
+            var batsniper;
+            batsniper = this.batsniperGroup.childNodes[j];          
+            batsniper.gotKilled(hachiplayer);
+          }
+          this.batsniperGenerator.defeated = true;
           
           //TODO: create Melody; else...        
           var melody = new Melody(game.width,424);
@@ -612,7 +616,7 @@ window.onload = function() {
         }
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
         //if all enemy generators were defeated
-        var sanduba = new SandubaItem(145,384);
+        var sanduba = new SandubaItem(145,384,hachiplayer.level);
         this.itemGroup.addChild(sanduba);
       }
     },
@@ -1319,17 +1323,27 @@ window.onload = function() {
       label = new FontSprite('sega24', 320, 320, '');
       label.x = 0;
       label.y = 72;
+
+      animationSpr = new Sprite(128, 128);
+      animationSpr.image = game.assets['res/interludeSheet.png'];
+      animationSpr.frame = 0;
+      animationSpr.x = 160;
+      animationSpr.y = 288;
+      this.animationSpr = animationSpr;
+      this.animationDuration = 0;
+      this.animationSpeed = 1.00;
+      this.iniFrame = 0;
+      this.endFrame = 1;      
       
       label.text = '       WORLD '+ hachiplayer.world + '-' + hachiplayer.round;
       if(hachiplayer.level == 24){
         label.text = glossary.text.finalstageMsg[language];
+        animationSpr.visible = false;
       }
-
       // this.addChild(map);
       // this.addChild(igloo);
       // this.addChild(igloo2);
-      // this.addChild(snow);
-      // this.addChild(melody);
+      this.addChild(animationSpr);
       this.addChild(label);
       
       // Listen for taps
@@ -1338,6 +1352,15 @@ window.onload = function() {
     },
     
     update: function(evt) {
+      // Animation
+      this.animationDuration += 0.05;    
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.animationSpr.frame<this.endFrame) this.animationSpr.frame ++;
+        else this.animationSpr.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
+      }
+      
+      // Start stage
       this.timeToStart -= 1;
       if(this.timeToStart<=0)
         game.replaceScene(new SceneGame());
@@ -1362,7 +1385,7 @@ window.onload = function() {
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
       this.backgroundColor = '#0000FF';
-      this.timeToStart = 300;
+      this.timeToStart = 600;
       
       label = new FontSprite('sega12', 320, 120, '');
       label.x = 0;
@@ -1533,8 +1556,8 @@ window.onload = function() {
       finger.image = game.assets['res/fingerSheet.png']; 
       this.finger = finger;
       
-      shootBtn = new Sprite(64,128);
-      shootBtn.x = game.width - 64;
+      shootBtn = new Sprite(120,128);
+      shootBtn.x = game.width - 120;
       shootBtn.y = dpad.y;
       //shootBtn.opacity = 0.5;
       shootBtn.image = game.assets['res/shootbtn.png'];
@@ -1907,7 +1930,7 @@ window.onload = function() {
       copyright.y = game.height - 16 - 60;
       copyright.addEventListener(Event.TOUCH_END, function(e){
         this.parentNode.cheatcodeCnt++;
-        if (this.parentNode.cheatcodeCnt>=31) this.parentNode.levelLabel.visible = true;
+        if (this.parentNode.cheatcodeCnt>=9) this.parentNode.levelLabel.visible = true;
       });
       
       

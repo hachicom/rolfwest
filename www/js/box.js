@@ -24,7 +24,7 @@ var BoxSprite = Class.create(Sprite, {
     this.animationSpeed = 0.20;
     this.idleTime=0;
     this.iniFrame = frame;
-    this.endFrame = frame;
+    this.endFrame = 4;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -36,6 +36,7 @@ var BoxSprite = Class.create(Sprite, {
     var arrFrag = [];
     
     this.hp-=1;
+    if(this.hp<=1){ this.frame = this.endFrame; }
     for(i=0;i<4;i++){
       arrFrag[i] = new BoxPiece(this.x+(this.width/2),this.y+this.height+arrHeight[i],arrSpeed[i]);
       this.parentNode.parentNode.addChild(arrFrag[i]);
@@ -85,11 +86,17 @@ var BoxSprite = Class.create(Sprite, {
     
     if (!this.parentNode.parentNode.paused){      
       /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
-      if (this.animationDuration >= this.animationSpeed) {
-        if(this.frame<this.endFrame) this.frame ++;
-        else this.frame = this.iniFrame;
-        this.animationDuration -= this.animationSpeed;
+      // this.animationDuration += 0.05;    
+      // if (this.animationDuration >= this.animationSpeed) {
+        // if(this.frame<this.endFrame) this.frame ++;
+        // else this.frame = this.iniFrame;
+        // this.animationDuration -= this.animationSpeed;
+      // }
+      if(this.hp<=1){
+        this.animationDuration+=1;
+        if(this.animationDuration%5==0){
+          this.frame=this.endFrame;
+        }else this.frame=this.iniFrame;
       }
       /*END ANIMATION BLOCK*/
     }

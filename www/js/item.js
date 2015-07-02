@@ -156,10 +156,12 @@ var DiamondItem = Class.create(Item, {
 });
 
 var SandubaItem = Class.create(Item, {
-  initialize: function(x, y){
+  initialize: function(x, y, level){
+    frame = 5;
+    if(level == 23) frame = 16;
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 1, -4, 0, 0.1, 5, 5, 0, false);
-    this.frame = 5;
+    Item.call(this, x, y, 0, 0, 1, -4, 0, 0.1, frame, frame, 0, false);
+    this.frame = frame;
     this.itemId = 'sanduba';
   },
   

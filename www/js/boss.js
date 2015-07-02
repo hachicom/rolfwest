@@ -183,7 +183,7 @@ var ChiefBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 20; //after 10 shots, goes crazy
+    this.hp = 1; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -320,7 +320,7 @@ var BarthoBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 15; //after 10 shots, goes crazy
+    this.hp = 20; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -381,7 +381,7 @@ var BarthoBoss = Class.create(Sprite, {
       }
       if(this.mode == 'idle'){
         this.shootTime-=1;
-        if(this.hp<=20){
+        if(this.hp<=5){
           this.mode = 'crazy';
           this.bullets = 3;
           this.shootTime = 20;
@@ -389,7 +389,7 @@ var BarthoBoss = Class.create(Sprite, {
         if(this.shootTime<=0){
           var s = new EnemyShot(this.parentNode.parentNode.rolf.x, -24, this.parentNode.parentNode.rolf, this.level, 'boss3', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
-          this.shootTime = 20;
+          this.shootTime = 40;
         }
       }
       if(this.mode == 'crazy'){
@@ -403,7 +403,7 @@ var BarthoBoss = Class.create(Sprite, {
             this.bullets-=1;
           }else{
             this.bullets = 3;
-            this.shootTime = 20;
+            this.shootTime = 30;
           }
         }
       }
@@ -459,7 +459,7 @@ var AgileBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 10; //after 10 shots, goes crazy
+    this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     this.modeTime = 90;
@@ -477,7 +477,7 @@ var AgileBoss = Class.create(Sprite, {
   
   gotHit: function(playerObj) {
     //if (this.gotHitTime>0) return false;
-    if (this.mode=='fly' || this.mode=='retreat'){
+    if (this.mode=='fly' || this.mode=='retreat' || this.mode == 'surprise'){
       switch(this.mode){
         case 'fly'    : playerObj.score+=10; break;
       }
