@@ -22,7 +22,7 @@ var MadBatBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 20; //after 10 shots, goes crazy
+    this.hp = 25; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -183,7 +183,7 @@ var ChiefBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 1; //after 10 shots, goes crazy
+    this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -459,7 +459,7 @@ var AgileBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 30; //after 10 shots, goes crazy
+    this.hp = 40; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
     this.modeTime = 90;

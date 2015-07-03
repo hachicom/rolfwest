@@ -5,7 +5,7 @@ var Rolf = Class.create(Sprite, {
       // 1 - Call superclass constructor
       Sprite.apply(this,[24, 24]);
       this.image = Game.instance.assets['res/rolfSheet.png'];
-      this.movespeed = 10;
+      this.movespeed = 7;
       this.x = x;
       this.y = y;
       this.nextpos = x;
@@ -108,12 +108,12 @@ var Rolf = Class.create(Sprite, {
       //COMMENT NEXT 10 LINES TO ENABLE VIRTUAL DPAD MOVEMENT
       if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
-          this.x-=5;
-          if (this.x<0) this.x=0;
+          this.x-=this.movespeed;
+          if (this.x<-24) this.x=game.width-1;
         }
         else if(this.moving == 1 && this.shootTime<=0) {
-          this.x+=5;
-          if (this.x>game.width-this.width) this.x=game.width-this.width;
+          this.x+=this.movespeed;
+          if (this.x>=game.width) this.x=-23;
         }
       }
       /*END MOVEMENT BLOCK*/
@@ -224,7 +224,7 @@ var Rolf = Class.create(Sprite, {
     }
     this.animationDuration = 0;
     this.animationSpeed = 0.25;
-    this.movespeed = 20;
+    //this.movespeed = 20;
   },
   
   gotHit: function(playerObj){

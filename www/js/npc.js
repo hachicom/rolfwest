@@ -45,20 +45,30 @@ var ScoreSprite = Class.create(Sprite, {
   }
 });
 
-// Yuki
+// Melody Sprite
 var Melody = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x, y) {
+  initialize: function(x, y, mode) {
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
     this.image  = Game.instance.assets['res/melodySheet.png'];    
-    this.frame = 0;  
     this.scaleX = -1;
-    this.iniFrame = 0;
-    this.endFrame = 1;
+    this.mode = mode;
+    if(mode == 'distress'){
+      this.frame = 2;  
+      this.iniFrame = 2;
+      this.endFrame = 3;
+      this.keepmove = false;
+      this.animationSpeed = 0.60;
+    }else{
+      this.frame = 0;  
+      this.iniFrame = 0;
+      this.endFrame = 1;
+      this.keepmove = true;
+      this.animationSpeed = 0.30;
+    }
     this.animationDuration = 0;
-    this.animationSpeed = 0.25;
-    this.keepmove = true;
+    this.startTime = 30;
     
     this.x = x;
     this.y = y;
@@ -77,21 +87,78 @@ var Melody = Class.create(Sprite, {
     }
     this.parentNode.parentNode.endLevel = true;
     this.keepmove = false;
+    this.endFrame = this.iniFrame;
   },
     
   update: function(evt) { 
-    // Movement
-    if(this.keepmove==true){
-      if (this.x > 224) this.x-=1;
-      else {
-        this.x = 224;
-        this.frame = 0;
-        this.iniFrame = 0;
-        this.endFrame = 0;
+    if (!this.parentNode.parentNode.paused){
+      // Movement
+      if(this.keepmove==true){
+        if (this.x > 224) this.x-=1;
+        else {
+          this.x = 224;
+          this.frame = 0;
+          this.iniFrame = 0;
+          this.endFrame = 0;
+        }
+      }
+      if(this.mode == 'distress'){
+        this.startTime-=1;
+        if(this.startTime%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        if(this.startTime<=0){
+          this.visible = true;
+        }
+      }
+      // Animation    
+      this.animationDuration += 0.05;
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
       }
     }
-    // Animation
+  }
+});
+
+//Melody Kidnapped
+var MelodyKidnapped = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x,y,level) {
+    // Call superclass constructor
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/melodySheet.png'];
+    this.x = x;
+    this.y = y;
+    this.scaleX = -1;
+    this.frame = 2;
+    this.iniFrame = 2;
+    this.endFrame = 3;
+    this.aboutToDisappear = 30;
+    this.disappear = false;
+    this.animationSpeed = 0.60;
+    this.animationDuration = 0;
+    
+    if(level!=24) this.visible = false;
+    
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  update: function(evt) {
     if (!this.parentNode.paused){
+      if(this.disappear==true){
+        this.aboutToDisappear-=1;
+        if(this.aboutToDisappear%2==0){
+          this.visible=false;
+        }else this.visible=true;
+        
+        if(this.aboutToDisappear<=0){
+          this.parentNode.removeChild(this);
+          delete this;
+        }
+      }
+
       this.animationDuration += 0.05;
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;

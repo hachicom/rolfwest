@@ -1,6 +1,6 @@
-var version = '0.9.0';
+var version = '0.9.5';
 
-var hiscore = 30000;
+var hiscore = 20000;
 var paused = false;
 var oldTime = new Date();
 var maxbonusDecTime = 30;
@@ -12,7 +12,7 @@ var soundOn = true;
 var language = 'en_US'; //ou en_US
 var playerData = {
   scoretable: {
-		hiscore: 30000
+		hiscore: 20000
 	},
   settings: {
 		sound: true,
@@ -367,6 +367,10 @@ window.onload = function() {
       rolf = new Rolf(145,424,hachiplayer);
       this.rolf = rolf;
       
+      // Melody Kidnapped (level 6-4)
+      melodyK = new MelodyKidnapped(game.width-64,424,hachiplayer.level);
+      this.melodyK = melodyK;
+      
       // Enemy Generators
       batGenerator = new BatGenerator(0,320,globalBatMap['stage'+hachiplayer.level],hachiplayer.world);
       this.batGenerator = batGenerator;
@@ -462,6 +466,7 @@ window.onload = function() {
       this.addChild(shotGroup);
       this.addChild(npcGroup);
       this.addChild(itemGroup);
+      this.addChild(melodyK);
       this.addChild(rolf);
       this.addChild(gui);
       this.addChild(ammoLabel);
@@ -610,8 +615,14 @@ window.onload = function() {
           }
           this.batsniperGenerator.defeated = true;
           
-          //TODO: create Melody; else...        
-          var melody = new Melody(game.width,424);
+          //TODO: create Melody; else... 
+          var melpos = game.width;
+          var mode = 'normal';
+          if(hachiplayer.level==24) {
+            melpos -= 64;
+            mode = 'distress';
+          }
+          var melody = new Melody(melpos,424,mode);
           this.npcGroup.addChild(melody);
         }
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
@@ -708,7 +719,10 @@ window.onload = function() {
              */
             if(this.startLevelMsg<=0) {
               this.batGenerator.modeStart=true;
-              if(hachiplayer.round == 4) this.bossGenerator.createBoss();
+              if(hachiplayer.round == 4) {
+                this.bossGenerator.createBoss();
+                if(hachiplayer.world == 6) this.melodyK.disappear = true;
+              }
               else this.checkLevelComplete();
             }
           }
@@ -1392,6 +1406,9 @@ window.onload = function() {
       label.y = 10;
       
       label.text = glossary.text.wingame1[language];
+      
+      playerData.scoretable.hiscore = hachiplayer.hiscore;
+      localStorage["playerData"] = JSON.encode(playerData);
             
       // this.addChild(map);
       // this.addChild(igloo);
@@ -1802,7 +1819,7 @@ window.onload = function() {
       saveLabel.x = 160;
       saveLabel.y = 256;
       saveLabel.addEventListener(Event.TOUCH_START, function(e){
-        if(resetHiscore) hachiplayer.hiscore = 30000;
+        if(resetHiscore) hachiplayer.hiscore = 20000;
         soundOn = tmpSound;
         language = tmpLanguage;
         playerData.scoretable.hiscore = hachiplayer.hiscore;
@@ -1846,7 +1863,7 @@ window.onload = function() {
       // Background
       title = new Sprite(256,160);
       title.x = 32;
-      title.y = 32;
+      title.y = 64;
       //bg.scale(2,2);
       title.image = game.assets['res/title.png'];      
       this.backgroundColor = '#0000FF';
@@ -1866,8 +1883,8 @@ window.onload = function() {
       this.hiscoreLabel = hiscoreLabel;
       
       //Title label
-      TitleLabel = new FontSprite('sega24', 240, 24, "ROLFWEST v"+version);
-      TitleLabel.x = 48;
+      TitleLabel = new FontSprite('sega24', 240, 24, "        v"+version);
+      TitleLabel.x = 88;
       TitleLabel.y = 198;
       
       // Press Start label
@@ -1944,7 +1961,7 @@ window.onload = function() {
       // scoreLabel._style.textShadow ="-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black";
       
       // Add labels  
-      //this.addChild(title);
+      this.addChild(title);
       //this.addChild(map);
       this.addChild(copyright);
       this.addChild(TitleLabel); 
