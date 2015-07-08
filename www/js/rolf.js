@@ -109,11 +109,13 @@ var Rolf = Class.create(Sprite, {
       if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
           this.x-=this.movespeed;
-          if (this.x<-24) this.x=game.width-1;
+          if (this.x<=0) this.x=0;
+          //if (this.x<-24) this.x=game.width-1;
         }
         else if(this.moving == 1 && this.shootTime<=0) {
           this.x+=this.movespeed;
-          if (this.x>=game.width) this.x=-23;
+          if (this.x>=game.width-24) this.x=game.width-24;
+          //if (this.x>=game.width) this.x=-23;
         }
       }
       /*END MOVEMENT BLOCK*/

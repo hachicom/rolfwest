@@ -66,13 +66,21 @@ var glossary = {
       pt_BR: 'TOQUE PARA PULAR',
       en_US: '  TAP TO SKIP'
     },
-		tutorialPg1: { //glossary.text.tutorialPg1[language]
-      pt_BR: '  ==COMO JOGAR==__'
-            +'Snow & Yuki é_um jogo estilo_Game & Watch_(minigame)!__'
-            +'Use os direcionais_para mover Snow_pelo estágio__',
-      en_US: '  ==HOW TO PLAY==__'
-            +'Snow & Yuki is_a Game & Watch alike_game (LCD handheld)!__'
-            +'Use directional pad_to move Snow_through the stage__'
+		storyPg1: { //glossary.text.storyPg1[language]
+      pt_BR: '      *HISTÓRIA*____'
+            +'Havia um lendário__xerife conhecido como__Billy West.__Billy e sua esposa__adotaram dois garotos__órfãos de guerra,__'
+            +'o lobo Rolf e__o morcego Agile.____Ambos foram ensinados__no caminho da justiça,__mas apenas Rolf seguiu__os passos de Billy,__'
+            +'enquanto Agile queria__apenas poder e fama.____20 anos se passaram__e agora Agile cria__a Batgang, um temido__grupo de morcegos__'            
+            +'fora-da-lei, e com__eles Agile invade sua__terra natal.____Atrapalhado e valente,__o jovem Rolf parte__para conquistar o__'
+            +'coração da bela__filha do prefeito,__Melody Smith, e__proteger sua cidade__'
+            +'das garras de Agile.___',
+      en_US: '       *STORY*____'
+            +'There was a legendary__Sheriff known as__Billy West.__Billy and his wife__adopted two war__orphaned kids,__'
+            +'Rolf the wolf__and Agile the bat.____Both were raised__in the path of justice,__but only Rolf followed__Billy\'s steps,__'
+            +'while Agile only__wanted power and fame.____20 years have passed__and now Agile creates__the Batgang, a feared__group of outlaw__'            
+            +'bats, and with them__Agile invades his__hometown.____Goofy but also brave,__the young Rolf goes__to win the heart__'
+            +'of the mayor\'s__beautiful daughter,__Melody Smith, and__protect his city__'
+            +'from Agile\'s hands.___'
     },
 		tutorialPg2: { //glossary.text.tutorialPg2[language]
       pt_BR: '  ==COMO JOGAR==__Desvie do gelo____'

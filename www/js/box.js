@@ -29,19 +29,20 @@ var BoxSprite = Class.create(Sprite, {
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  gotHit: function(playerObj) {
+  gotHit: function(playerObj,addScore) {
     var i,game;
     var arrSpeed = [1,3,-3,-1];
     var arrHeight = [0,16,16,0];
     var arrFrag = [];
     
     this.hp-=1;
+    if(addScore==true) playerObj.addScore(10,false);
     if(this.hp<=1){ this.frame = this.endFrame; }
     for(i=0;i<4;i++){
       arrFrag[i] = new BoxPiece(this.x+(this.width/2),this.y+this.height+arrHeight[i],arrSpeed[i]);
       this.parentNode.parentNode.addChild(arrFrag[i]);
     }
-    if(this.hp<=0){      
+    if(this.hp<=0){
       if(this.mode == 2){
         var s1 = new Explosion(this.x-20,this.y-20,true);
         var s2 = new Explosion(this.x+4, this.y-20,true);

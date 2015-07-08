@@ -852,7 +852,7 @@ window.onload = function() {
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  var ks = box.gotHit(hachiplayer); 
+                  var ks = box.gotHit(hachiplayer,true); 
                   if(ks) {
                     this.shotGroup.removeChild(shot);
                   }
@@ -919,7 +919,7 @@ window.onload = function() {
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  var ks = box.gotHit(hachiplayer); 
+                  var ks = box.gotHit(hachiplayer,false); 
                   if(ks) {
                     this.evilShotGroup.removeChild(evilshot);
                   }
@@ -1033,7 +1033,7 @@ window.onload = function() {
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
-                  var ks = box.gotHit(hachiplayer); 
+                  var ks = box.gotHit(hachiplayer,false); 
                   break;
                 }
               }
@@ -1122,7 +1122,7 @@ window.onload = function() {
   var SceneBonus = Class.create(Scene, {
     initialize: function() {
       Scene.apply(this);      
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage2'];
       
       /**
        * SCENE ANIMATION
@@ -1331,7 +1331,7 @@ window.onload = function() {
       // title.x = 32;
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage2'];
       this.timeToStart = 120;
       
       label = new FontSprite('sega24', 320, 320, '');
@@ -1398,7 +1398,7 @@ window.onload = function() {
       // title.x = 32;
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage4'];
       this.timeToStart = 600;
       
       label = new FontSprite('sega12', 320, 120, '');
@@ -1439,7 +1439,7 @@ window.onload = function() {
     initialize: function() {
       var gameOverLabel, scoreLabel;
       Scene.apply(this);    
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage3'];
       this.timeToStart = 200;
       
       label = new FontSprite('sega24', 320, 60, '');
@@ -1481,7 +1481,7 @@ window.onload = function() {
     initialize: function() {
       var TitleLabel, scoreLabel;
       Scene.apply(this);     
-      this.backgroundColor = '#000000';
+      this.backgroundColor = globalBgColor['stage4'];
       
       label = new FontSprite('sega24', 320, 640, '');
       label.x = 0;
@@ -1508,7 +1508,7 @@ window.onload = function() {
     
     update: function(evt) {
       this.label.y -= 2;
-      if(this.label.y<= -this.label.height) this.label.y = game.height;
+      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle());
     },
     
     touchToStart: function(evt) {
@@ -1525,7 +1525,7 @@ window.onload = function() {
   var SceneTutorial = Class.create(Scene, {
     initialize: function() {
       Scene.apply(this);      
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage1'];
       
       /**
        * SCENE ANIMATION
@@ -1731,7 +1731,7 @@ window.onload = function() {
       tmpSound = soundOn;
       tmpLanguage = language;
       
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage1'];
       // map = new Map(32, 32);
       // map.image = game.assets['res/western1Sheet.png'];
       // map.loadData(arrMap1Top,arrMap1Sub);
@@ -1853,6 +1853,43 @@ window.onload = function() {
     }
   });
   
+  // SceneStory
+  var SceneStory = Class.create(Scene, {
+    initialize: function() {
+      var TitleLabel, scoreLabel;
+      Scene.apply(this);     
+      this.backgroundColor = globalBgColor['stage3'];
+      
+      label = new FontSprite('sega24', 320, 960, '');
+      label.x = 0;
+      label.y = game.height;
+      this.label = label;
+      
+      label.text = glossary.text.storyPg1[language];
+                  
+      this.addChild(label);
+      
+      // Listen for taps
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+      // Listen for taps
+      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+    },
+    
+    update: function(evt) {
+      this.label.y -= 1;
+      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle());
+    },
+    
+    touchToStart: function(evt) {
+      var game = Game.instance;
+      if( isAndroid ) {
+        //if(soundOn && endingstatus==2)//ending.stop();
+        if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+      }
+      game.replaceScene(new SceneTitle());
+    }
+  });
+  
   // SceneTitle
   var SceneTitle = Class.create(Scene, {
     initialize: function(score) {
@@ -1866,7 +1903,7 @@ window.onload = function() {
       title.y = 64;
       //bg.scale(2,2);
       title.image = game.assets['res/title.png'];      
-      this.backgroundColor = '#0000FF';
+      this.backgroundColor = globalBgColor['stage2'];
       map = new Map(32, 32);
       //map.y = 320;
       map.image = game.assets['res/western1Sheet.png'];
@@ -1950,15 +1987,7 @@ window.onload = function() {
         if (this.parentNode.cheatcodeCnt>=9) this.parentNode.levelLabel.visible = true;
       });
       
-      
-      // Hiscore label
-      // scoreLabel = new Label('HISCORE: ' + score);
-      // scoreLabel.x = 0;
-      // scoreLabel.y = 0;        
-      // scoreLabel.color = 'white';
-      // scoreLabel.font = '16px system';
-      // scoreLabel.textAlign = 'center';
-      // scoreLabel._style.textShadow ="-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black";
+      this.timeToStory = 300;
       
       // Add labels  
       this.addChild(title);
@@ -1983,6 +2012,18 @@ window.onload = function() {
       }/* else{
         if(soundOn) game.assets['res/intro.mp3'].play();
       } */
+            
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+    },
+    
+    update: function(evt) {
+      this.timeToStory--;
+      if(this.timeToStory<=0) game.replaceScene(new SceneStory());
+    },
+    
+    touchToStart: function(evt) {
+      this.timeToStory=300;
     }
   });  
 };
