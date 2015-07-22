@@ -5,7 +5,7 @@ var paused = false;
 var oldTime = new Date();
 var maxbonusDecTime = 30;
 var fpscount = 0;
-var currentBGM;
+var currentBGM = 'stage1';
 var isAndroid = isMobile();
 var scoreRewards = [20000,40000,80000,160000];
 var soundOn = true;
@@ -143,12 +143,16 @@ window.onload = function() {
     document.addEventListener("deviceready", function ()
     {
       if( window.plugins && window.plugins.LowLatencyAudio ) {
-        //alert("load plugin");
-        window.plugins.LowLatencyAudio.preloadAudio('bgm', "res/bgm.ogg",1);
-        window.plugins.LowLatencyAudio.preloadAudio('bonus', "res/bonus.ogg",1);
-        window.plugins.LowLatencyAudio.preloadAudio('intro', "res/intro.ogg",1);
-        window.plugins.LowLatencyAudio.preloadAudio('end', "res/end.ogg",1);
-        
+        //BGMs
+        window.plugins.LowLatencyAudio.preloadAudio('stage1', "res/stage1.ogg",1);
+        window.plugins.LowLatencyAudio.preloadAudio('stage2', "res/stage2.ogg",1);
+        window.plugins.LowLatencyAudio.preloadAudio('stage3', "res/stage3.ogg",1);
+        window.plugins.LowLatencyAudio.preloadAudio('stage4', "res/stage4.ogg",1);
+        window.plugins.LowLatencyAudio.preloadAudio('credits', "res/credits.ogg",1);
+        //Jingles
+        window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
+        window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
+        //SFX
         window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
         window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
         window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
@@ -437,7 +441,7 @@ window.onload = function() {
       
       // Background music
       if( isAndroid ) {
-        currentBGM = 'bgm';
+        currentBGM = 'stage'+hachiplayer.round;
         if(soundOn) window.plugins.LowLatencyAudio.loop(currentBGM);
         //Hide Banner to avoid annoying player with lags from banner
         if(AdMob) AdMob.hideBanner();
@@ -636,14 +640,14 @@ window.onload = function() {
       var worldcomplete = false;
       if(hachiplayer.round==hachiplayer.levellimit) worldcomplete = true;
       hachiplayer.levelUp(1);
-      if (hachiplayer.level == 35) this.winGame = 1;
-      if (this.winGame == 2) {
-        if( soundOn ) {
-          if(isAndroid) //this.bgm.stop();
-            window.plugins.LowLatencyAudio.stop(currentBGM);
-        }
-        game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
-      }
+      // if (hachiplayer.level == 35) this.winGame = 1;
+      // if (this.winGame == 2) {
+        // if( soundOn ) {
+          // if(isAndroid) //this.bgm.stop();
+            // window.plugins.LowLatencyAudio.stop(currentBGM);
+        // }
+        // game.replaceScene(new SceneGameOver(this.scoreLabel,this.ammoLabel,this.levelLabel,this.livesLabel,this.hiscoreLabel,this.winGame)); 
+      // }
       
       if(hachiplayer.level>Object.keys(globalTileMap).length){
         /******************************
@@ -875,10 +879,10 @@ window.onload = function() {
                 //bat.crashToPieces();
                 this.gotHit = true; 
                 this.rolf.gotHit(hachiplayer);
-                if( isAndroid ) {
-                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                // if( isAndroid ) {
+                  // if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                   //this.bgm.stop();
-                }
+                // }
                 break;
               }
             }
@@ -901,10 +905,10 @@ window.onload = function() {
                 this.evilShotGroup.removeChild(evilshot);
                 this.gotHit = true; 
                 this.rolf.gotHit(hachiplayer);
-                if( isAndroid ) {
-                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                // if( isAndroid ) {
+                  // if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
                   //this.bgm.stop();
-                }
+                // }
                 break;
               }
               
@@ -943,10 +947,10 @@ window.onload = function() {
                 } */
                 this.gotHit = true; 
                 this.rolf.gotHit(hachiplayer);
-                if( isAndroid ) {
-                  if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-                  //this.bgm.stop();
-                }
+                // if( isAndroid ) {
+                  // if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+                  // this.bgm.stop();
+                // }
                 break;
               }
               
@@ -1089,6 +1093,10 @@ window.onload = function() {
           this.reloadLabel.text = '';
           this.endLevelDuration += 1; 
           this.rolf.wonStage();
+          if( soundOn ) {
+            if(isAndroid) //this.bgm.stop();
+              window.plugins.LowLatencyAudio.stop(currentBGM);
+          }
           if(this.endLevelDuration >= 90){
             this.incLevelUp();
           }
@@ -1431,6 +1439,13 @@ window.onload = function() {
       // this.addChild(snow);
       this.addChild(animationSpr);
       this.addChild(label);
+      
+      if( isAndroid ) {
+        if(soundOn) {
+          currentBGM = 'credits';
+          window.plugins.LowLatencyAudio.play(currentBGM);
+        }
+      }
       
       // Listen for taps
       this.addEventListener(Event.TOUCH_END, this.touchToStart);
@@ -2079,14 +2094,15 @@ window.onload = function() {
       // this.addChild(scoreLabel);
       // this.addChild(hiscoreLabel);
       
-      if( isAndroid ) {
-        if(soundOn) {
-          currentBGM = 'intro';
-          window.plugins.LowLatencyAudio.play(currentBGM);
-          /* intro.seekTo(1);
-          intro.play(); */
-        }
-      }/* else{
+      // if( isAndroid ) {
+        // if(soundOn) {
+          // currentBGM = 'intro';
+          // window.plugins.LowLatencyAudio.play(currentBGM);
+          // /* intro.seekTo(1);
+          // intro.play(); */
+        // }
+      // }
+      /* else{
         if(soundOn) game.assets['res/intro.mp3'].play();
       } */
             
