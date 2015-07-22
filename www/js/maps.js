@@ -317,6 +317,10 @@ var globalBgColor = {
   stage2: '#0000FF',
   stage3: '#FF5555',
   stage4: '#000055',
+  bg1: '#FFAA55',
+  bg2: '#AAAAAA',
+  bg3: '#55AAFF',
+  bg4: '#005555',
 };
 
 var globalTileMap = {  

@@ -6,9 +6,16 @@ var GuiWindow = Class.create(Group, {
     Group.apply(this);
     
     bg = new Sprite(w, h);
-    bg.backgroundColor = '#0000FF';
+    bg.backgroundColor = '#AAAAAA';
     bg.x = x;
     bg.y = y;
+	
+	var surface = new Surface(w, h);
+	surface.context.lineWidth="4";
+	surface.context.rect(0,0,w,h);
+	surface.context.stroke();
+	
+	bg.image = surface;
     this.bgwindow = bg;
 
     titlelable = new FontSprite('sega24', 144, 28, title);

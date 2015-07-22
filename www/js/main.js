@@ -1122,7 +1122,7 @@ window.onload = function() {
   var SceneBonus = Class.create(Scene, {
     initialize: function() {
       Scene.apply(this);      
-      this.backgroundColor = globalBgColor['stage2'];
+      this.backgroundColor = globalBgColor['bg1'];
       
       /**
        * SCENE ANIMATION
@@ -1148,6 +1148,12 @@ window.onload = function() {
       this.endSceneTime = 120;
       this.mode = 'watch'; //watch/choose/end
       this.starposition = 0;
+      
+      animationSpr = new Sprite(128, 128);
+      animationSpr.image = game.assets['res/interludeSheet.png'];
+      animationSpr.frame = 2;
+      animationSpr.x = game.width/2 - 64;
+      animationSpr.y = game.height/2 - 128;
             
       star = new Sprite(32,32);
       star.x = 0;
@@ -1212,6 +1218,7 @@ window.onload = function() {
       this.addChild(star);
       this.addChild(titleLabel);
       this.addChild(msgLabel);
+      this.addChild(animationSpr);
       
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -1331,7 +1338,7 @@ window.onload = function() {
       // title.x = 32;
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
-      this.backgroundColor = globalBgColor['stage2'];
+      this.backgroundColor = globalBgColor['bg1'];
       this.timeToStart = 120;
       
       label = new FontSprite('sega24', 320, 320, '');
@@ -1353,6 +1360,8 @@ window.onload = function() {
       if(hachiplayer.level == 24){
         label.text = glossary.text.finalstageMsg[language];
         animationSpr.visible = false;
+        this.backgroundColor = globalBgColor['stage3'];
+        this.timeToStart = 300;
       }
       // this.addChild(map);
       // this.addChild(igloo);
@@ -1398,10 +1407,10 @@ window.onload = function() {
       // title.x = 32;
       // title.y = 32;
       // title.image = game.assets['res/title.png'];      
-      this.backgroundColor = globalBgColor['stage4'];
+      this.backgroundColor = globalBgColor['bg3'];
       this.timeToStart = 600;
       
-      label = new FontSprite('sega12', 320, 120, '');
+      label = new FontSprite('sega24', 320, 400, '');
       label.x = 0;
       label.y = 10;
       
@@ -1409,12 +1418,18 @@ window.onload = function() {
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
       localStorage["playerData"] = JSON.encode(playerData);
+      
+      animationSpr = new Sprite(128, 128);
+      animationSpr.image = game.assets['res/interludeSheet.png'];
+      animationSpr.frame = 2;
+      animationSpr.x = 160;
+      animationSpr.y = 288;
             
       // this.addChild(map);
       // this.addChild(igloo);
       // this.addChild(igloo2);
       // this.addChild(snow);
-      // this.addChild(melody);
+      this.addChild(animationSpr);
       this.addChild(label);
       
       // Listen for taps
@@ -1481,7 +1496,7 @@ window.onload = function() {
     initialize: function() {
       var TitleLabel, scoreLabel;
       Scene.apply(this);     
-      this.backgroundColor = globalBgColor['stage4'];
+      this.backgroundColor = globalBgColor['bg4'];
       
       label = new FontSprite('sega24', 320, 640, '');
       label.x = 0;
@@ -1489,13 +1504,15 @@ window.onload = function() {
       this.label = label;
       
       label.text = '   *ROLF WEST*__CODE, ART & DESIGN__'
-                  +'Adinan Batista Alves_______'
+                  +'Adinan Batista Alves_____'
                   +'CHIPTUNE MUSIC__'
-                  +'Wonderboy(demoscene)_______'
+                  +'SketchyLogic__(OpenGameArt.com)_____'
                   +'BMFONT PLUGIN__'
-                  +'COFFEE DOG GAMES_______'
+                  +'COFFEE DOG GAMES_____'
                   +'SOUND EFFECTS__'
-                  +'CREATED IN BFXR.NET_______'
+                  +'CREATED IN BFXR.NET_____'
+                  +'8BIT JINGLES__'
+                  +'Little Robot Sound_Factory (.com)_____'
                   +'THANKS FOR PLAYING!____    SEE YOU IN_  THE NEXT GAME!';
                   
       this.addChild(label);
@@ -1525,7 +1542,7 @@ window.onload = function() {
   var SceneTutorial = Class.create(Scene, {
     initialize: function() {
       Scene.apply(this);      
-      this.backgroundColor = globalBgColor['stage1'];
+      this.backgroundColor = globalBgColor['bg3'];
       
       /**
        * SCENE ANIMATION
@@ -1731,7 +1748,7 @@ window.onload = function() {
       tmpSound = soundOn;
       tmpLanguage = language;
       
-      this.backgroundColor = globalBgColor['stage1'];
+      this.backgroundColor = globalBgColor['bg3'];
       // map = new Map(32, 32);
       // map.image = game.assets['res/western1Sheet.png'];
       // map.loadData(arrMap1Top,arrMap1Sub);
@@ -1858,7 +1875,7 @@ window.onload = function() {
     initialize: function() {
       var TitleLabel, scoreLabel;
       Scene.apply(this);     
-      this.backgroundColor = globalBgColor['stage3'];
+      this.backgroundColor = globalBgColor['bg3'];
       
       label = new FontSprite('sega24', 320, 960, '');
       label.x = 0;
@@ -1877,7 +1894,68 @@ window.onload = function() {
     
     update: function(evt) {
       this.label.y -= 1;
-      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle());
+      if(this.label.y<= -this.label.height) game.replaceScene(new SceneCharacters());
+    },
+    
+    touchToStart: function(evt) {
+      var game = Game.instance;
+      if( isAndroid ) {
+        //if(soundOn && endingstatus==2)//ending.stop();
+        if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+      }
+      //game.replaceScene(new SceneTitle());
+      game.replaceScene(new SceneCharacters());
+    }
+  });
+  
+  // SceneCharacters
+  var SceneCharacters = Class.create(Scene, {
+    initialize: function() {
+      var TitleLabel, scoreLabel;
+      Scene.apply(this);     
+      this.backgroundColor = globalBgColor['bg2'];
+      this.timeToTitle = 600;
+      
+      label = new FontSprite('sega24', 320, 960, '');
+      label.x = 0;
+      label.y = 0;
+      this.label = label;
+      
+      label.text = glossary.text.storyPg2[language];
+                  
+      this.addChild(label);
+      
+      char1 = new Sprite(24,24);
+      char1.x = 10;
+      char1.y = 144;
+      char1.frame = 4;
+      char1.image = game.assets['res/rolfSheet.png'];
+      this.addChild(char1);
+            
+      char2 = new Sprite(24,24);
+      char2.x = 10;
+      char2.y = 250;
+      char2.image = game.assets['res/melodySheet.png']; 
+      this.addChild(char2);
+      
+      char3 = new Sprite(24,24);
+      char3.x = 10;
+      char3.y = 356;
+      char3.image = game.assets['res/bossAgileSheet.png'];
+      this.addChild(char3);
+      
+      //townsfolk at 396
+      //wildbat at 456
+      
+      // Listen for taps
+      this.addEventListener(Event.ENTER_FRAME, this.update);
+      // Listen for taps
+      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+    },
+    
+    update: function(evt) {
+      this.timeToTitle -= 1;
+      if(this.timeToTitle<= 0) game.replaceScene(new SceneTitle());
     },
     
     touchToStart: function(evt) {
@@ -1895,7 +1973,6 @@ window.onload = function() {
     initialize: function(score) {
       var TitleLabel, scoreLabel;
       Scene.apply(this);
-      //this.backgroundColor = '#0026FF';
       
       // Background
       title = new Sprite(256,160);
@@ -1903,7 +1980,7 @@ window.onload = function() {
       title.y = 64;
       //bg.scale(2,2);
       title.image = game.assets['res/title.png'];      
-      this.backgroundColor = globalBgColor['stage2'];
+      this.backgroundColor = globalBgColor['bg1'];
       map = new Map(32, 32);
       //map.y = 320;
       map.image = game.assets['res/western1Sheet.png'];

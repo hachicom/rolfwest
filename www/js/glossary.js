@@ -66,35 +66,35 @@ var glossary = {
       pt_BR: 'TOQUE PARA PULAR',
       en_US: '  TAP TO SKIP'
     },
-		storyPg1: { //glossary.text.storyPg1[language]
+    storyPg1: { //glossary.text.storyPg1[language]
       pt_BR: '      *HISTÓRIA*____'
             +'Havia um lendário__xerife conhecido como__Billy West.__Billy e sua esposa__adotaram dois garotos__órfãos de guerra,__'
             +'o lobo Rolf e__o morcego Agile.____Ambos foram ensinados__no caminho da justiça,__mas apenas Rolf seguiu__os passos de Billy,__'
-            +'enquanto Agile queria__apenas poder e fama.____20 anos se passaram__e agora Agile cria__a Batgang, um temido__grupo de morcegos__'            
-            +'fora-da-lei, e com__eles Agile invade sua__terra natal.____Atrapalhado e valente,__o jovem Rolf parte__para conquistar o__'
-            +'coração da bela__filha do prefeito,__Melody Smith, e__proteger sua cidade__'
+            +'enquanto Agile queria__apenas poder e fama.____20 anos se passaram__e agora Agile cria__a WildBat Gang, temido__grupo de morcegos__'            
+            +'fora-da-lei, e com__eles Agile invade sua__terra natal.____Atrapalhado e valente,__o jovem Rolf parte__para proteger a cidade__'
             +'das garras de Agile.___',
       en_US: '       *STORY*____'
             +'There was a legendary__Sheriff known as__Billy West.__Billy and his wife__adopted two war__orphaned kids,__'
             +'Rolf the wolf__and Agile the bat.____Both were raised__in the path of justice,__but only Rolf followed__Billy\'s steps,__'
-            +'while Agile only__wanted power and fame.____20 years have passed__and now Agile creates__the Batgang, a feared__group of outlaw__'            
-            +'bats, and with them__Agile invades his__hometown.____Goofy but also brave,__the young Rolf goes__to win the heart__'
-            +'of the mayor\'s__beautiful daughter,__Melody Smith, and__protect his city__'
-            +'from Agile\'s hands.___'
+            +'while Agile only__wanted power and fame.____20 years have passed__and now Agile creates__the WildBat Gang,__a feared group of__'            
+            +'outlaw bats, and__with them Agile__invades his hometown.____Goofy but also brave,__the young Rolf goes__to protect his city__'
+            +'from Agile\'s clutches.___'
     },
-		tutorialPg2: { //glossary.text.tutorialPg2[language]
-      pt_BR: '  ==COMO JOGAR==__Desvie do gelo____'
-            +'Colete peixes____'
-            +'Evite piranhas____'
-            +'Cada fase requer uma_quantidade de peixes_a ser coletada.__Ao coletar os peixes_'
-            +'leve-os para a Yuki_para passar de fase!_',
-      en_US: '  ==HOW TO PLAY==__Avoid ice cubes____'
-            +'Collect fish____'
-            +'Avoid piranas____'
-            +'Each stage requires_a quantity of fish_to be collected.__After collecting_'
-            +'them, go to Yuki_to clear the stage!_'
+    storyPg2: { //glossary.text.storyPg2[language]
+      pt_BR: '     *PERSONAGENS*____'
+            +'Rolf West:__Sucessor de Billy West__e herói deste jogo.____'
+            +'Melody Smith:__Filha do prefeito,__e namorada de Rolf.____'
+            +'Agile West:__irmáo adotivo de Rolf e__lider da WildBat Gang.____'
+            +'Habitantes da cidade:______'
+            +'WildBat Gang:______',
+      en_US: '     *CHARACTERS*____'
+            +'Rolf West:__Billy West\'s successor__and hero of this game.____'
+            +'Melody Smith:__Mayor\'s daughter,__and Rolf\'s girlfriend.____'
+            +'Agile West:__Rolf\'s adoptive brother__and WildBat Gang leader.____'
+            +'Townspeople:______'
+            +'WildBat Gang:______',
     },
-		tutorialPg3: { //glossary.text.tutorialPg3[language]
+    tutorialPg3: { //glossary.text.tutorialPg3[language]
       pt_BR: '  ==COMO JOGAR==__Todo sétimo round_é um round bônus!_Colete corações_para ganhar pontos_______'
             +'Ganhe vida atingindo_a pontuação abaixo:__'
             +'->5000_->10000_->20000_->40000_->80000___Tente marcar 99999_pra zerar o jogo!',
@@ -102,32 +102,20 @@ var glossary = {
             +'Extra lives rewarded_at scores below:__'
             +'->5000_->10000_->20000_->40000_->80000___Try scoring 99999_to beat the game!'
     },
-		municao: { //glossary.text.peixe[language]
+    municao: { //glossary.text.peixe[language]
       pt_BR: 'BALAS',
       en_US: 'AMMO',
     },
-		colete: { //glossary.text.colete[language]
-      pt_BR: 'COLETE ',
-      en_US: 'COLLECT '
-    },
-		peixes: { //glossary.text.peixes[language]
-      pt_BR: ' PEIXES!',
-      en_US: ' FISH!'
-    },
-		alertaReload: { //glossary.text.alertaReload[language]
+    alertaReload: { //glossary.text.alertaReload[language]
       pt_BR: '  RECARREGUE!!!',
       en_US: '     RELOAD!!!'
     },
-		coracoes: { //glossary.text.coracoes[language]
-      pt_BR: ' CORAçÕES: ',
-      en_US: '   HEARTS: '
-    },
     gameoverHint1: { //glossary.text.gameoverHint1[language]
-      pt_BR: 'DICA: Tente pegar as_piranhas pela cauda,_vale 100 pontos!',
-      en_US: 'HINT: Try getting_piranas by tail,_scores 100 points!'
+      pt_BR: 'DICA: Tente acertar o_sniper enquanto ele,_está atirando!',
+      en_US: 'HINT: Try shooting the_sniper while he,_is shooting!'
     },
     gameoverHint2: { //glossary.text.gameoverHint2[language]
-      pt_BR: 'DICA: A cambalhota_de uma piranha pode_quebrar os cubos_de gelo!',
+      pt_BR: 'DICA: Os tiros inimigos_de uma piranha pode_quebrar os cubos_de gelo!',
       en_US: "HINT: Pirana's_somersault can break_ice cubes!"
     },
     gameoverHint3: { //glossary.text.gameoverHint3[language]
@@ -147,16 +135,12 @@ var glossary = {
       en_US: "HINT: Piranas don't_attack Snow after_all required fish_were collected!"
     },
     finalstageMsg: { //glossary.text.finalstageMsg[language]
-      pt_BR: 'Estou com a Melody!__Se quiser ela de volta_venha sozinho e me_encontre na antiga_delegacia...___Agile West',
-      en_US: "I have Melody!__If you want her back_come alone and find_me at the old sheriff_station...___Agile West"
+      pt_BR: 'Estou com a Melody!____Se quiser ela de volta__venha sozinho e me__encontre na antiga__delegacia...____Agile West',
+      en_US: "I have Melody!____If you want her back__come alone and find__me at the old sheriff__station...____Agile West"
     },
     wingame1: { //glossary.text.wingame1[language]
-      pt_BR: "A batalha chegou ao fim!__Rolf derrotou a temida Batgang,_restaurando a paz da cidade!___Parabéns!!!_Nos vemos no próximo jogo!",
-      en_US: "The battle is over!__Rolf defeated the feared Batgang_and restored peace to the town!___Congratulations!!!_See you in the next game!"
-    },
-    wingame2: { //glossary.text.wingame2[language]
-      pt_BR: "      PARABÉNS!__Você zerou o placar_ de Snow & Yuki!!!______________ Até o próximo jogo",
-      en_US: "  CONGRATULATIONS!__ You got max score_ at Snow & Yuki!!!______________ See you next game!"
+      pt_BR: "A batalha acabou!____Rolf derrotou a WildBat__Gang e restaurou a paz__da cidade!____Parabéns!!!__Até o próximo jogo!",
+      en_US: "The battle is over!____Rolf defeated WildBat__Gang and restored peace__to the town!____Congratulations!!!__See you next game!"
     },
     gameover: { //glossary.text.gameover[language]
       pt_BR: "    FIM DE JOGO!",
