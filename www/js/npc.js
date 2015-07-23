@@ -86,6 +86,7 @@ var Melody = Class.create(Sprite, {
       item.gotHit(playerObj,hero); //collect all itens
     }
     this.parentNode.parentNode.endLevel = true;
+    this.parentNode.parentNode.playSound("powerup");
     this.keepmove = false;
     this.endFrame = this.iniFrame;
   },

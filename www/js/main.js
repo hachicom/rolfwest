@@ -134,7 +134,7 @@ window.onload = function() {
     if(playerData.settings.language!=null) language = playerData.settings.language;
     
     // 2 - New scene
-    scene = new SceneTitle();
+    scene = new SceneTitle(false);
     game.pushScene(scene);
 	}
   
@@ -144,6 +144,7 @@ window.onload = function() {
     {
       if( window.plugins && window.plugins.LowLatencyAudio ) {
         //BGMs
+        window.plugins.LowLatencyAudio.preloadAudio('title', "res/title.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('stage1', "res/stage1.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('stage2', "res/stage2.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('stage3', "res/stage3.ogg",1);
@@ -151,24 +152,28 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadAudio('credits', "res/credits.ogg",1);
         //Jingles
         window.plugins.LowLatencyAudio.preloadFX('interlude', "res/interlude.mp3");
+        window.plugins.LowLatencyAudio.preloadFX('clear', "res/clear.mp3");
         window.plugins.LowLatencyAudio.preloadFX('gameover', "res/gameover.mp3");
         //SFX
         window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
         window.plugins.LowLatencyAudio.preloadFX('miss', "res/miss.wav");
         window.plugins.LowLatencyAudio.preloadFX('coin', "res/coin.wav");
         window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
-        window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
+        window.plugins.LowLatencyAudio.preloadFX('break', "res/break.wav");
         window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
-        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot2.wav");
-        window.plugins.LowLatencyAudio.preloadFX('eshoot', "res/shoot3.wav");
+        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot1.wav");
+        window.plugins.LowLatencyAudio.preloadFX('eshoot', "res/shoot2.wav");
+        window.plugins.LowLatencyAudio.preloadFX('explode', "res/explosion.wav");
+        window.plugins.LowLatencyAudio.preloadFX('select', "res/select.wav");
+        window.plugins.LowLatencyAudio.preloadFX('crash', "res/crash.wav");
       }else{
         alert("erro plugin");
       }
         
-      navigator.globalization.getPreferredLanguage(
-        function (language) {alert(language.value);},
-        function () {alert('Error getting language');}
-      );
+      // navigator.globalization.getPreferredLanguage(
+        // function (language) {alert(language.value);},
+        // function () {alert('Error getting language');}
+      // );
       
       document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
         
@@ -186,10 +191,10 @@ window.onload = function() {
       function onBackKeyDown(){
           game.stop();
 	      navigator.notification.confirm(
-	        'Deseja sair do jogo?', // message
+	        'Sair/Quit?', // message
 	        onConfirm, // callback to invoke with index of button pressed
-	        'Confirmar', // title
-	        ['Cancelar','Sair'] // buttonLabels
+	        'Exit', // title
+	        ['Cancel','Ok'] // buttonLabels
 	      );
 	      e.preventDefault();
 	    }
@@ -197,6 +202,7 @@ window.onload = function() {
 	    function onConfirm(buttonIndex) {
 	      if(buttonIndex == 2){
             window.plugins.LowLatencyAudio.stop(currentBGM);
+            window.plugins.LowLatencyAudio.unload('title');
             window.plugins.LowLatencyAudio.unload('stage1');
             window.plugins.LowLatencyAudio.unload('stage2');
             window.plugins.LowLatencyAudio.unload('stage3');
@@ -204,16 +210,20 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.unload('credits');
           
             window.plugins.LowLatencyAudio.unload('interlude');
+            window.plugins.LowLatencyAudio.unload('clear');
             window.plugins.LowLatencyAudio.unload('gameover');
           
             window.plugins.LowLatencyAudio.unload('hit');
             window.plugins.LowLatencyAudio.unload('miss');
             window.plugins.LowLatencyAudio.unload('coin');
             window.plugins.LowLatencyAudio.unload('item');
-            window.plugins.LowLatencyAudio.unload('crash');
+            window.plugins.LowLatencyAudio.unload('break');
             window.plugins.LowLatencyAudio.unload('powerup');
             window.plugins.LowLatencyAudio.unload('shoot');
             window.plugins.LowLatencyAudio.unload('eshoot');
+            window.plugins.LowLatencyAudio.unload('explode');
+            window.plugins.LowLatencyAudio.unload('select');
+            window.plugins.LowLatencyAudio.unload('crash');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
@@ -528,6 +538,13 @@ window.onload = function() {
       // this.parentNode.batkidGenerator.defeated = true;
     },
   
+    playSound: function(soundNick){
+      if( isAndroid ) {
+        if(soundOn) //this.parentNode.bgm.play();
+          window.plugins.LowLatencyAudio.play(soundNick);
+      }
+    },
+  
     resumeMusic: function(){
       if( isAndroid ) {
         if(soundOn) //this.parentNode.bgm.play();
@@ -615,7 +632,7 @@ window.onload = function() {
     
     goToTitleScreen: function (value) {
       hachiplayer.reset();
-      game.replaceScene(new SceneTitle(0));
+      game.replaceScene(new SceneTitle(false));
     },
     
     checkLevelComplete: function () {
@@ -834,15 +851,16 @@ window.onload = function() {
                 var batsniper;
                 batsniper = this.batsniperGroup.childNodes[j];
                 if (shot.intersect(batsniper)){
-                  if( isAndroid ) {
-                    if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
-                  }/* else{
+                  /* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   var ks = batsniper.gotHit(hachiplayer); 
                   if(ks) {
                     this.shotGroup.removeChild(shot);
+                    if( isAndroid ) {
+                      if(soundOn)
+                        window.plugins.LowLatencyAudio.play('hit');
+                    }
                     if(hachiplayer.round != hachiplayer.levellimit)
                       this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
                   }
@@ -855,15 +873,16 @@ window.onload = function() {
                 var boss;
                 boss = this.bossGroup.childNodes[j];
                 if (shot.intersect(boss)){
-                  if( isAndroid ) {
-                    if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
-                  }/* else{
+                  /* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   var ks = boss.gotHit(hachiplayer); 
                   if(ks) {
                     this.shotGroup.removeChild(shot);
+                    if( isAndroid ) {
+                      if(soundOn)
+                        window.plugins.LowLatencyAudio.play('hit');
+                    }
                   }
                   break;
                 }
@@ -876,7 +895,7 @@ window.onload = function() {
                 if (shot.intersect(box)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('crash');
+                      window.plugins.LowLatencyAudio.play('break');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -943,7 +962,7 @@ window.onload = function() {
                 if (evilshot.intersect(box) && (box.y>=384/*  || box.frame==2 */)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('crash');
+                      window.plugins.LowLatencyAudio.play('break');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -1019,14 +1038,15 @@ window.onload = function() {
                 var batsniper;
                 batsniper = this.batsniperGroup.childNodes[j];
                 if (explosion.intersect(batsniper)){
-                  if( isAndroid ) {
-                    if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
-                  }/* else{
+                  /* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   var ks = batsniper.gotHit(hachiplayer); 
                   if(ks) {
+                    if( isAndroid ) {
+                      if(soundOn)
+                        window.plugins.LowLatencyAudio.play('hit');
+                    }
                     if(hachiplayer.round != hachiplayer.levellimit)
                       this.checkLevelComplete();//if the batsniper shot is the last one, batkidGenerator will be defeated
                   }
@@ -1039,13 +1059,16 @@ window.onload = function() {
                 var boss;
                 boss = this.bossGroup.childNodes[j];
                 if (explosion.intersect(boss)){
-                  if( isAndroid ) {
-                    if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
-                  }/* else{
+                  /* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
                   var ks = boss.gotHit(hachiplayer);
+                  if(ks) {
+                    if( isAndroid ) {
+                      if(soundOn)
+                        window.plugins.LowLatencyAudio.play('hit');
+                    }
+                  }
                   break;
                 }
               }
@@ -1057,7 +1080,7 @@ window.onload = function() {
                 if (explosion.intersect(box)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('crash');
+                      window.plugins.LowLatencyAudio.play('break');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -1073,10 +1096,6 @@ window.onload = function() {
               item = this.itemGroup.childNodes[i];
               if (item.within(this.rolf,16)){
                 item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
-                if( isAndroid ) {
-                  if(soundOn)
-                    window.plugins.LowLatencyAudio.play('coin');
-                }
                 break;
               }
             }
@@ -1088,10 +1107,6 @@ window.onload = function() {
               npc = this.npcGroup.childNodes[i];
               if (npc.within(this.rolf,16)){
                 npc.interact(hachiplayer,this.rolf); //here the item collected will grant some reward
-                if( isAndroid ) {
-                  if(soundOn)
-                    window.plugins.LowLatencyAudio.play('coin');
-                }
                 break;
               }
             }
@@ -1262,7 +1277,7 @@ window.onload = function() {
       
       if( isAndroid ) {
         if(soundOn) //this.parentNode.bgm.play();
-          window.plugins.LowLatencyAudio.play("interlude");
+          window.plugins.LowLatencyAudio.play("clear");
       }
       
       // Update
@@ -1544,7 +1559,7 @@ window.onload = function() {
       }
       
       // Listen for taps
-      this.addEventListener(Event.TOUCH_START, this.touchToRestart);
+      this.addEventListener(Event.TOUCH_END, this.touchToRestart);
       this.addEventListener(Event.ENTER_FRAME, this.update);
     },
     
@@ -1553,7 +1568,7 @@ window.onload = function() {
       
       // Reset player
       hachiplayer.reset();      
-      game.replaceScene(new SceneTitle(0));
+      game.replaceScene(new SceneTitle(false));
     },
     
     update: function(evt){
@@ -1561,7 +1576,7 @@ window.onload = function() {
       if(this.timeToStart<=0){
         // Reset player
         hachiplayer.reset();
-        game.replaceScene(new SceneTitle(0));        
+        game.replaceScene(new SceneTitle(false));        
       }
     }
   });
@@ -1573,15 +1588,15 @@ window.onload = function() {
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg4'];
       
-      label = new FontSprite('sega24', 320, 640, '');
+      label = new FontSprite('sega24', 320, 800, '');
       label.x = 0;
       label.y = game.height;
       this.label = label;
       
       label.text = '   *ROLF WEST*__CODE, ART & DESIGN__'
                   +'Adinan Batista Alves_____'
-                  +'CHIPTUNE MUSIC__'
-                  +'SketchyLogic__(OpenGameArt.com)_____'
+                  +'DEMOSCENE MUSIC__'
+                  +'My South West_(WONDERBOY)__'
                   +'BMFONT PLUGIN__'
                   +'COFFEE DOG GAMES_____'
                   +'SOUND EFFECTS__'
@@ -1600,7 +1615,7 @@ window.onload = function() {
     
     update: function(evt) {
       this.label.y -= 2;
-      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle());
+      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle(true));
     },
     
     touchToStart: function(evt) {
@@ -1609,7 +1624,7 @@ window.onload = function() {
         //if(soundOn && endingstatus==2)//ending.stop();
         if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
       }
-      game.replaceScene(new SceneTitle());
+      game.replaceScene(new SceneTitle(true));
     }
   });
   
@@ -1919,14 +1934,14 @@ window.onload = function() {
         playerData.settings.language = language;
         
         localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
-        game.replaceScene(new SceneTitle());
+        game.replaceScene(new SceneTitle(false));
       });
       
       exitLabel = new FontSprite('sega24', 144, 24, glossary.UI.voltar[language]);
       exitLabel.x = 16;
       exitLabel.y = 256;
       exitLabel.addEventListener(Event.TOUCH_START, function(e){
-        game.replaceScene(new SceneTitle());
+        game.replaceScene(new SceneTitle(false));
       });
             
       // Add labels
@@ -1964,7 +1979,7 @@ window.onload = function() {
       // Listen for taps
       this.addEventListener(Event.ENTER_FRAME, this.update);
       // Listen for taps
-      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+      this.addEventListener(Event.TOUCH_END, this.touchToStart);
     },
     
     update: function(evt) {
@@ -1978,7 +1993,7 @@ window.onload = function() {
         //if(soundOn && endingstatus==2)//ending.stop();
         if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
       }
-      //game.replaceScene(new SceneTitle());
+      //game.replaceScene(new SceneTitle(true));
       game.replaceScene(new SceneCharacters());
     }
   });
@@ -2030,7 +2045,7 @@ window.onload = function() {
     
     update: function(evt) {
       this.timeToTitle -= 1;
-      if(this.timeToTitle<= 0) game.replaceScene(new SceneTitle());
+      if(this.timeToTitle<= 0) game.replaceScene(new SceneTitle(true));
     },
     
     touchToStart: function(evt) {
@@ -2039,13 +2054,13 @@ window.onload = function() {
         //if(soundOn && endingstatus==2)//ending.stop();
         if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
       }
-      game.replaceScene(new SceneTitle());
+      game.replaceScene(new SceneTitle(true));
     }
   });
   
   // SceneTitle
   var SceneTitle = Class.create(Scene, {
-    initialize: function(score) {
+    initialize: function(keepMusic) {
       var TitleLabel, scoreLabel;
       Scene.apply(this);
       
@@ -2082,8 +2097,10 @@ window.onload = function() {
       PressStart.y = 264;
       PressStart.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
-          //if(soundOn && introstatus==2)intro.stop();
-          if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+          if(soundOn) {
+            window.plugins.LowLatencyAudio.stop(currentBGM);
+            window.plugins.LowLatencyAudio.play("select");
+          }
         }/* else{
           if(soundOn) game.assets['res/intro.mp3'].stop();
         } */
@@ -2102,11 +2119,11 @@ window.onload = function() {
       optionLabel.y = 304;
       optionLabel.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
-          //if(soundOn && introstatus==2)intro.stop();
-          if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-        }/* else{
-          if(soundOn) game.assets['res/intro.mp3'].stop();
-        } */
+          if(soundOn) {
+            window.plugins.LowLatencyAudio.stop(currentBGM);
+            window.plugins.LowLatencyAudio.play("select");
+          }
+        }
         game.replaceScene(new SceneSettings());
       });
       
@@ -2114,6 +2131,11 @@ window.onload = function() {
       creditLabel.x = 64;
       creditLabel.y = 344;
       creditLabel.addEventListener(Event.TOUCH_END, function(e){
+        if( isAndroid ) {
+          if(soundOn) {
+            window.plugins.LowLatencyAudio.play("select");
+          }
+        }
         game.replaceScene(new SceneCredits());
       });
       
@@ -2125,6 +2147,11 @@ window.onload = function() {
         if(hachiplayer.level>=24) hachiplayer.reset();
         else hachiplayer.levelUp(1);
         this.text = "[STAGE "+hachiplayer.level+"]";
+        if( isAndroid ) {
+          if(soundOn) {
+            window.plugins.LowLatencyAudio.play("select");
+          }
+        }
       });
       levelLabel.visible = false;
       this.levelLabel = levelLabel;
@@ -2154,17 +2181,13 @@ window.onload = function() {
       // this.addChild(scoreLabel);
       // this.addChild(hiscoreLabel);
       
-      // if( isAndroid ) {
-        // if(soundOn) {
-          // currentBGM = 'intro';
-          // window.plugins.LowLatencyAudio.play(currentBGM);
-          // /* intro.seekTo(1);
-          // intro.play(); */
-        // }
-      // }
-      /* else{
-        if(soundOn) game.assets['res/intro.mp3'].play();
-      } */
+      if(!keepMusic)
+      if( isAndroid ) {
+        if(soundOn) {
+          currentBGM = 'title';
+          window.plugins.LowLatencyAudio.loop(currentBGM);
+        }
+      }
             
       this.addEventListener(Event.ENTER_FRAME, this.update);
       this.addEventListener(Event.TOUCH_START, this.touchToStart);

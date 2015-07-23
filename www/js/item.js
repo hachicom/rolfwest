@@ -87,6 +87,7 @@ var HatItem = Class.create(Item, {
     hero.incHealth(playerObj);
     playerObj.addScore(1000,false);
     this.parentNode.parentNode.showReward(this.x,this.y,1000);
+    this.parentNode.parentNode.playSound("powerup");
     this.remove();
   }
 });
@@ -103,6 +104,7 @@ var CoinItem = Class.create(Item, {
   gotHit: function(playerObj,hero) {
     playerObj.addScore(50,false);
     this.parentNode.parentNode.showReward(this.x,this.y,50);
+    this.parentNode.parentNode.playSound("coin");
     this.remove();
   }
 });
@@ -119,6 +121,7 @@ var GoldCupItem = Class.create(Item, {
   gotHit: function(playerObj,hero) {
     playerObj.addScore(100,false);
     this.parentNode.parentNode.showReward(this.x,this.y,100);
+    this.parentNode.parentNode.playSound("coin");
     this.remove();
   }
 });
@@ -135,6 +138,7 @@ var GoldBarsItem = Class.create(Item, {
   gotHit: function(playerObj,hero) {
     playerObj.addScore(250,false);
     this.parentNode.parentNode.showReward(this.x,this.y,250);
+    this.parentNode.parentNode.playSound("item");
     this.remove();
   }
 });
@@ -151,6 +155,7 @@ var DiamondItem = Class.create(Item, {
   gotHit: function(playerObj,hero) {
     playerObj.addScore(500,false);
     this.parentNode.parentNode.showReward(this.x,this.y,500);
+    this.parentNode.parentNode.playSound("item");
     this.remove();
   }
 });
@@ -174,6 +179,7 @@ var SandubaItem = Class.create(Item, {
         item.gotHit(playerObj,hero); //collect all itens
       }
     }
+    this.parentNode.parentNode.playSound("powerup");
     this.parentNode.parentNode.endLevel = true;
     this.remove();
   }

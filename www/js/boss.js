@@ -126,6 +126,7 @@ var MadBatBoss = Class.create(Sprite, {
           if(this.level>=4) bulletId = 'boss3';
           var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 60;
           if(this.level>=4) this.shootTime = 30;
@@ -263,6 +264,7 @@ var ChiefBoss = Class.create(Sprite, {
           if(this.level>=4) shootdown = false;
           var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss2', shootdown);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 25;
           if(this.level>=4) this.shootTime = 20;
@@ -389,6 +391,7 @@ var BarthoBoss = Class.create(Sprite, {
         if(this.shootTime<=0){
           var s = new EnemyShot(this.parentNode.parentNode.rolf.x, -24, this.parentNode.parentNode.rolf, this.level, 'boss3', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("explode");
           this.shootTime = 40;
         }
       }
@@ -400,6 +403,7 @@ var BarthoBoss = Class.create(Sprite, {
             this.parentNode.parentNode.evilShotGroup.addChild(s1);
             var s2 = new EnemyShot(this.x+48, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
             this.parentNode.parentNode.evilShotGroup.addChild(s2);
+            this.parentNode.parentNode.playSound("eshoot");
             this.bullets-=1;
           }else{
             this.bullets = 3;
@@ -540,6 +544,7 @@ var AgileBoss = Class.create(Sprite, {
         if(this.shootTime<=0){
           var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 10;
         }
@@ -565,6 +570,7 @@ var AgileBoss = Class.create(Sprite, {
         if(this.bullets>=0 && this.shootTime<=0){
           var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           if(this.bullets<=0){
             this.mode = 'retreat';
@@ -652,18 +658,21 @@ var BossKilled = Class.create(Sprite, {
   },
   
   update: function(evt) {
-    this.aboutToDieTime-=1;
-    if(this.aboutToDieTime%2==0){
-      this.visible=false;
-    }else this.visible=true;
-    if(this.aboutToDieTime%5==0){
-      var explosion = new Explosion(getRandom(this.x-12,this.x+this.width),getRandom(this.y-12,this.y+this.height),false);
-      this.parentNode.addChild(explosion);
-    }
-    if(this.aboutToDieTime<=0){
-      this.parentNode.checkLevelComplete();
-      this.parentNode.removeChild(this);
-      delete this;
+    if (!this.parentNode.paused){
+      this.aboutToDieTime-=1;
+      if(this.aboutToDieTime%2==0){
+        this.visible=false;
+      }else this.visible=true;
+      if(this.aboutToDieTime%5==0){
+        var explosion = new Explosion(getRandom(this.x-12,this.x+this.width),getRandom(this.y-12,this.y+this.height),false);
+        this.parentNode.addChild(explosion);
+        this.parentNode.playSound("explode");
+      }
+      if(this.aboutToDieTime<=0){
+        this.parentNode.checkLevelComplete();
+        this.parentNode.removeChild(this);
+        delete this;
+      }
     }
   }
 });

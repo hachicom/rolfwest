@@ -70,11 +70,13 @@ var BoxSprite = Class.create(Sprite, {
         this.parentNode.parentNode.explosionGroup.addChild(s11);
         this.parentNode.parentNode.explosionGroup.addChild(s12);
         this.parentNode.parentNode.explosionGroup.addChild(s13);
+        this.parentNode.parentNode.playSound("explode");
       }
       if(this.mode == 3){
         var hat = new HatItem(this.x,this.y);
         this.parentNode.parentNode.itemGroup.addChild(hat);
       }
+        this.parentNode.parentNode.playSound("crash");
       this.parentNode.removeChild(this);
       delete this;
     }

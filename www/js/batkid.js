@@ -157,6 +157,7 @@ var BatKidEnemy = Class.create(Sprite, {
         if(this.bullets>0 && this.shootTime<=0){
           var s = new EnemyShot(this.x+12, this.y+12, this.parentNode.parentNode.rolf, this.level, 'batkid', false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           if(this.bullets<=0){
             this.direction = findAngle(this.x,this.y,this.nextposX,this.originY);

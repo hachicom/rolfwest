@@ -148,6 +148,7 @@ var BatEnemy = Class.create(Sprite, {
           if(this.level>=3) shootdown = false;
           var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'bat', shootdown);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 5 + getRandom(0,5);          
         }

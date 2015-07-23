@@ -174,6 +174,7 @@ var BatSniperEnemy = Class.create(Sprite, {
           //if(this.isHidden()) this.y=this.originY - 16;
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           if(this.bullets<=0){
             this.mode = 'offguard';
@@ -211,6 +212,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         if(this.bullets>=0 && this.shootTime<=0){
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
+          this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 10;
         }
