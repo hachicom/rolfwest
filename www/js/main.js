@@ -95,6 +95,7 @@ window.onload = function() {
                'res/western2Sheet.png',
                'res/western3Sheet.png',
                'res/western4Sheet.png',
+               'res/townsfolkSheet.png',
                'res/title.png',
                'res/dpad.png',
                'res/shootbtn.png',
@@ -103,7 +104,13 @@ window.onload = function() {
                'res/pause.png',
                'res/sega16_0.png',
                'res/sega22_0.png',
-               'res/interludeSheet.png');
+               'res/interludeSheet.png',
+               'res/rolfBig.png',
+               'res/melodyBig.png',
+               'res/agileBig.png',
+               'res/townsfolkBig.png',
+               'res/wildBatSheet.png'
+               );
   
 	// 5 - Game settings
 	game.fps = 30;
@@ -166,6 +173,7 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadFX('explode', "res/explosion.wav");
         window.plugins.LowLatencyAudio.preloadFX('select', "res/select.wav");
         window.plugins.LowLatencyAudio.preloadFX('crash', "res/crash.wav");
+        window.plugins.LowLatencyAudio.preloadFX('reload', "res/reload.wav");
       }else{
         alert("erro plugin");
       }
@@ -224,6 +232,7 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.unload('explode');
             window.plugins.LowLatencyAudio.unload('select');
             window.plugins.LowLatencyAudio.unload('crash');
+            window.plugins.LowLatencyAudio.unload('reload');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
@@ -673,7 +682,9 @@ window.onload = function() {
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
         //if all enemy generators were defeated
         var sanduba = new SandubaItem(145,384,hachiplayer.level);
+        var townsfolk = new TownsFolk(145,384);
         this.itemGroup.addChild(sanduba);
+        this.npcGroup.addChild(townsfolk);
       }
     },
     
@@ -703,29 +714,6 @@ window.onload = function() {
          ******************************/
         if(worldcomplete) game.replaceScene(new SceneBonus());
         else game.replaceScene(new SceneInterlude());
-        // Reload tilemaps and bgcolor
-        // this.backgroundColor = globalBgColor['stage'+hachiplayer.round];
-        // this.lvlMap.loadData(globalTileMap['stage'+hachiplayer.level]['mainlayer']);
-        // this.lvlFrontLayer.loadData(globalTileMap['stage'+hachiplayer.level]['toplayer']);
-        // this.lvlMap.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
-        // this.lvlFrontLayer.image = game.assets[globalTileMap['stage'+hachiplayer.level]['sheet']];
-        
-        //Reset Stage Variables      
-        // this.startLevelMsg = 60;
-        // this.gotHit = false;
-        // this.hitDuration = 0;
-        // this.endLevel = false;
-        // this.endLevelDuration = 0; 
-        // this.bonusMode = false;
-        // this.bonusDuration = 0;
-        
-        //Reset Hero Position
-        // this.rolf.resetPosition(hachiplayer);
-        
-        //Reload Enemy Generators
-        // this.batGenerator.loadNewLevel(globalBatMap['stage'+hachiplayer.level],hachiplayer.level);
-        // this.batkidGenerator.loadNewLevel(globalBatKidMap['stage'+hachiplayer.level],hachiplayer.level);
-        // this.batsniperGenerator.loadNewLevel(globalBatSniperMap['stage'+hachiplayer.level],hachiplayer.level);
       }
     },
     
@@ -1588,7 +1576,7 @@ window.onload = function() {
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg4'];
       
-      label = new FontSprite('sega24', 320, 800, '');
+      label = new FontSprite('sega24', 320, 844, '');
       label.x = 0;
       label.y = game.height;
       this.label = label;
@@ -1596,7 +1584,12 @@ window.onload = function() {
       label.text = '   *ROLF WEST*__CODE, ART & DESIGN__'
                   +'Adinan Batista Alves_____'
                   +'DEMOSCENE MUSIC__'
+                  +'Worship_(AMADEUS VOXON)__'
                   +'My South West_(WONDERBOY)__'
+                  +'Spanish Candy_(ARACHNO)__'
+                  +'My Dirty Old Kamel_(ZALZA)__'
+                  +'Chipset Sunset_(STROBE)__'
+                  +'One Way Heart_(Joule & Malmen)_____'
                   +'BMFONT PLUGIN__'
                   +'COFFEE DOG GAMES_____'
                   +'SOUND EFFECTS__'
@@ -1967,7 +1960,7 @@ window.onload = function() {
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg3'];
       
-      label = new FontSprite('sega24', 320, 960, '');
+      label = new FontSprite('sega24', 320, 940, '');
       label.x = 0;
       label.y = game.height;
       this.label = label;
@@ -1989,10 +1982,6 @@ window.onload = function() {
     
     touchToStart: function(evt) {
       var game = Game.instance;
-      if( isAndroid ) {
-        //if(soundOn && endingstatus==2)//ending.stop();
-        if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-      }
       //game.replaceScene(new SceneTitle(true));
       game.replaceScene(new SceneCharacters());
     }
@@ -2004,35 +1993,56 @@ window.onload = function() {
       var TitleLabel, scoreLabel;
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg2'];
-      this.timeToTitle = 600;
+      this.timeToTitle = 200;
       
       label = new FontSprite('sega24', 320, 960, '');
       label.x = 0;
       label.y = 0;
       this.label = label;
       
-      label.text = glossary.text.storyPg2[language];
-                  
+      this.pgCnt = 2;
+      label.text = glossary.text['storyPg'+this.pgCnt][language];
       this.addChild(label);
       
-      char1 = new Sprite(24,24);
-      char1.x = 10;
-      char1.y = 144;
+      char1 = new Sprite(96,96);
+      char1.x = game.width/2 - 48;
+      char1.y = game.height/2;
       char1.frame = 4;
-      char1.image = game.assets['res/rolfSheet.png'];
+      char1.image = game.assets['res/rolfBig.png'];
+      this.char1 = char1;
       this.addChild(char1);
-            
-      char2 = new Sprite(24,24);
-      char2.x = 10;
-      char2.y = 250;
-      char2.image = game.assets['res/melodySheet.png']; 
+      
+      char2 = new Sprite(96,96);
+      char2.x = game.width/2 - 48;
+      char2.y = game.height/2;
+      char2.image = game.assets['res/melodyBig.png'];
+      char2.visible = false;
+      this.char2 = char2;
       this.addChild(char2);
       
-      char3 = new Sprite(24,24);
-      char3.x = 10;
-      char3.y = 356;
-      char3.image = game.assets['res/bossAgileSheet.png'];
+      char3 = new Sprite(96,96);
+      char3.x = game.width/2 - 48;
+      char3.y = game.height/2;
+      char3.image = game.assets['res/agileBig.png'];
+      char3.visible = false;
+      this.char3 = char3;
       this.addChild(char3);
+            
+      char4 = new Sprite(288,72);
+      char4.x = 10;
+      char4.y = 96;
+      char4.image = game.assets['res/townsfolkBig.png']; 
+      char4.visible = false;
+      this.char4 = char4;
+      this.addChild(char4);
+      
+      char5 = new Sprite(256,64);
+      char5.x = 30;
+      char5.y = 320;
+      char5.image = game.assets['res/wildBatSheet.png'];
+      char5.visible = false;
+      this.char5 = char5;
+      this.addChild(char5);
       
       //townsfolk at 396
       //wildbat at 456
@@ -2045,7 +2055,19 @@ window.onload = function() {
     
     update: function(evt) {
       this.timeToTitle -= 1;
-      if(this.timeToTitle<= 0) game.replaceScene(new SceneTitle(true));
+      if(this.timeToTitle<= 0) {
+        this.pgCnt++;
+        this.timeToTitle = 200;
+        
+        if(this.pgCnt<=5) label.text = glossary.text['storyPg'+this.pgCnt][language];
+        switch(this.pgCnt){
+          case 2: this.char1.visible = true; break;
+          case 3: this.char1.visible = false; this.char2.visible = true; break;
+          case 4: this.char2.visible = false; this.char3.visible = true; break;
+          case 5: this.char3.visible = false; this.char4.visible = true; this.char5.visible = true; break;
+          default: game.replaceScene(new SceneTitle(true)); break;
+        }
+      }
     },
     
     touchToStart: function(evt) {

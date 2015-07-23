@@ -185,6 +185,7 @@ var Rolf = Class.create(Sprite, {
     if(this.bullets<6 && this.alive==true && this.winPose==false){
       //this.reload = true;
       this.reloadTime=2;
+      this.parentNode.playSound("reload");
     }
   },
   

@@ -82,25 +82,29 @@ var glossary = {
     },
     storyPg2: { //glossary.text.storyPg2[language]
       pt_BR: '     *PERSONAGENS*____'
-            +'Rolf West:__Sucessor de Billy West__e herói deste jogo.____'
-            +'Melody Smith:__Filha do prefeito,__e namorada de Rolf.____'
-            +'Agile West:__irmáo adotivo de Rolf e__lider da WildBat Gang.____'
-            +'Habitantes da cidade:______'
-            +'WildBat Gang:______',
+            +'Rolf West:__Sucessor de Billy West__e herói deste jogo.____',
       en_US: '     *CHARACTERS*____'
             +'Rolf West:__Billy West\'s successor__and hero of this game.____'
-            +'Melody Smith:__Mayor\'s daughter,__and Rolf\'s girlfriend.____'
-            +'Agile West:__Rolf\'s adoptive brother__and WildBat Gang leader.____'
-            +'Townspeople:______'
-            +'WildBat Gang:______',
     },
-    tutorialPg3: { //glossary.text.tutorialPg3[language]
-      pt_BR: '  ==COMO JOGAR==__Todo sétimo round_é um round bônus!_Colete corações_para ganhar pontos_______'
-            +'Ganhe vida atingindo_a pontuação abaixo:__'
-            +'->5000_->10000_->20000_->40000_->80000___Tente marcar 99999_pra zerar o jogo!',
-      en_US: '  ==HOW TO PLAY==__Every 7th round_is a bonus round!_Collect hearts_to score points_______'
-            +'Extra lives rewarded_at scores below:__'
-            +'->5000_->10000_->20000_->40000_->80000___Try scoring 99999_to beat the game!'
+    storyPg3: { //glossary.text.storyPg2[language]
+      pt_BR: '     *PERSONAGENS*____'
+            +'Melody Smith:__Filha do prefeito,__e namorada de Rolf.____',
+      en_US: '     *CHARACTERS*____'
+            +'Melody Smith:__Mayor\'s daughter,__and Rolf\'s girlfriend.____'
+    },
+    storyPg4: { //glossary.text.storyPg2[language]
+      pt_BR: '     *PERSONAGENS*____'
+            +'Agile West:__Irmão adotivo de Rolf e__lider da WildBat Gang.____',
+      en_US: '     *CHARACTERS*____'
+            +'Agile West:__Rolf\'s adoptive brother__and WildBat Gang leader.____'
+    },
+    storyPg5: { //glossary.text.storyPg2[language]
+      pt_BR: '     *PERSONAGENS*____'
+            +'Habitantes da cidade:________________'
+            +'WildBat Gang:______',
+      en_US: '     *CHARACTERS*____'
+            +'Townspeople:________________'
+            +'WildBat Gang:______',
     },
     municao: { //glossary.text.peixe[language]
       pt_BR: 'BALAS',

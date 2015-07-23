@@ -45,6 +45,44 @@ var ScoreSprite = Class.create(Sprite, {
   }
 });
 
+// TownsFolk Sprite
+var TownsFolk = Class.create(Sprite, {
+  // The obstacle that the penguin must avoid
+  initialize: function(x, y) {
+    // Call superclass constructor
+    Sprite.apply(this,[24, 24]);
+    this.image  = Game.instance.assets['res/townsfolkSheet.png'];
+    
+    this.frame = getRandom(0,11);  
+    this.iniFrame = this.frame;
+    this.endFrame = this.frame;
+    this.keepmove = true;
+    this.animationSpeed = 0.30;
+    this.animationDuration = 0;
+    this.startTime = 30;
+    
+    this.x = x;
+    this.y = y;
+    this.addEventListener(Event.ENTER_FRAME, this.update);
+  },
+  
+  interact: function(playerObj,hero){
+    return false;
+  },
+    
+  update: function(evt) { 
+    if (!this.parentNode.parentNode.paused){
+      // Animation    
+      this.animationDuration += 0.05;
+      if (this.animationDuration >= this.animationSpeed) {
+        if(this.frame<this.endFrame) this.frame ++;
+        else this.frame = this.iniFrame;
+        this.animationDuration -= this.animationSpeed;
+      }
+    }
+  }
+});
+
 // Melody Sprite
 var Melody = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
