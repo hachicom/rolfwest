@@ -254,7 +254,10 @@ window.onload = function() {
   
 	// 7 - Start 
   var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
+  
+  alert('starting game');
   game.start();
+  
   //window.scrollTo(0, 1);
   
   // SceneGame  
@@ -1988,6 +1991,7 @@ window.onload = function() {
     initialize: function(score) {
       var TitleLabel, scoreLabel;
       Scene.apply(this);
+      alert('I started');
       
       // Background
       title = new Sprite(256,160);
