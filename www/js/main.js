@@ -2072,10 +2072,6 @@ window.onload = function() {
     
     touchToStart: function(evt) {
       var game = Game.instance;
-      if( isAndroid ) {
-        //if(soundOn && endingstatus==2)//ending.stop();
-        if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-      }
       game.replaceScene(new SceneTitle(true));
     }
   });
