@@ -150,15 +150,15 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadAudio('stage4', "res/stage4.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('credits', "res/credits.ogg",1);
         //Jingles
-        window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
-        window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
+        //window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
+        //window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
         //SFX
-        window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
-        window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
-        window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
-        window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
-        window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
-        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
+        // window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
       }else{
         alert("erro plugin");
       }
@@ -195,17 +195,18 @@ window.onload = function() {
 	    function onConfirm(buttonIndex) {
 	      if(buttonIndex == 2){
             window.plugins.LowLatencyAudio.stop(currentBGM);
-            window.plugins.LowLatencyAudio.unload('bgm');
-            window.plugins.LowLatencyAudio.unload('bonus');
-            window.plugins.LowLatencyAudio.unload('intro');
-            window.plugins.LowLatencyAudio.unload('end');
+            window.plugins.LowLatencyAudio.unload('stage1');
+            window.plugins.LowLatencyAudio.unload('stage2');
+            window.plugins.LowLatencyAudio.unload('stage3');
+            window.plugins.LowLatencyAudio.unload('stage4');
+            window.plugins.LowLatencyAudio.unload('credits');
           
-            window.plugins.LowLatencyAudio.unload('hit');
-            window.plugins.LowLatencyAudio.unload('coin');
-            window.plugins.LowLatencyAudio.unload('item');
-            window.plugins.LowLatencyAudio.unload('crash');
-            window.plugins.LowLatencyAudio.unload('powerup');
-            window.plugins.LowLatencyAudio.unload('shoot');
+            // window.plugins.LowLatencyAudio.unload('hit');
+            // window.plugins.LowLatencyAudio.unload('coin');
+            // window.plugins.LowLatencyAudio.unload('item');
+            // window.plugins.LowLatencyAudio.unload('crash');
+            // window.plugins.LowLatencyAudio.unload('powerup');
+            // window.plugins.LowLatencyAudio.unload('shoot');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
