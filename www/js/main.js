@@ -681,8 +681,9 @@ window.onload = function() {
         }
       }else if(this.batGenerator.defeated && this.batkidGenerator.defeated && this.batsniperGenerator.defeated){ 
         //if all enemy generators were defeated
-        var sanduba = new SandubaItem(145,384,hachiplayer.level);
-        var townsfolk = new TownsFolk(145,384);
+        var npcpos = globalTileMap['stage'+hachiplayer.level]['npc'];
+        var sanduba = new SandubaItem(npcpos[0],npcpos[1]-12,hachiplayer.level);
+        var townsfolk = new TownsFolk(npcpos[0],npcpos[1]);
         this.itemGroup.addChild(sanduba);
         this.npcGroup.addChild(townsfolk);
       }
@@ -1422,17 +1423,17 @@ window.onload = function() {
         animationSpr.visible = false;
         this.backgroundColor = globalBgColor['stage3'];
         this.timeToStart = 300;
+      }else{
+        if( isAndroid ) {
+          if(soundOn) //this.parentNode.bgm.play();
+            window.plugins.LowLatencyAudio.play("interlude");
+        }
       }
       // this.addChild(map);
       // this.addChild(igloo);
       // this.addChild(igloo2);
       this.addChild(animationSpr);
       this.addChild(label);
-      
-      if( isAndroid ) {
-        if(soundOn) //this.parentNode.bgm.play();
-          window.plugins.LowLatencyAudio.play("interlude");
-      }
       
       // Listen for taps
       this.addEventListener(Event.TOUCH_START, this.touchToStart);
@@ -1977,13 +1978,13 @@ window.onload = function() {
     
     update: function(evt) {
       this.label.y -= 1;
-      if(this.label.y<= -this.label.height) game.replaceScene(new SceneCharacters());
+      if(this.label.y<= -this.label.height) game.replaceScene(new SceneTitle(true));
     },
     
     touchToStart: function(evt) {
       var game = Game.instance;
-      //game.replaceScene(new SceneTitle(true));
-      game.replaceScene(new SceneCharacters());
+      game.replaceScene(new SceneTitle(true));
+      //game.replaceScene(new SceneCharacters());
     }
   });
   
@@ -2028,8 +2029,8 @@ window.onload = function() {
       this.char3 = char3;
       this.addChild(char3);
             
-      char4 = new Sprite(288,72);
-      char4.x = 10;
+      char4 = new Sprite(256,64);
+      char4.x = 30;
       char4.y = 96;
       char4.image = game.assets['res/townsfolkBig.png']; 
       char4.visible = false;
@@ -2050,7 +2051,7 @@ window.onload = function() {
       // Listen for taps
       this.addEventListener(Event.ENTER_FRAME, this.update);
       // Listen for taps
-      this.addEventListener(Event.TOUCH_START, this.touchToStart);
+      this.addEventListener(Event.TOUCH_END, this.touchToStart);
     },
     
     update: function(evt) {
@@ -2065,7 +2066,7 @@ window.onload = function() {
           case 3: this.char1.visible = false; this.char2.visible = true; break;
           case 4: this.char2.visible = false; this.char3.visible = true; break;
           case 5: this.char3.visible = false; this.char4.visible = true; this.char5.visible = true; break;
-          default: game.replaceScene(new SceneTitle(true)); break;
+          default: game.replaceScene(new SceneStory()); break;
         }
       }
     },
@@ -2213,7 +2214,7 @@ window.onload = function() {
     
     update: function(evt) {
       this.timeToStory--;
-      if(this.timeToStory<=0) game.replaceScene(new SceneStory());
+      if(this.timeToStory<=0) game.replaceScene(new SceneCharacters());
     },
     
     touchToStart: function(evt) {
