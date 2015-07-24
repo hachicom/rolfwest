@@ -798,7 +798,7 @@ window.onload = function() {
                 if (shot.intersect(bat)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('miss');
+                      window.plugins.LowLatencyAudio.play('hit');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -1276,6 +1276,10 @@ window.onload = function() {
         if(boxnum == this.starposition){
           this.msgLabel.text = 'NICE! 1-UP!!!';
           hachiplayer.lives+=1;
+          if( isAndroid ) {
+            if(soundOn)
+              window.plugins.LowLatencyAudio.play('powerup');
+          }
         }else this.msgLabel.text = '  NO BONUS!';
         this.mode = 'end';
         this.star.visible = true;
