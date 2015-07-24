@@ -154,11 +154,13 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadFX('gameover', "res/gameover.mp3");
         //SFX
         window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
-        window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
+        window.plugins.LowLatencyAudio.preloadFX('miss', "res/miss.wav");
+        window.plugins.LowLatencyAudio.preloadFX('coin', "res/coin.wav");
         window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
         window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
         window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
-        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
+        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot2.wav");
+        window.plugins.LowLatencyAudio.preloadFX('eshoot', "res/shoot3.wav");
       }else{
         alert("erro plugin");
       }
@@ -205,11 +207,13 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.unload('gameover');
           
             window.plugins.LowLatencyAudio.unload('hit');
+            window.plugins.LowLatencyAudio.unload('miss');
             window.plugins.LowLatencyAudio.unload('coin');
             window.plugins.LowLatencyAudio.unload('item');
             window.plugins.LowLatencyAudio.unload('crash');
             window.plugins.LowLatencyAudio.unload('powerup');
             window.plugins.LowLatencyAudio.unload('shoot');
+            window.plugins.LowLatencyAudio.unload('eshoot');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
@@ -576,7 +580,13 @@ window.onload = function() {
     handleTouchShootControl: function (evt) {
       if(!this.parentNode.paused){
         if(this.parentNode.startLevelMsg<=0){
-          this.parentNode.rolf.shoot();
+          playsnd = this.parentNode.rolf.shoot();
+          if(playsnd)
+            if( isAndroid ) {
+              if(soundOn) 
+                window.plugins.LowLatencyAudio.play("shoot");
+              //bgm.pause();
+            }
         }
       }
       // evt.stopPropagation();
@@ -788,7 +798,7 @@ window.onload = function() {
                 if (shot.intersect(bat)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
+                      window.plugins.LowLatencyAudio.play('miss');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -866,7 +876,7 @@ window.onload = function() {
                 if (shot.intersect(box)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
+                      window.plugins.LowLatencyAudio.play('crash');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -886,7 +896,7 @@ window.onload = function() {
               if (bat.within(this.rolf,16) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
-                    window.plugins.LowLatencyAudio.play('hit');
+                    window.plugins.LowLatencyAudio.play('miss');
                 }/* else{
                   if(soundOn) game.assets['res/hit.wav'].play();
                 } */
@@ -911,7 +921,7 @@ window.onload = function() {
               if (evilshot.within(this.rolf,16) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
-                    window.plugins.LowLatencyAudio.play('hit');
+                    window.plugins.LowLatencyAudio.play('miss');
                 }/* else{
                   if(soundOn) game.assets['res/hit.wav'].play();
                 } */
@@ -933,7 +943,7 @@ window.onload = function() {
                 if (evilshot.intersect(box) && (box.y>=384/*  || box.frame==2 */)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
+                      window.plugins.LowLatencyAudio.play('crash');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -955,7 +965,7 @@ window.onload = function() {
               if (explosion.intersect(this.rolf) && this.rolf.isVulnerable()){
                 if( isAndroid ) {
                   if(soundOn)
-                    window.plugins.LowLatencyAudio.play('hit');
+                    window.plugins.LowLatencyAudio.play('miss');
                 }/* else{
                   if(soundOn) game.assets['res/hit.wav'].play();
                 } */
@@ -1047,7 +1057,7 @@ window.onload = function() {
                 if (explosion.intersect(box)){
                   if( isAndroid ) {
                     if(soundOn)
-                      window.plugins.LowLatencyAudio.play('hit');
+                      window.plugins.LowLatencyAudio.play('crash');
                   }/* else{
                     if(soundOn) game.assets['res/hit.wav'].play();
                   } */
@@ -1063,6 +1073,10 @@ window.onload = function() {
               item = this.itemGroup.childNodes[i];
               if (item.within(this.rolf,16)){
                 item.gotHit(hachiplayer,this.rolf); //here the item collected will grant some reward
+                if( isAndroid ) {
+                  if(soundOn)
+                    window.plugins.LowLatencyAudio.play('coin');
+                }
                 break;
               }
             }
@@ -1074,6 +1088,10 @@ window.onload = function() {
               npc = this.npcGroup.childNodes[i];
               if (npc.within(this.rolf,16)){
                 npc.interact(hachiplayer,this.rolf); //here the item collected will grant some reward
+                if( isAndroid ) {
+                  if(soundOn)
+                    window.plugins.LowLatencyAudio.play('coin');
+                }
                 break;
               }
             }
@@ -1279,6 +1297,10 @@ window.onload = function() {
           this.star.visible = true;
           this.starposition = getRandom(1,4);
           this.star.x = this.boxes[this.starposition].x;
+          if( isAndroid ) {
+            if(soundOn)
+              window.plugins.LowLatencyAudio.play('coin');
+          }
           break;
         default: 
           var newpos = getRandom(1,4);
@@ -1288,6 +1310,10 @@ window.onload = function() {
           }
           this.starposition = newpos;
           this.star.x = this.boxes[this.starposition].x;
+          if( isAndroid ) {
+            if(soundOn)
+              window.plugins.LowLatencyAudio.play('coin');
+          }
           break;
       }
     },
@@ -1508,6 +1534,7 @@ window.onload = function() {
       this.addChild(label);
       
       if( isAndroid ) {
+        if(AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
         if(soundOn) //this.parentNode.bgm.play();
           window.plugins.LowLatencyAudio.play("gameover");
       }
