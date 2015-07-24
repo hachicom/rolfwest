@@ -150,34 +150,34 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadAudio('stage4', "res/stage4.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('credits', "res/credits.ogg",1);
         //Jingles
-        // window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
-        // window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
+        window.plugins.LowLatencyAudio.preloadFX('interlude', "res/interlude.mp3");
+        window.plugins.LowLatencyAudio.preloadFX('gameover', "res/gameover.mp3");
         //SFX
-        // window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
-        // window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
-        // window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
-        // window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
-        // window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
-        // window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
+        window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
+        window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
+        window.plugins.LowLatencyAudio.preloadFX('item', "res/item.wav");
+        window.plugins.LowLatencyAudio.preloadFX('crash', "res/break.wav");
+        window.plugins.LowLatencyAudio.preloadFX('powerup', "res/powerup.wav");
+        window.plugins.LowLatencyAudio.preloadFX('shoot', "res/shoot.wav");
       }else{
         alert("erro plugin");
       }
         
-      /*navigator.globalization.getPreferredLanguage(
+      navigator.globalization.getPreferredLanguage(
         function (language) {alert(language.value);},
         function () {alert('Error getting language');}
-      );*/
+      );
       
-      // document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
+      document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
         
-      // function onVisibilityChange(event) {
-        // if (event.target.webkitHidden) {
-          // window.plugins.LowLatencyAudio.stop(currentBGM);
-        // }
-        // else {
-          // window.plugins.LowLatencyAudio.play(currentBGM);
-        // }
-      // }
+      function onVisibilityChange(event) {
+        if (event.target.webkitHidden) {
+          window.plugins.LowLatencyAudio.stop(currentBGM);
+        }
+        else {
+          window.plugins.LowLatencyAudio.play(currentBGM);
+        }
+      }
 
       document.addEventListener("backbutton", onBackKeyDown, false);
             
@@ -201,12 +201,15 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.unload('stage4');
             window.plugins.LowLatencyAudio.unload('credits');
           
-            // window.plugins.LowLatencyAudio.unload('hit');
-            // window.plugins.LowLatencyAudio.unload('coin');
-            // window.plugins.LowLatencyAudio.unload('item');
-            // window.plugins.LowLatencyAudio.unload('crash');
-            // window.plugins.LowLatencyAudio.unload('powerup');
-            // window.plugins.LowLatencyAudio.unload('shoot');
+            window.plugins.LowLatencyAudio.unload('interlude');
+            window.plugins.LowLatencyAudio.unload('gameover');
+          
+            window.plugins.LowLatencyAudio.unload('hit');
+            window.plugins.LowLatencyAudio.unload('coin');
+            window.plugins.LowLatencyAudio.unload('item');
+            window.plugins.LowLatencyAudio.unload('crash');
+            window.plugins.LowLatencyAudio.unload('powerup');
+            window.plugins.LowLatencyAudio.unload('shoot');
               
 	        if (navigator && navigator.app) {
               navigator.app.exitApp();
@@ -256,7 +259,7 @@ window.onload = function() {
 	// 7 - Start 
   var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
   
-  alert('starting game');
+  //alert('starting game');
   game.start();
   
   //window.scrollTo(0, 1);
@@ -519,6 +522,13 @@ window.onload = function() {
       //paused = this.parentNode.paused;
       // this.parentNode.batGenerator.defeated = true;
       // this.parentNode.batkidGenerator.defeated = true;
+    },
+  
+    resumeMusic: function(){
+      if( isAndroid ) {
+        if(soundOn) //this.parentNode.bgm.play();
+          window.plugins.LowLatencyAudio.loop(currentBGM);
+      }
     },
   
     showReward: function(x,y,scoreval){
@@ -1232,6 +1242,11 @@ window.onload = function() {
       this.addChild(msgLabel);
       this.addChild(animationSpr);
       
+      if( isAndroid ) {
+        if(soundOn) //this.parentNode.bgm.play();
+          window.plugins.LowLatencyAudio.play("interlude");
+      }
+      
       // Update
       this.addEventListener(Event.ENTER_FRAME, this.update);
     },
@@ -1381,6 +1396,11 @@ window.onload = function() {
       this.addChild(animationSpr);
       this.addChild(label);
       
+      if( isAndroid ) {
+        if(soundOn) //this.parentNode.bgm.play();
+          window.plugins.LowLatencyAudio.play("interlude");
+      }
+      
       // Listen for taps
       this.addEventListener(Event.TOUCH_START, this.touchToStart);
       this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -1486,6 +1506,11 @@ window.onload = function() {
       localStorage["playerData"] = JSON.encode(playerData);
             
       this.addChild(label);
+      
+      if( isAndroid ) {
+        if(soundOn) //this.parentNode.bgm.play();
+          window.plugins.LowLatencyAudio.play("gameover");
+      }
       
       // Listen for taps
       this.addEventListener(Event.TOUCH_START, this.touchToRestart);
@@ -1992,7 +2017,6 @@ window.onload = function() {
     initialize: function(score) {
       var TitleLabel, scoreLabel;
       Scene.apply(this);
-      alert('I started');
       
       // Background
       title = new Sprite(256,160);

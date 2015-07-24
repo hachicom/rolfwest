@@ -63,6 +63,7 @@ var PauseWindow = Class.create(GuiWindow, {
   handleResume: function(){
     this.parentNode.setVisibility(false);
     this.parentNode.parentNode.paused = false;
+    this.parentNode.parentNode.resumeMusic();
   },
   
   handleQuit: function(){
