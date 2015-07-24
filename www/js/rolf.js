@@ -177,7 +177,8 @@ var Rolf = Class.create(Sprite, {
       /* if(this.bullets<=0) {
         this.reload = true;
       } */
-    }
+      return true;
+    }else return false;
   },
   
   reloadBullets: function(){
