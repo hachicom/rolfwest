@@ -150,8 +150,8 @@ window.onload = function() {
         window.plugins.LowLatencyAudio.preloadAudio('stage4', "res/stage4.ogg",1);
         window.plugins.LowLatencyAudio.preloadAudio('credits', "res/credits.ogg",1);
         //Jingles
-        //window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
-        //window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
+        // window.plugins.LowLatencyAudio.preloadFX('hit', "res/interlude.mp3");
+        // window.plugins.LowLatencyAudio.preloadFX('coin', "res/gameover.mp3");
         //SFX
         // window.plugins.LowLatencyAudio.preloadFX('hit', "res/hit.wav");
         // window.plugins.LowLatencyAudio.preloadFX('coin', "res/fish.wav");
@@ -168,16 +168,16 @@ window.onload = function() {
         function () {alert('Error getting language');}
       );*/
       
-      document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
+      // document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
         
-      function onVisibilityChange(event) {
-        if (event.target.webkitHidden) {
-          window.plugins.LowLatencyAudio.stop(currentBGM);
-        }
-        else {
-          window.plugins.LowLatencyAudio.play(currentBGM);
-        }
-      }
+      // function onVisibilityChange(event) {
+        // if (event.target.webkitHidden) {
+          // window.plugins.LowLatencyAudio.stop(currentBGM);
+        // }
+        // else {
+          // window.plugins.LowLatencyAudio.play(currentBGM);
+        // }
+      // }
 
       document.addEventListener("backbutton", onBackKeyDown, false);
             
