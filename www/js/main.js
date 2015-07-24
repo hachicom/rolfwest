@@ -140,7 +140,7 @@ window.onload = function() {
   
   // Set Phonegap Events
   if( isAndroid ) {
-    /* document.addEventListener("deviceready", function ()
+    document.addEventListener("deviceready", function ()
     {
       if( window.plugins && window.plugins.LowLatencyAudio ) {
         //BGMs
@@ -163,10 +163,10 @@ window.onload = function() {
         alert("erro plugin");
       }
         
-      navigator.globalization.getPreferredLanguage(
+      /*navigator.globalization.getPreferredLanguage(
         function (language) {alert(language.value);},
         function () {alert('Error getting language');}
-      );
+      );*/
       
       // document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
         
@@ -250,7 +250,7 @@ window.onload = function() {
         autoShow:true,
         isForChild:true
       });
-    } */
+    }
   }
   
 	// 7 - Start 
