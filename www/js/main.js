@@ -1,4 +1,4 @@
-var version = '0.9.5';
+var version = '1.0.0';
 
 var hiscore = 20000;
 var paused = false;
@@ -7,7 +7,7 @@ var maxbonusDecTime = 30;
 var fpscount = 0;
 var currentBGM = 'stage1';
 var isAndroid = isMobile();
-var scoreRewards = [20000,40000,80000,160000];
+var scoreRewards = [50000,150000];
 var soundOn = true;
 var language = 'en_US'; //ou en_US
 var playerData = {
@@ -88,8 +88,12 @@ window.onload = function() {
                'res/bossMadbatSheet.png',
                'res/bossChiefSheet.png',
                'res/bossBarthoSheet.png',
+               'res/bossCannonSheet.png',
+               'res/bossChenSheet.png',
                'res/bossAgileSheet.png',
                'res/bossDefeatedSheet.png',
+               'res/bossPosterSheet.png',
+               'res/bossNames.png',
                'res/explosionSheet.png',
                'res/western1Sheet.png',
                'res/western2Sheet.png',
@@ -109,13 +113,15 @@ window.onload = function() {
                'res/melodyBig.png',
                'res/agileBig.png',
                'res/townsfolkBig.png',
-               'res/wildBatSheet.png'
+               'res/wildBatSheet.png',
+               'res/wanted.png'
                );
   
 	// 5 - Game settings
 	game.fps = 30;
 	//game.scale = 1;
 	// 6 - Once Game finishes loading
+  var hachiplayer = new Hachiplayer(1,4,scoreRewards,20000); //world 1-1, after level 4 world goes up
   game.onload = function() {
 		// 1 - Variables
     //enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
@@ -128,7 +134,7 @@ window.onload = function() {
 	    //console.log("Supports Save!");
       playerDataTmp = JSON.decode(localStorage["com.hachicom.rolfwest.playerData"]);
       if (playerDataTmp!=null) playerData = playerDataTmp;
-      //console.dir(playerData);
+      console.dir(playerData);
     }
     else
     {
@@ -136,6 +142,7 @@ window.onload = function() {
       localStorage = [];
     }
     hiscore = playerData.scoretable.hiscore;
+    hachiplayer.hiscore = hiscore;
     soundOn = playerData.settings.sound;
     //alert(playerData.settings.language!=null);
     if(playerData.settings.language!=null) language = playerData.settings.language;
@@ -278,10 +285,7 @@ window.onload = function() {
       });
     }
   }
-  
-	// 7 - Start 
-  var hachiplayer = new Hachiplayer(1,4,scoreRewards,hiscore); //world 1-1, after level 4 world goes up
-  
+  // 7 - Start   
   //alert('starting game');
   game.start();
   
@@ -640,6 +644,9 @@ window.onload = function() {
     },
     
     goToTitleScreen: function (value) {
+      playerData.scoretable.hiscore = hachiplayer.hiscore;
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
+      
       hachiplayer.reset();
       game.replaceScene(new SceneTitle(false));
     },
@@ -1415,7 +1422,27 @@ window.onload = function() {
       this.animationDuration = 0;
       this.animationSpeed = 1.00;
       this.iniFrame = 0;
-      this.endFrame = 1;      
+      this.endFrame = 1;
+      
+      posterWantedSpr = new Sprite(128, 128);
+      posterWantedSpr.image = game.assets['res/wanted.png'];
+      posterWantedSpr.x = 20;
+      posterWantedSpr.y = 120;
+      if(hachiplayer.level>=24) posterWantedSpr.visible = false;
+      
+      posterNameSpr = new Sprite(64, 64);
+      posterNameSpr.image = game.assets['res/bossNames.png'];
+      posterNameSpr.frame = hachiplayer.world - 1;
+      posterNameSpr.x = posterWantedSpr.x + 20;
+      posterNameSpr.y = posterWantedSpr.y + 96;
+      if(hachiplayer.level>=24) posterNameSpr.visible = false;
+      
+      posterCharSpr = new Sprite(64, 64);
+      posterCharSpr.image = game.assets['res/bossPosterSheet.png'];
+      posterCharSpr.frame = hachiplayer.world - 1;
+      posterCharSpr.x = posterWantedSpr.x + 32;
+      posterCharSpr.y = posterWantedSpr.y + 28;
+      if(hachiplayer.world>=6) posterCharSpr.visible = false;
       
       label.text = '       WORLD '+ hachiplayer.world + '-' + hachiplayer.round;
       if(hachiplayer.level == 24){
@@ -1429,9 +1456,10 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.play("interlude");
         }
       }
-      // this.addChild(map);
-      // this.addChild(igloo);
-      // this.addChild(igloo2);
+      
+      this.addChild(posterWantedSpr);
+      this.addChild(posterNameSpr);
+      this.addChild(posterCharSpr);
       this.addChild(animationSpr);
       this.addChild(label);
       
@@ -1483,7 +1511,7 @@ window.onload = function() {
       label.text = glossary.text.wingame1[language];
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
-      localStorage["playerData"] = JSON.encode(playerData);
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData)
       
       animationSpr = new Sprite(128, 128);
       animationSpr.image = game.assets['res/interludeSheet.png'];
@@ -1499,6 +1527,7 @@ window.onload = function() {
       this.addChild(label);
       
       if( isAndroid ) {
+        if(AdMob) AdMob.showBanner(AdMob.AD_POSITION.BOTTOM_CENTER);
         if(soundOn) {
           currentBGM = 'credits';
           window.plugins.LowLatencyAudio.play(currentBGM);
@@ -1537,7 +1566,7 @@ window.onload = function() {
       label.text = glossary.text.gameover[language]+'___  FINAL SCORE: '+hachiplayer.score;
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
-      localStorage["playerData"] = JSON.encode(playerData);
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
             
       this.addChild(label);
       
@@ -1614,10 +1643,6 @@ window.onload = function() {
     
     touchToStart: function(evt) {
       var game = Game.instance;
-      if( isAndroid ) {
-        //if(soundOn && endingstatus==2)//ending.stop();
-        if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-      }
       game.replaceScene(new SceneTitle(true));
     }
   });
@@ -2029,9 +2054,9 @@ window.onload = function() {
       this.char3 = char3;
       this.addChild(char3);
             
-      char4 = new Sprite(256,64);
-      char4.x = 30;
-      char4.y = 96;
+      char4 = new Sprite(144,192);
+      char4.x = 60;
+      char4.y = 84;
       char4.image = game.assets['res/townsfolkBig.png']; 
       char4.visible = false;
       this.char4 = char4;
@@ -2039,7 +2064,7 @@ window.onload = function() {
       
       char5 = new Sprite(256,64);
       char5.x = 30;
-      char5.y = 320;
+      char5.y = 340;
       char5.image = game.assets['res/wildBatSheet.png'];
       char5.visible = false;
       this.char5 = char5;
@@ -2081,12 +2106,12 @@ window.onload = function() {
   var SceneTitle = Class.create(Scene, {
     initialize: function(keepMusic) {
       var TitleLabel, scoreLabel;
-      Scene.apply(this);
+      Scene.apply(this);      
       
       // Background
       title = new Sprite(256,160);
       title.x = 32;
-      title.y = 64;
+      title.y = 32;
       //bg.scale(2,2);
       title.image = game.assets['res/title.png'];      
       this.backgroundColor = globalBgColor['bg1'];

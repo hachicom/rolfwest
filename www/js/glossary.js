@@ -100,10 +100,10 @@ var glossary = {
     },
     storyPg5: { //glossary.text.storyPg2[language]
       pt_BR: '     *PERSONAGENS*____'
-            +'Habitantes da cidade:________________'
+            +'Habitantes da cidade:________________++'
             +'WildBat Gang:______',
       en_US: '     *CHARACTERS*____'
-            +'Townspeople:________________'
+            +'Townspeople:__________________'
             +'WildBat Gang:______',
     },
     municao: { //glossary.text.peixe[language]

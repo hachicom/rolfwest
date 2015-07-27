@@ -40,7 +40,7 @@ var Item = Class.create(Sprite, {
       this.x += this.moveSpeed * Math.cos(this.direction);
       this.y += this.moveSpeed * Math.sin(this.direction);
     
-      if(this.y > game.height || this.x > game.width || this.x < -this.width || this.y < -this.height){
+      if(this.y > game.height || this.x > game.width || this.x < -this.width){
         this.remove();
       }
       this.ySpeed += this.yAccel;

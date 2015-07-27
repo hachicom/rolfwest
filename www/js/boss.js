@@ -4,7 +4,8 @@ var MadBatBoss = Class.create(Sprite, {
   initialize: function(x,y,level) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
-    this.image  = Game.instance.assets['res/bossMadbatSheet.png'];
+    if(level>=4) this.image  = Game.instance.assets['res/bossCannonSheet.png'];
+    else this.image  = Game.instance.assets['res/bossMadbatSheet.png'];
     this.x = x;
     this.y = y;
     this.originX = x;
@@ -47,7 +48,9 @@ var MadBatBoss = Class.create(Sprite, {
       if(this.hp<0){
         //alert("i'm dead");
         this.parentNode.parentNode.bossGenerator.defeated = true;
-        var madbatk = new BossKilled(this.x,this.y, 'madbat');
+        var madbatk;
+        if(this.level>=4) madbatk = new BossKilled(this.x,this.y, 'cannon');
+        else madbatk = new BossKilled(this.x,this.y, 'madbat');
         this.parentNode.parentNode.addChild(madbatk);
         playerObj.score+=1000;
         this.parentNode.removeChild(this);
@@ -166,7 +169,8 @@ var ChiefBoss = Class.create(Sprite, {
   initialize: function(x,y,level) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
-    this.image  = Game.instance.assets['res/bossChiefSheet.png'];
+    if(level>=4) this.image  = Game.instance.assets['res/bossChenSheet.png'];
+    else this.image  = Game.instance.assets['res/bossChiefSheet.png'];
     this.x = x;
     this.y = y;
     this.originX = x;
@@ -209,7 +213,9 @@ var ChiefBoss = Class.create(Sprite, {
       if(this.hp<0){
         //alert("i'm dead");
         this.parentNode.parentNode.bossGenerator.defeated = true;
-        var madbatk = new BossKilled(this.x,this.y, 'chief');
+        var madbatk;
+        if(this.level>=4) madbatk = new BossKilled(this.x,this.y, 'chen');
+        else madbatk = new BossKilled(this.x,this.y, 'chief');
         this.parentNode.parentNode.addChild(madbatk);
         playerObj.score+=1000;
         this.parentNode.removeChild(this);
@@ -650,7 +656,9 @@ var BossKilled = Class.create(Sprite, {
       case 'madbat': this.frame = 0; break;
       case 'chief':  this.frame = 1; break;
       case 'bartho': this.frame = 2; break;
-      case 'agile':  this.frame = 3; break;
+      case 'cannon': this.frame = 3; break;
+      case 'chen':   this.frame = 4; break;
+      case 'agile':  this.frame = 5; break;
       default: this.frame = 0; break;
     }
     
