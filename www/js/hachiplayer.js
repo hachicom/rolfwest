@@ -1,5 +1,5 @@
 var Hachiplayer = Class.create({
-  initialize: function(level,levellimit,scoreRewards,hiscore) {    
+  initialize: function(level,levellimit,scoreRewards,hiscore,maxstage) {    
     this.lives = 3;
     this.health = 3;
     this.score = 0;
@@ -7,6 +7,7 @@ var Hachiplayer = Class.create({
     this.scoreRewards = scoreRewards;
     this.scoreTarget = 0;
     this.hiscore = hiscore;
+    this.maxstage = maxstage;
     this.multiplier = 1;
     
     this.level = level;
@@ -40,6 +41,7 @@ var Hachiplayer = Class.create({
       //this.world += 1;
       this.round = this.levellimit;
     }
+    if (this.level >= this.maxstage) this.maxstage = this.level;
   },
 
   addScore: function (value,multi) {

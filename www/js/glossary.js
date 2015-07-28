@@ -21,8 +21,11 @@ var glossary = {
       en_US: '[CREDITS]'
     },
     optionsTxt :{ //glossary.UI.optionsTxt[language]
-      pt_BR: '  *MENU DE OPÇÕES*__SOM & BGM_____REGIÃO/REGION_____RESETAR HISCORE',
-      en_US: '  *SETTINGS MENU*__SFX & BGM_____REGIÃO/REGION_____RESET HISCORE'
+      pt_BR: '  *MENU DE OPÇÕES*__SOM & BGM_____REGIÃO/REGION_____RESETAR DADOS SALVOS',
+      en_US: '  *SETTINGS MENU*__SFX & BGM_____REGIÃO/REGION_____RESET SAVE DATA'
+    },
+    firstRunSetupTxt :{ //glossary.UI.firstRunSetupTxt['all']
+      all: '  *INITIAL SETUP*__SOM/SOUND?_____IDIOMA/LANGUAGE_____',
     },
     sim :{ //glossary.UI.sim[language]
       pt_BR: '[SIM]',
@@ -100,7 +103,7 @@ var glossary = {
     },
     storyPg5: { //glossary.text.storyPg2[language]
       pt_BR: '     *PERSONAGENS*____'
-            +'Habitantes da cidade:________________++'
+            +'Habitantes da cidade:__________________'
             +'WildBat Gang:______',
       en_US: '     *CHARACTERS*____'
             +'Townspeople:__________________'

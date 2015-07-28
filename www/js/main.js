@@ -9,17 +9,23 @@ var currentBGM = 'stage1';
 var isAndroid = isMobile();
 var scoreRewards = [50000,150000];
 var soundOn = true;
-var language = 'en_US'; //ou en_US
-var playerData = {
+var language = 'en_US'; //ou pt_BR
+var playerDataDefault = {
   scoretable: {
 		hiscore: 20000
 	},
+  savedata: {
+		firstrun: true
+	},
   settings: {
 		sound: true,
-    language: 'en_US'
+    language: 'en_US',
+    difficulty: 'normal',
+    maxstage: 1
 	},
 	// ...
 }; 
+var playerData = playerDataDefault;
 
 //Desligando os eventos de mouse (Android hack)
 /* document.addEventListener('mousedown', function (e) {
@@ -114,14 +120,15 @@ window.onload = function() {
                'res/agileBig.png',
                'res/townsfolkBig.png',
                'res/wildBatSheet.png',
-               'res/wanted.png'
+               'res/wanted.png',
+               'res/cover.png'
                );
   
 	// 5 - Game settings
 	game.fps = 30;
 	//game.scale = 1;
 	// 6 - Once Game finishes loading
-  var hachiplayer = new Hachiplayer(1,4,scoreRewards,20000); //world 1-1, after level 4 world goes up
+  var hachiplayer = new Hachiplayer(1,4,scoreRewards,20000,playerData.settings.maxstage); //world 1-1, after level 4 world goes up
   game.onload = function() {
 		// 1 - Variables
     //enchant.bmfont.createFont('score', 'res/font0.fnt', game.assets['res/font0_0.png']);
@@ -134,21 +141,27 @@ window.onload = function() {
 	    //console.log("Supports Save!");
       playerDataTmp = JSON.decode(localStorage["com.hachicom.rolfwest.playerData"]);
       if (playerDataTmp!=null) playerData = playerDataTmp;
+      else playerData = playerDataDefault;
       console.dir(playerData);
     }
     else
     {
       //console.log("Doesn't support Save!");
       localStorage = [];
+      playerData = playerDataDefault;
     }
     hiscore = playerData.scoretable.hiscore;
     hachiplayer.hiscore = hiscore;
     soundOn = playerData.settings.sound;
-    //alert(playerData.settings.language!=null);
     if(playerData.settings.language!=null) language = playerData.settings.language;
+    if(playerData.settings.difficulty==null) playerData.settings.difficulty = playerDataDefault.settings.difficulty;
+    if(playerData.savedata.firstrun==null) playerData.savedata.firstrun = playerDataDefault.savedata.firstrun;
+    if(playerData.settings.maxstage==null) playerData.settings.maxstage = playerDataDefault.settings.maxstage;
+    hachiplayer.maxstage = playerData.settings.maxstage;
     
     // 2 - New scene
-    scene = new SceneTitle(false);
+    if (playerData.savedata.firstrun === true) scene = new SceneSettings(true);
+    else scene = new SceneTitle(false);
     game.pushScene(scene);
 	}
   
@@ -645,6 +658,7 @@ window.onload = function() {
     
     goToTitleScreen: function (value) {
       playerData.scoretable.hiscore = hachiplayer.hiscore;
+      playerData.settings.maxstage = hachiplayer.maxstage;
       localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
       
       hachiplayer.reset();
@@ -717,6 +731,13 @@ window.onload = function() {
         hachiplayer.reset();
         game.replaceScene(new SceneEnding(0));
       }else{
+        /******************************
+         ****  SAVING PLAYER DATA  ****
+         ******************************/
+        playerData.scoretable.hiscore = hachiplayer.hiscore;
+        playerData.settings.maxstage = hachiplayer.maxstage;
+        localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
+        
         /******************************
          ****  LOADING NEXT LEVEL  ****
          ******************************/
@@ -1511,6 +1532,7 @@ window.onload = function() {
       label.text = glossary.text.wingame1[language];
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
+      playerData.settings.maxstage = hachiplayer.maxstage;
       localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData)
       
       animationSpr = new Sprite(128, 128);
@@ -1566,6 +1588,7 @@ window.onload = function() {
       label.text = glossary.text.gameover[language]+'___  FINAL SCORE: '+hachiplayer.score;
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
+      playerData.settings.maxstage = hachiplayer.maxstage;
       localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
             
       this.addChild(label);
@@ -1849,7 +1872,7 @@ window.onload = function() {
   
   // SceneSettings
   var SceneSettings = Class.create(Scene, {
-    initialize: function(score) {
+    initialize: function(firstrun) {
       var TitleLabel, scoreLabel, tmpLanguage, tmpSound;
       var resetHiscore = false;
       Scene.apply(this);
@@ -1877,6 +1900,7 @@ window.onload = function() {
       label = new FontSprite('sega24', 320, 200, glossary.UI.optionsTxt[language]);
       label.x = 0;
       label.y = 8;
+      if(firstrun) label.text = glossary.UI.firstRunSetupTxt['all'];
       
       // SOUND SETTINGS
       SoundOnLabel = new FontSprite('sega24', 80, 24, " [ON]");
@@ -1945,10 +1969,17 @@ window.onload = function() {
       saveLabel.x = 160;
       saveLabel.y = 256;
       saveLabel.addEventListener(Event.TOUCH_START, function(e){
-        if(resetHiscore) hachiplayer.hiscore = 20000;
+        if(resetHiscore || firstrun) {
+          hachiplayer.hiscore = playerDataDefault.scoretable.hiscore;
+          hachiplayer.maxstage = playerDataDefault.settings.maxstage;
+          hachiplayer.level = hachiplayer.maxstage;
+          playerData.savedata.firstrun = false;
+          playerData.settings.difficulty = playerDataDefault.settings.difficulty;
+        }
         soundOn = tmpSound;
         language = tmpLanguage;
         playerData.scoretable.hiscore = hachiplayer.hiscore;
+        playerData.settings.maxstage = hachiplayer.maxstage;
         playerData.settings.sound = soundOn;
         playerData.settings.language = language;
         
@@ -1972,9 +2003,11 @@ window.onload = function() {
       this.addChild(SoundOffLabel);
       this.addChild(PtBrLabel);
       this.addChild(EnUsLabel);
-      this.addChild(ResetYesLabel);
-      this.addChild(ResetNoLabel);
-      this.addChild(exitLabel);
+      if(!firstrun){
+        this.addChild(ResetYesLabel);
+        this.addChild(ResetNoLabel);
+        this.addChild(exitLabel);
+      }
       this.addChild(saveLabel);
     }
   });
@@ -2111,34 +2144,33 @@ window.onload = function() {
       // Background
       title = new Sprite(256,160);
       title.x = 32;
-      title.y = 32;
-      //bg.scale(2,2);
+      title.y = 10;
       title.image = game.assets['res/title.png'];      
       this.backgroundColor = globalBgColor['bg1'];
-      map = new Map(32, 32);
-      //map.y = 320;
-      map.image = game.assets['res/western1Sheet.png'];
-      //map.loadData(arrMap1Top,arrMap1Sub);
+      // map = new Map(32, 32);
+      // map.y = 320;
+      // map.image = game.assets['res/western1Sheet.png'];
+      // map.loadData(arrMap1Top,arrMap1Sub);
       
-      scoreLabel = new FontSprite('sega12', 128, 12, 'SC 0');
-      scoreLabel.x = 8;
-      scoreLabel.y = 0;
-      this.scoreLabel = scoreLabel;
+      // scoreLabel = new FontSprite('sega12', 128, 12, 'SC 0');
+      // scoreLabel.x = 8;
+      // scoreLabel.y = 0;
+      // this.scoreLabel = scoreLabel;
             
-      hiscoreLabel = new FontSprite('sega12', 144, 12, 'TOP '+hachiplayer.hiscore);
-      hiscoreLabel.x = 160;
-      hiscoreLabel.y = 0;
-      this.hiscoreLabel = hiscoreLabel;
+      // hiscoreLabel = new FontSprite('sega12', 144, 12, 'TOP '+hachiplayer.hiscore);
+      // hiscoreLabel.x = 160;
+      // hiscoreLabel.y = 0;
+      // this.hiscoreLabel = hiscoreLabel;
       
       //Title label
       TitleLabel = new FontSprite('sega24', 240, 24, "        v"+version);
       TitleLabel.x = 88;
-      TitleLabel.y = 198;
+      TitleLabel.y = 176;
       
       // Press Start label
       PressStart = new FontSprite('sega24', 192, 24, glossary.UI.start[language]);
       PressStart.x = 64;
-      PressStart.y = 264;
+      PressStart.y = 218;
       PressStart.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
           if(soundOn) {
@@ -2160,7 +2192,7 @@ window.onload = function() {
       
       optionLabel = new FontSprite('sega24', 160, 24, glossary.UI.settings[language]);
       optionLabel.x = 64;
-      optionLabel.y = 304;
+      optionLabel.y = 258;
       optionLabel.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
           if(soundOn) {
@@ -2168,12 +2200,12 @@ window.onload = function() {
             window.plugins.LowLatencyAudio.play("select");
           }
         }
-        game.replaceScene(new SceneSettings());
+        game.replaceScene(new SceneSettings(false));
       });
       
       creditLabel = new FontSprite('sega24', 160, 24, glossary.UI.credits[language]);
       creditLabel.x = 64;
-      creditLabel.y = 344;
+      creditLabel.y = 298;
       creditLabel.addEventListener(Event.TOUCH_END, function(e){
         if( isAndroid ) {
           if(soundOn) {
@@ -2186,9 +2218,9 @@ window.onload = function() {
       // Level Select label
       levelLabel = new FontSprite('sega24', 160, 24, "[STAGE "+hachiplayer.level+"]");
       levelLabel.x = 64;
-      levelLabel.y = 384;
+      levelLabel.y = 338;
       levelLabel.addEventListener(Event.TOUCH_END, function(e){
-        if(hachiplayer.level>=24) hachiplayer.reset();
+        if(hachiplayer.level>=playerData.settings.maxstage) hachiplayer.reset();
         else hachiplayer.levelUp(1);
         this.text = "[STAGE "+hachiplayer.level+"]";
         if( isAndroid ) {
@@ -2197,8 +2229,14 @@ window.onload = function() {
           }
         }
       });
-      levelLabel.visible = false;
+      if(playerData.settings.maxstage == 1) levelLabel.visible = false;
       this.levelLabel = levelLabel;
+      
+      coverArt = new Sprite(256,100);
+      coverArt.x = 32;
+      coverArt.y = 368;
+      //bg.scale(2,2);
+      coverArt.image = game.assets['res/cover.png'];    
       
       // Copyright label
       this.cheatcodeCnt = 0;
@@ -2207,7 +2245,15 @@ window.onload = function() {
       copyright.y = game.height - 16 - 60;
       copyright.addEventListener(Event.TOUCH_END, function(e){
         this.parentNode.cheatcodeCnt++;
-        if (this.parentNode.cheatcodeCnt>=9) this.parentNode.levelLabel.visible = true;
+        if (this.parentNode.cheatcodeCnt>=9) {
+          levelLabel.visible = true;
+          playerData.settings.maxstage = 24;
+          if( isAndroid ) {
+            if(soundOn) {
+              window.plugins.LowLatencyAudio.play("powerup");
+            }
+          }
+        }
       });
       
       this.timeToStory = 300;
@@ -2222,6 +2268,7 @@ window.onload = function() {
       this.addChild(optionLabel);
       this.addChild(creditLabel);
       this.addChild(levelLabel);
+      this.addChild(coverArt);
       // this.addChild(scoreLabel);
       // this.addChild(hiscoreLabel);
       
