@@ -1,13 +1,14 @@
 // Bat Enemy
 var BatEnemy = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,xTarget,yTarget,level,batGenKey) {
+  initialize: function(x,y,xTarget,yTarget,level,batGenKey,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
     this.image  = Game.instance.assets['res/batSheet.png'];
     this.x = x;
     this.y = y;
     this.batGenKey = batGenKey;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -22,6 +23,9 @@ var BatEnemy = Class.create(Sprite, {
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
+    this.hp = 0;
+    if(difficulty=='hard') this.hp = 1;
+    this.gotHitTime = 0;
     
     // 3 - Animate
     this.frame = 0;
@@ -35,27 +39,36 @@ var BatEnemy = Class.create(Sprite, {
   },
   
   gotHit: function(playerObj) {
-    this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
     switch(this.mode){
       case 'start'  : playerObj.addScore(20,false); break;
       case 'idle'   : playerObj.addScore(10,false); break;
       case 'fly'    : playerObj.addScore(30,false); break;
       case 'retreat': playerObj.addScore(50,false); break;
     }
-    var batk = new BatKilled(this.x,this.y);
-    this.parentNode.parentNode.addChild(batk);
-    
-    var coinchance = getRandom(1,4);
-    if(coinchance == 3){
-      var coin = new CoinItem(this.x,this.y);
-      this.parentNode.parentNode.itemGroup.addChild(coin);
-    }else if(coinchance == 2){
-      var cup = new GoldCupItem(this.x,this.y);
-      this.parentNode.parentNode.itemGroup.addChild(cup);
+    this.hp-=1;
+    if(this.hp<0){
+      this.parentNode.parentNode.batGenerator.rearrangeBats(this.batGenKey);
+      var batk = new BatKilled(this.x,this.y);
+      this.parentNode.parentNode.addChild(batk);
+      
+      var coinchance = getRandom(1,4);
+      if(coinchance == 3){
+        var coin = new CoinItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(coin);
+      }else if(coinchance == 2){
+        var cup = new GoldCupItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(cup);
+      }
+          
+      this.parentNode.removeChild(this);
+      delete this;
+    }else{
+      this.gotHitTime = 10;
+      this.animationDuration = 0;
+      this.frame = 4;
+      this.iniFrame = 4;
+      this.endFrame = 4;
     }
-        
-    this.parentNode.removeChild(this);
-    delete this;
   },
   
   gotKilled: function(playerObj) {
@@ -145,7 +158,7 @@ var BatEnemy = Class.create(Sprite, {
         this.shootTime-=1;
         if(this.bullets>0 && this.shootTime<=0){
           var shootdown = true;
-          if(this.level>=3) shootdown = false;
+          if(this.level>=3 || this.difficulty=='hard') shootdown = false;
           var s = new EnemyShot(this.x+9, this.y, this.parentNode.parentNode.rolf, this.level, 'bat', shootdown);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
@@ -167,6 +180,15 @@ var BatEnemy = Class.create(Sprite, {
         }
       }
       
+      if(this.gotHitTime>0){
+        this.gotHitTime-=1;
+        if(this.gotHitTime<=0) {
+          this.animationDuration = 0;
+          this.frame = 0;
+          this.iniFrame = 0;
+          this.endFrame = 3;
+        }
+      }
     }
   }
 });
@@ -202,7 +224,7 @@ var BatKilled = Class.create(Sprite, {
 //Bat Generator
 var BatGenerator = Class.create(Sprite, {
   // The windows that will create the bats
-  initialize: function(x,y,lvlBatEnemyMap,level) {
+  initialize: function(x,y,lvlBatEnemyMap,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
@@ -218,6 +240,7 @@ var BatGenerator = Class.create(Sprite, {
     this.batIdx = 0;
     this.batIdy = 0;
     this.level = level;
+    this.difficulty = difficulty;
     
     //movement vars
     this.modeStart = false;
@@ -244,7 +267,7 @@ var BatGenerator = Class.create(Sprite, {
           this.createBatTime -= 1;
           if (this.createBatTime <= 0) {
             //console.log("creating bat");
-            var bat = new BatEnemy(this.genpoint+this.createBatSide*(game.width+48),this.y,this.batIdx,this.batIdy,this.level,this.bats.length);
+            var bat = new BatEnemy(this.genpoint+this.createBatSide*(game.width+48),this.y,this.batIdx,this.batIdy,this.level,this.bats.length,this.difficulty);
             this.bats.push(bat);
             this.parentNode.batGroup.addChild(bat);
             this.createBatTime = 8;

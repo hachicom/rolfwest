@@ -1,7 +1,7 @@
 // Bosses
 var MadBatBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,level) {
+  initialize: function(x,y,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
     if(level>=4) this.image  = Game.instance.assets['res/bossCannonSheet.png'];
@@ -10,6 +10,7 @@ var MadBatBoss = Class.create(Sprite, {
     this.y = y;
     this.originX = x;
     this.originY = y;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -23,9 +24,14 @@ var MadBatBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 25; //after 10 shots, goes crazy
+    this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
+    
+    if(difficulty=='hard') {
+      this.hp = 36;
+      this.moveSpeed = 4;
+    }
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -52,7 +58,7 @@ var MadBatBoss = Class.create(Sprite, {
         if(this.level>=4) madbatk = new BossKilled(this.x,this.y, 'cannon');
         else madbatk = new BossKilled(this.x,this.y, 'madbat');
         this.parentNode.parentNode.addChild(madbatk);
-        playerObj.score+=1000;
+        playerObj.score+=1000*this.level;
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -126,13 +132,13 @@ var MadBatBoss = Class.create(Sprite, {
         this.shootTime-=1;
         if(this.shootTime<=0){
           var bulletId = 'boss1';
-          if(this.level>=4) bulletId = 'boss3';
+          if(this.level>=4 || this.difficulty=='hard') bulletId = 'boss3';
           var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 60;
-          if(this.level>=4) this.shootTime = 30;
+          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 30;
         }
       }
       if(this.gotHitTime>0){
@@ -166,7 +172,7 @@ var MadBatBoss = Class.create(Sprite, {
 
 var ChiefBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,level) {
+  initialize: function(x,y,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
     if(level>=4) this.image  = Game.instance.assets['res/bossChenSheet.png'];
@@ -175,6 +181,7 @@ var ChiefBoss = Class.create(Sprite, {
     this.y = y;
     this.originX = x;
     this.originY = y;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -191,6 +198,11 @@ var ChiefBoss = Class.create(Sprite, {
     this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
+    
+    if(difficulty=='hard') {
+      this.hp = 38;
+      this.moveSpeed = 4;
+    }
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -217,7 +229,7 @@ var ChiefBoss = Class.create(Sprite, {
         if(this.level>=4) madbatk = new BossKilled(this.x,this.y, 'chen');
         else madbatk = new BossKilled(this.x,this.y, 'chief');
         this.parentNode.parentNode.addChild(madbatk);
-        playerObj.score+=1000;
+        playerObj.score+=1000*this.level;
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -267,13 +279,13 @@ var ChiefBoss = Class.create(Sprite, {
         this.shootTime-=1;
         if(this.shootTime<=0){
           var shootdown = true;
-          if(this.level>=4) shootdown = false;
+          if(this.level>=4 || this.difficulty=='hard') shootdown = false;
           var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss2', shootdown);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 25;
-          if(this.level>=4) this.shootTime = 20;
+          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 20;
         }
       }
       if(this.gotHitTime>0){
@@ -307,7 +319,7 @@ var ChiefBoss = Class.create(Sprite, {
 
 var BarthoBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,level) {
+  initialize: function(x,y,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[64, 64]);
     this.image  = Game.instance.assets['res/bossBarthoSheet.png'];
@@ -315,6 +327,7 @@ var BarthoBoss = Class.create(Sprite, {
     this.y = y;
     this.originX = x;
     this.originY = y;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -328,9 +341,14 @@ var BarthoBoss = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
-    this.hp = 20; //after 10 shots, goes crazy
+    this.hp = 22; //after 10 shots, goes crazy
     this.gotHitTime = 0;
     this.startTime = 30;
+    
+    if(difficulty=='hard') {
+      this.hp = 33;
+      //this.moveSpeed = 4;
+    }
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -356,7 +374,7 @@ var BarthoBoss = Class.create(Sprite, {
         this.parentNode.parentNode.bossGenerator.defeated = true;
         var madbatk = new BossKilled(this.x,this.y, 'bartho');
         this.parentNode.parentNode.addChild(madbatk);
-        playerObj.score+=1000;
+        playerObj.score+=1000*this.level;
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -389,7 +407,7 @@ var BarthoBoss = Class.create(Sprite, {
       }
       if(this.mode == 'idle'){
         this.shootTime-=1;
-        if(this.hp<=5){
+        if(this.hp<=18){
           this.mode = 'crazy';
           this.bullets = 3;
           this.shootTime = 20;
@@ -399,6 +417,7 @@ var BarthoBoss = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("explode");
           this.shootTime = 40;
+          if(this.difficulty=='hard') this.shootTime = 30;
         }
       }
       if(this.mode == 'crazy'){
@@ -414,6 +433,7 @@ var BarthoBoss = Class.create(Sprite, {
           }else{
             this.bullets = 3;
             this.shootTime = 30;
+            if(this.difficulty=='hard') this.shootTime = 20;
           }
         }
       }
@@ -448,7 +468,7 @@ var BarthoBoss = Class.create(Sprite, {
 
 var AgileBoss = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,level) {
+  initialize: function(x,y,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
     this.image  = Game.instance.assets['res/bossAgileSheet.png'];
@@ -456,6 +476,7 @@ var AgileBoss = Class.create(Sprite, {
     this.y = y;
     this.originX = x;
     this.originY = y;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -473,6 +494,11 @@ var AgileBoss = Class.create(Sprite, {
     this.gotHitTime = 0;
     this.startTime = 30;
     this.modeTime = 90;
+    
+    if(difficulty=='hard') {
+      this.hp = 60;
+      this.moveSpeed = 4;
+    }
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -497,7 +523,7 @@ var AgileBoss = Class.create(Sprite, {
         this.parentNode.parentNode.bossGenerator.defeated = true;
         var madbatk = new BossKilled(this.x,this.y, 'agile');
         this.parentNode.parentNode.addChild(madbatk);
-        playerObj.score+=1000;
+        playerObj.score+=10000;
         this.parentNode.removeChild(this);
         delete this;
       }else{
@@ -553,6 +579,7 @@ var AgileBoss = Class.create(Sprite, {
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
           this.shootTime = 10;
+          if(this.difficulty=='hard') this.shootTime = 8;
         }
         this.modeTime -= 1;
         if(this.modeTime<=0) {this.mode = 'hide'; this.modeTime = 30;}
@@ -565,6 +592,7 @@ var AgileBoss = Class.create(Sprite, {
         if(this.modeTime<=0){
           this.visible = true;
           this.bullets = 6;
+          if(this.difficulty=='hard') this.bullets+= getRandom(0,3);
           this.shootTime = 0;
           this.y = this.parentNode.parentNode.rolf.y - 96;
           this.x = this.parentNode.parentNode.rolf.x;
@@ -582,6 +610,7 @@ var AgileBoss = Class.create(Sprite, {
             this.mode = 'retreat';
           }
           this.shootTime = 10;
+          if(this.difficulty=='hard') this.shootTime = 5;
         }
       }
       if(this.mode == 'retreat'){
@@ -688,7 +717,7 @@ var BossKilled = Class.create(Sprite, {
 //Boss Generator
 var BossGenerator = Class.create(Sprite, {
   // The windows that will create the batsnipers
-  initialize: function(x,y,world,round) {
+  initialize: function(x,y,world,round,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
@@ -702,6 +731,7 @@ var BossGenerator = Class.create(Sprite, {
     this.world = world;
     this.round = round;
     this.defeated = false;
+    this.difficulty = difficulty;
     
     //this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -710,22 +740,22 @@ var BossGenerator = Class.create(Sprite, {
     var game = Game.instance;
     switch(this.world){
       case 1: 
-        var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world);
+        var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world,this.difficulty);
         break;
       case 2: 
-        var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world);
+        var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world,this.difficulty);
         break;
       case 3: 
-        var boss = new BarthoBoss(game.width/2 - 32,64,this.world);
+        var boss = new BarthoBoss(game.width/2 - 32,64,this.world,this.difficulty);
         break;
       case 4: 
-        var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world);
+        var boss = new MadBatBoss(game.width/2 - 32,this.y,this.world,this.difficulty);
         break;
       case 5: 
-        var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world);
+        var boss = new ChiefBoss(game.width/2 - 32,this.y,this.world,this.difficulty);
         break;
       case 6: 
-        var boss = new AgileBoss(game.width/2,this.y,this.world);
+        var boss = new AgileBoss(game.width/2,this.y,this.world,this.difficulty);
         break;
     }
     this.parentNode.bossGroup.addChild(boss);

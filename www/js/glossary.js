@@ -149,6 +149,14 @@ var glossary = {
       pt_BR: "A batalha acabou!____Rolf derrotou a WildBat__Gang e restaurou a paz__da cidade!____Parabéns!!!__Até o próximo jogo!",
       en_US: "The battle is over!____Rolf defeated WildBat__Gang and restored peace__to the town!____Congratulations!!!__See you next game!"
     },
+    wingame2: { //glossary.text.wingame2[language]
+      pt_BR: "JOGUE O MODO HARD!!____SELECIONE [STAGE 25]_NA TELA TÍTULO!",
+      en_US: "LET'S TRY HARD MODE!____SELECT [STAGE 25]_ON THE TITLE SCREEN!"
+    },
+    wingame3: { //glossary.text.wingame2[language]
+      pt_BR: "OBRIGADO POR JOGAR!____  VOCÊ É UM_  SUPER JOGADOR!!",
+      en_US: "THANKS FOR PLAYING!____  YOU ARE A_  SUPER PLAYER!!!"
+    },
     gameover: { //glossary.text.gameover[language]
       pt_BR: "    FIM DE JOGO!",
       en_US: "     GAME OVER!"

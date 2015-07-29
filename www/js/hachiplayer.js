@@ -9,8 +9,11 @@ var Hachiplayer = Class.create({
     this.hiscore = hiscore;
     this.maxstage = maxstage;
     this.multiplier = 1;
+    this.loopstart = 24;
+    this.difficulty = 'normal';
     
     this.level = level;
+    this.levelExib = level;
     this.levellimit = levellimit;
     this.world = Math.ceil((level/levellimit));
     this.round = level%levellimit;
@@ -30,18 +33,28 @@ var Hachiplayer = Class.create({
     this.world = 1;
     this.round = 1;
     this.level = 1;
+    this.levelExib = 1;
     this.multiplier = 1;
+    this.difficulty = 'normal';
   },
   
   levelUp: function(incVal) {
-    this.level += incVal;
+    this.levelExib += incVal;
+    this.level = this.levelExib;
+    if(this.level > this.loopstart) {
+      this.level -= this.loopstart;
+      this.difficulty = 'hard';
+    }else{
+      this.difficulty = 'normal';
+    }
     this.world = Math.ceil((this.level/this.levellimit));
     this.round = this.level%this.levellimit;
     if (this.round<=0) {
       //this.world += 1;
       this.round = this.levellimit;
     }
-    if (this.level >= this.maxstage) this.maxstage = this.level;
+    if (this.levelExib >= this.maxstage) this.maxstage = this.levelExib;
+    if (this.maxstage >= 48) this.maxstage = 48;
   },
 
   addScore: function (value,multi) {

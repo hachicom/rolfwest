@@ -1,7 +1,7 @@
 // BatSniper Enemy
 var BatSniperEnemy = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,xTarget,level,batsniperGenKey,moveLimit,moveHideout) {
+  initialize: function(x,y,xTarget,level,batsniperGenKey,moveLimit,moveHideout,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     this.image  = Game.instance.assets['res/batsniperSheet.png'];
@@ -10,6 +10,7 @@ var BatSniperEnemy = Class.create(Sprite, {
     this.originX = x;
     this.originY = y;
     this.batsniperGenKey = batsniperGenKey;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -31,7 +32,8 @@ var BatSniperEnemy = Class.create(Sprite, {
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
-    this.hp = 2; //after two shots, goes crazy
+    this.hp = 3; //goes crazy when hp = 0
+    if(difficulty=='hard') this.hp = 5;
     this.gotHitTime = 0;
     this.startTime = 30;
     
@@ -52,7 +54,7 @@ var BatSniperEnemy = Class.create(Sprite, {
   },
   
   gotHit: function(playerObj) {
-    if (this.gotHitTime>0) return false;
+    //if (this.gotHitTime>0) return false;
     if (!this.isHidden()){
       switch(this.mode){
         case 'idle'    : playerObj.addScore(20,false); break;
@@ -118,12 +120,12 @@ var BatSniperEnemy = Class.create(Sprite, {
       this.shootTime = 10;
       this.mode = 'shoot';
       this.bullets = 0 + addBullet;
-      if(this.level>=5) this.bullets = 3 + addBullet;
+      if(this.level>=5 || this.difficulty=='hard') this.bullets = 3 + addBullet;
     }else if(this.hp>0) {
       this.shootTime = 5;
       this.mode = 'shoot';
       this.bullets = 3 + addBullet*2;
-      if(this.level>=5) this.bullets = 3 + addBullet * getRandom(3,6);
+      if(this.level>=5 || this.difficulty=='hard') this.bullets = 3 + addBullet * getRandom(3,6);
     }else if(this.hp<=0) {
       this.startTime = 20;
       this.mode = 'hiding';
@@ -284,7 +286,7 @@ var BatsniperKilled = Class.create(Sprite, {
 //BatSniper Generator
 var BatSniperGenerator = Class.create(Sprite, {
   // The windows that will create the batsnipers
-  initialize: function(x,y,lvlBatSniperEnemyMap,level) {
+  initialize: function(x,y,lvlBatSniperEnemyMap,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/Ice.png'];      
@@ -300,6 +302,7 @@ var BatSniperGenerator = Class.create(Sprite, {
     this.batsniperIdx = 0;
     //this.batsniperIdy = 0;
     this.level = level;
+    this.difficulty = difficulty;
     
     //movement vars
     this.modeStart = false;
@@ -329,7 +332,7 @@ var BatSniperGenerator = Class.create(Sprite, {
           for(var j=0; j<this.batsniperEnemyMap.length; j++){
             this.x = this.batsniperEnemyMap[this.batsniperIdx][0];
             this.y = this.batsniperEnemyMap[this.batsniperIdx][1];
-            var batsniper = new BatSniperEnemy(this.x,this.y,this.batsniperIdx,this.level,this.batsnipers.length,this.moveLimit,this.moveHideout);
+            var batsniper = new BatSniperEnemy(this.x,this.y,this.batsniperIdx,this.level,this.batsnipers.length,this.moveLimit,this.moveHideout,this.difficulty);
             this.batsnipers.push(batsniper);
             this.parentNode.batsniperGroup.addChild(batsniper);
             this.createBatSniperTime = 8;

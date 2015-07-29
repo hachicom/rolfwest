@@ -1,7 +1,7 @@
 // BatKid Enemy
 var BatKidEnemy = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,xTarget,level,batkidGenKey,moveLimit) {
+  initialize: function(x,y,xTarget,level,batkidGenKey,moveLimit,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[24, 24]);
     this.image  = Game.instance.assets['res/batkidSheet.png'];
@@ -10,6 +10,7 @@ var BatKidEnemy = Class.create(Sprite, {
     this.originX = x;
     this.originY = y;
     this.batkidGenKey = batkidGenKey;
+    this.difficulty = difficulty;
 
     // 2 - Status
     this.level = level;
@@ -26,7 +27,9 @@ var BatKidEnemy = Class.create(Sprite, {
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
-    this.health = 2;
+    this.hp = 0;
+    if(difficulty=='hard') this.hp = 2;
+    this.gotHitTime = 0;
     
     // 3 - Animate
     this.animationDuration = 0;
@@ -41,7 +44,6 @@ var BatKidEnemy = Class.create(Sprite, {
   
   gotHit: function(playerObj) {
     //if(this.mode=='start') return false;
-    this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
     switch(this.mode){
       //case 'start'  : playerObj.score+=120; break;
       case 'idle'   : playerObj.addScore(30,false); break;
@@ -49,21 +51,32 @@ var BatKidEnemy = Class.create(Sprite, {
       case 'shoot'  : playerObj.addScore(50,false); break;
       case 'retreat': playerObj.addScore(100,false); break;
     }
-    var batkidk = new BatkidKilled(this.x,this.y);
-    this.parentNode.parentNode.addChild(batkidk);
     
-    if(this.mode == 'retreat' || this.mode=='shoot'){
-      var bars = new GoldBarsItem(this.x,this.y);
-      this.parentNode.parentNode.itemGroup.addChild(bars);
-    }else{ 
-      var coinchance = getRandom(1,3);
-      if(coinchance == 2){
-        var cup = new GoldCupItem(this.x,this.y);
-        this.parentNode.parentNode.itemGroup.addChild(cup);
+    this.hp-=1;
+    if(this.hp<0){
+      this.parentNode.parentNode.batkidGenerator.rearrangeBatKids(this.batkidGenKey);
+      var batkidk = new BatkidKilled(this.x,this.y);
+      this.parentNode.parentNode.addChild(batkidk);
+      
+      if(this.mode == 'retreat' || this.mode=='shoot'){
+        var bars = new GoldBarsItem(this.x,this.y);
+        this.parentNode.parentNode.itemGroup.addChild(bars);
+      }else{ 
+        var coinchance = getRandom(1,3);
+        if(coinchance == 2){
+          var cup = new GoldCupItem(this.x,this.y);
+          this.parentNode.parentNode.itemGroup.addChild(cup);
+        }
       }
+      this.parentNode.removeChild(this);
+      delete this;
+    }else{
+      this.gotHitTime = 10;
+      this.animationDuration = 0;
+      this.frame = 8;
+      this.iniFrame = 8;
+      this.endFrame = 8;
     }
-    this.parentNode.removeChild(this);
-    delete this;
   },
   
   gotKilled: function(playerObj) {
@@ -145,7 +158,7 @@ var BatKidEnemy = Class.create(Sprite, {
           this.mode = 'shoot';
           this.shootTime = 10;
           this.bullets = 2;
-          if(this.level>=4) this.bullets = getRandom(3,this.level);
+          if(this.level>=4 || this.difficulty=='hard') this.bullets = getRandom(3,this.level);
           this.moveSpeed = 2;
           this.y = 220;
           //this.x = this.nextposX;
@@ -174,6 +187,16 @@ var BatKidEnemy = Class.create(Sprite, {
           this.mode = 'idle';
           this.y = this.nextposY;
           this.x = this.nextposX;
+        }
+      }
+      
+      if(this.gotHitTime>0){
+        this.gotHitTime-=1;
+        if(this.gotHitTime<=0) {
+          this.animationDuration = 0;
+          this.frame = 4;
+          this.iniFrame = 4;
+          this.endFrame = 7;
         }
       }
       
@@ -220,7 +243,7 @@ var BatkidKilled = Class.create(Sprite, {
 //BatKid Generator
 var BatKidGenerator = Class.create(Sprite, {
   // The windows that will create the batkids
-  initialize: function(x,y,lvlBatKidEnemyMap,level) {
+  initialize: function(x,y,lvlBatKidEnemyMap,level,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/doorgen.png'];      
@@ -236,6 +259,7 @@ var BatKidGenerator = Class.create(Sprite, {
     this.batkidIdx = 0;
     //this.batkidIdy = 0;
     this.level = level;
+    this.difficulty = difficulty;
     
     //movement vars
     this.modeStart = false;
@@ -262,7 +286,7 @@ var BatKidGenerator = Class.create(Sprite, {
         if (this.createBatKidTime <= 0) {
           //console.log("creating batkid");
           this.y = this.batkidEnemyMap[this.batkidIdx][1];
-          var batkid = new BatKidEnemy(this.genpoint+this.createBatKidSide*(game.width+64),this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit);
+          var batkid = new BatKidEnemy(this.genpoint+this.createBatKidSide*(game.width+64),this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit,this.difficulty);
           this.batkids.push(batkid);
           this.parentNode.batkidGroup.addChild(batkid);
           this.createBatKidTime = 8;

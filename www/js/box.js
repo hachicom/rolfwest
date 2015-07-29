@@ -1,14 +1,14 @@
 // Box Sprite
 var BoxSprite = Class.create(Sprite, {
   // The obstacle that the penguin must avoid
-  initialize: function(x,y,frame) {
+  initialize: function(x,y,frame,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     this.image  = Game.instance.assets['res/boxSheet.png'];
     this.x = x;
     this.y = y;
     
-    // 0=normal (3hits); 1=iron (6hits); 2=tnt (3hits); 3=powerup (2hits)
+    // 0=normal (2hits); 1=iron (6hits); 2=tnt (3hits); 3=powerup (4hits)
     this.frame = frame;
     this.mode = frame;
     switch(frame){
@@ -19,11 +19,27 @@ var BoxSprite = Class.create(Sprite, {
       default: this.hp = 1; break;
     }
     
+    if(difficulty=='hard') {
+      if(this.y < 384){
+        this.hp = this.hp + 2;
+        if(this.frame == 0) {
+          this.frame = 1;
+          this.hp = 8;
+        }
+      }else{
+        this.hp = 1;
+        if(this.frame == 0) {
+          this.frame = 2;
+          this.mode = 2;
+        }
+      }
+    }
+    
     // Animate
     this.animationDuration = 0;
     this.animationSpeed = 0.20;
     this.idleTime=0;
-    this.iniFrame = frame;
+    this.iniFrame = this.frame;
     this.endFrame = 4;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
@@ -141,7 +157,7 @@ var BoxPiece = Class.create(Sprite, {
 //Box Generator
 var BoxGenerator = Class.create(Sprite, {
   // The windows that will create the batkids
-  initialize: function(x,y,lvlBoxMap,boxGroup) {
+  initialize: function(x,y,lvlBoxMap,boxGroup,difficulty) {
     // Call superclass constructor
     Sprite.apply(this,[32, 32]);
     //this.image  = Game.instance.assets['res/doorgen.png'];      
@@ -152,7 +168,7 @@ var BoxGenerator = Class.create(Sprite, {
     //this.boxes = [];
     
     for(var i=0; i<lvlBoxMap.length; i++){
-      var box = new BoxSprite(lvlBoxMap[i][0],lvlBoxMap[i][1],lvlBoxMap[i][2]);
+      var box = new BoxSprite(lvlBoxMap[i][0],lvlBoxMap[i][1],lvlBoxMap[i][2],difficulty);
       boxGroup.addChild(box);
     }
   }
