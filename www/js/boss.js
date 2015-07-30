@@ -21,7 +21,7 @@ var MadBatBoss = Class.create(Sprite, {
     this.ySpeed = 0;
     this.yAccel = 0.5;
     this.shootTime = 0;
-    this.bullets = 0;
+    this.bullets = 3;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
     this.hp = 30; //after 10 shots, goes crazy
@@ -131,13 +131,32 @@ var MadBatBoss = Class.create(Sprite, {
         
         this.shootTime-=1;
         if(this.shootTime<=0){
-          var bulletId = 'boss1';
-          if(this.level>=4 || this.difficulty=='hard') bulletId = 'boss3';
-          var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
-          this.parentNode.parentNode.evilShotGroup.addChild(s);
-          this.parentNode.parentNode.playSound("eshoot");
-          this.bullets-=1;
-          this.shootTime = 60;
+          if(this.level>=4){
+            bulletId = 'boss3';
+            var s = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
+            this.parentNode.parentNode.evilShotGroup.addChild(s);
+            this.parentNode.parentNode.playSound("eshoot");
+            //this.bullets-=1;
+            this.shootTime = 30;
+            if(this.difficulty=='hard') this.shootTime = 20;
+          }else{
+            bulletId = 'boss1';
+            if(this.bullets > 0){
+              var s1 = new EnemyShot(this.x+6, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
+              this.parentNode.parentNode.evilShotGroup.addChild(s1);
+              var s2 = new EnemyShot(this.x+48, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
+              this.parentNode.parentNode.evilShotGroup.addChild(s2);
+              this.parentNode.parentNode.playSound("eshoot");
+              this.bullets-=1;
+            }else{
+              this.bullets = 3;
+              this.shootTime = 60;
+              if(this.difficulty=='hard') this.shootTime = 30;
+            }
+          }          
+           
+          
+          
           if(this.level>=4 || this.difficulty=='hard') this.shootTime = 30;
         }
       }

@@ -736,7 +736,14 @@ window.onload = function() {
       
       if(hachiplayer.level>Object.keys(globalTileMap).length){
         /******************************
-         *******  ENDING GAME  ********
+         *******  ENDING HARD  ********
+         ******************************/
+        //TODO: show an ending screen instead of title screen
+        hachiplayer.reset();
+        game.replaceScene(new SceneEnding(1));
+      }else if(hachiplayer.level==1 && hachiplayer.difficulty=='hard'){
+        /******************************
+         ******  ENDING NORMAL  *******
          ******************************/
         //TODO: show an ending screen instead of title screen
         hachiplayer.reset();
@@ -2240,7 +2247,7 @@ window.onload = function() {
       levelDecLabel.x = levelLabel.x - 64;
       levelDecLabel.y = 338;
       levelDecLabel.addEventListener(Event.TOUCH_END, function(e){
-        if(hachiplayer.levelExib==1) hachiplayer.levelUp(hachiplayer.maxstage - 1);
+        if(hachiplayer.levelExib==1) hachiplayer.levelUp(playerData.settings.maxstage - 1);
         else hachiplayer.levelUp(-1);
         if( isAndroid ) {
           if(soundOn) {
@@ -2276,9 +2283,9 @@ window.onload = function() {
       
       // Copyright label
       this.cheatcodeCnt = 0;
-      copyright = new FontSprite('sega12', 240, 32, "© 2015 HACHICOM");
-      copyright.x = 120;
-      copyright.y = game.height - 16 - 60;
+      copyright = new FontSprite('sega12', 320, 32, "© 2015 ADINAN BATISTA ALVES_       HACHICOM SOFT");
+      copyright.x = 22;
+      copyright.y = game.height - 86;
       copyright.addEventListener(Event.TOUCH_END, function(e){
         this.parentNode.cheatcodeCnt++;
         if (this.parentNode.cheatcodeCnt>=9) {
@@ -2286,6 +2293,7 @@ window.onload = function() {
           levelDecLabel.visible = true;
           levelIncLabel.visible = true;
           playerData.settings.maxstage = 48;
+          hachiplayer.maxstage = 48;
           if( isAndroid ) {
             if(soundOn) {
               window.plugins.LowLatencyAudio.play("powerup");
