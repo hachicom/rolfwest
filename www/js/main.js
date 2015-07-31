@@ -3,7 +3,7 @@ var version = '1.0.0';
 var hiscore = 20000;
 var paused = false;
 var oldTime = new Date();
-var maxbonusDecTime = 150;
+var maxbonusDecTime = 90;
 var fpscount = 0;
 var currentBGM = 'stage1';
 var isAndroid = isMobile();
@@ -1650,20 +1650,22 @@ window.onload = function() {
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg4'];
       
-      label = new FontSprite('sega24', 320, 844, '');
+      label = new FontSprite('sega24', 320, 984, '');
       label.x = 0;
       label.y = game.height;
       this.label = label;
       
       label.text = '   *ROLF WEST*__CODE, ART & DESIGN__'
-                  +'Adinan Batista Alves_____'
+                  +'Adinan Batista Alves_hachicomsoft@gmail.com_____'
                   +'DEMOSCENE MUSIC__'
-                  +'Worship_(AMADEUS VOXON)__'
+                  +'Caramel Condition_(ko0x)__'
                   +'My South West_(WONDERBOY)__'
                   +'Spanish Candy_(ARACHNO)__'
                   +'My Dirty Old Kamel_(ZALZA)__'
                   +'Chipset Sunset_(STROBE)__'
-                  +'One Way Heart_(Joule & Malmen)_____'
+                  +'One Way Heart_(Joule & Malmen)___'
+                  +'THESE TRACKS ARE_PRESUMED TO BE FREE_OR PUBLIC DOMAIN__'
+                  +'IF YOUR MUSIC IS HERE_AND WANT IT REMOVED,_PLEASE CONTACT ME_____'
                   +'BMFONT PLUGIN__'
                   +'COFFEE DOG GAMES_____'
                   +'SOUND EFFECTS__'

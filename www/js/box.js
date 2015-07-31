@@ -21,17 +21,17 @@ var BoxSprite = Class.create(Sprite, {
     
     if(difficulty=='hard') {
       if(this.y < 384){
-        this.hp = this.hp + 2;
+        // this.hp = this.hp + 2;
         if(this.frame == 0) {
           this.frame = 1;
-          this.hp = 8;
+          this.hp = 6;
         }
       }else{
         this.hp = 1;
-        if(this.frame == 0) {
-          this.frame = 2;
-          this.mode = 2;
-        }
+        // if(this.frame == 0) {
+          // this.frame = 2;
+          // this.mode = 2;
+        // }
       }
     }
     

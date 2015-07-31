@@ -140,18 +140,17 @@ var MadBatBoss = Class.create(Sprite, {
             this.shootTime = 30;
             if(this.difficulty=='hard') this.shootTime = 20;
           }else{
-            bulletId = 'boss1';
             if(this.bullets > 0){
-              var s1 = new EnemyShot(this.x+6, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
+              var s1 = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1', false);
               this.parentNode.parentNode.evilShotGroup.addChild(s1);
-              var s2 = new EnemyShot(this.x+48, this.y+50, this.parentNode.parentNode.rolf, this.level, bulletId, false);
+              var s2 = new EnemyShot(this.x+32, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1', false);
               this.parentNode.parentNode.evilShotGroup.addChild(s2);
               this.parentNode.parentNode.playSound("eshoot");
               this.bullets-=1;
             }else{
               this.bullets = 3;
-              this.shootTime = 60;
-              if(this.difficulty=='hard') this.shootTime = 30;
+              this.shootTime = 30;
+              if(this.difficulty=='hard') this.shootTime = 20;
             }
           }          
            
@@ -445,8 +444,10 @@ var BarthoBoss = Class.create(Sprite, {
           if(this.bullets > 0){
             var s1 = new EnemyShot(this.x+6, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
             this.parentNode.parentNode.evilShotGroup.addChild(s1);
-            var s2 = new EnemyShot(this.x+48, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
+            var s2 = new EnemyShot(this.x+24, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
             this.parentNode.parentNode.evilShotGroup.addChild(s2);
+            var s3 = new EnemyShot(this.x+42, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
+            this.parentNode.parentNode.evilShotGroup.addChild(s3);
             this.parentNode.parentNode.playSound("eshoot");
             this.bullets-=1;
           }else{
