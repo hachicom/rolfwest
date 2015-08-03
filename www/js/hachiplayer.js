@@ -1,6 +1,6 @@
 var Hachiplayer = Class.create({
   initialize: function(level,levellimit,scoreRewards,hiscore,maxstage) {    
-    this.lives = 3;
+    this.lives = 1;
     this.health = 3;
     this.score = 0;
     this.coins = 0;

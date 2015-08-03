@@ -5,7 +5,7 @@ var paused = false;
 var oldTime = new Date();
 var maxbonusDecTime = 90;
 var fpscount = 0;
-var currentBGM = 'stage1';
+var currentBGM = 'title';
 var isAndroid = isMobile();
 var scoreRewards = [50000,150000];
 var soundOn = true;
@@ -289,8 +289,8 @@ window.onload = function() {
     
     var ad_units = {
       android : {
-        banner: "ca-app-pub-8006522456285045/2785327219", // or DFP format "/6253334/dfp_example_ad"
-        interstitial: "ca-app-pub-8006522456285045/4262060411"
+        banner: "ca-app-pub-8006522456285045/9794726415", // or DFP format "/6253334/dfp_example_ad"
+        interstitial: "ca-app-pub-8006522456285045/2271459614"
       }
     };
     
@@ -303,7 +303,7 @@ window.onload = function() {
         adId:admobid.banner, 
         position:AdMob.AD_POSITION.BOTTOM_CENTER, 
         overlap:true, 
-        isTesting:true,
+        isTesting:false,
         autoShow:true,
         isForChild:true
       });
@@ -500,6 +500,7 @@ window.onload = function() {
       // Background music
       if( isAndroid ) {
         currentBGM = 'stage'+hachiplayer.round;
+        if(hachiplayer.world == 6 && hachiplayer.round == 4) currentBGM = 'title';
         if(soundOn) window.plugins.LowLatencyAudio.loop(currentBGM);
         //Hide Banner to avoid annoying player with lags from banner
         if(AdMob) AdMob.hideBanner();
@@ -739,14 +740,12 @@ window.onload = function() {
          *******  ENDING HARD  ********
          ******************************/
         //TODO: show an ending screen instead of title screen
-        hachiplayer.reset();
         game.replaceScene(new SceneEnding(1));
       }else if(hachiplayer.level==1 && hachiplayer.difficulty=='hard'){
         /******************************
          ******  ENDING NORMAL  *******
          ******************************/
         //TODO: show an ending screen instead of title screen
-        hachiplayer.reset();
         game.replaceScene(new SceneEnding(0));
       }else{
         /******************************
@@ -1533,7 +1532,7 @@ window.onload = function() {
   
   // SceneEnding
   var SceneEnding = Class.create(Scene, {
-    initialize: function() {
+    initialize: function(endloop) {
       var TitleLabel, scoreLabel;
       Scene.apply(this);
       //this.backgroundColor = '#0026FF';
@@ -1550,11 +1549,12 @@ window.onload = function() {
       label.x = 0;
       label.y = 10;
       
-      label.text = glossary.text.wingame1[language];
+      label.text = glossary.text['wingame'+endloop][language]+'____FINAL SCORE:__'+hachiplayer.score;
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
       playerData.settings.maxstage = hachiplayer.maxstage;
-      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData)
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
+      hachiplayer.reset();
       
       animationSpr = new Sprite(128, 128);
       animationSpr.image = game.assets['res/interludeSheet.png'];
@@ -1602,11 +1602,11 @@ window.onload = function() {
       this.backgroundColor = globalBgColor['stage3'];
       this.timeToStart = 200;
       
-      label = new FontSprite('sega24', 320, 60, '');
+      label = new FontSprite('sega24', 320, 120, '');
       label.x = 20;
       label.y = 72;
       
-      label.text = glossary.text.gameover[language]+'___  FINAL SCORE: '+hachiplayer.score;
+      label.text = glossary.text.gameover[language]+'___    FINAL SCORE:__    '+hachiplayer.score;
       
       playerData.scoretable.hiscore = hachiplayer.hiscore;
       playerData.settings.maxstage = hachiplayer.maxstage;

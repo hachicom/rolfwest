@@ -121,9 +121,13 @@ var glossary = {
       pt_BR: 'Estou com a Melody!____Se quiser ela de volta__venha sozinho e me__encontre na antiga__delegacia...____Agile West',
       en_US: "I have Melody!____If you want her back__come alone and find__me at the old sheriff__station...____Agile West"
     },
-    wingame1: { //glossary.text.wingame1[language]
-      pt_BR: "A batalha acabou!____Rolf derrotou a WildBat__Gang e restaurou a paz__da cidade!____Parabéns!!!__Até o próximo jogo!",
+    wingame0: { //glossary.text.wingame0[language]  NORMAL
+      pt_BR: "A batalha acabou!____Rolf derrota a WildBat__Gang e restaura a paz__da cidade!____Parabéns!!!__Até o próximo jogo!",
       en_US: "The battle is over!____Rolf defeated WildBat__Gang and restored peace__to the town!____Congratulations!!!__See you next game!"
+    },
+    wingame1: { //glossary.text.wingame1[language]  HARD
+      pt_BR: "A batalha acabou!____Uma nova lenda__nasce no velho oeste!__As histórias de Rolf__serão contadas por__gerações!____Parabéns!!!__Até o próximo jogo!",
+      en_US: "The battle is over!____A new legend is__born at old west!__Rolf\'s tales will be__told for generations!____Congratulations!!!__See you next game!"
     },
     wingame2: { //glossary.text.wingame2[language]
       pt_BR: "JOGUE O MODO HARD!!____SELECIONE [STAGE 25]_NA TELA TÍTULO!",
