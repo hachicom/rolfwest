@@ -73,7 +73,7 @@ enchant();
 // 2 - On document load 
 window.onload = function() {
   //console.log(screen.width+"X"+screen.height);
-  var gameheight = (320 * screen.height)/screen.width;
+  //var gameheight = (320 * screen.height)/screen.width;
   //alert(gameheight);
   // 3 - Starting point
 	//var game = new Core(320, gameheight);
@@ -126,7 +126,7 @@ window.onload = function() {
                );
   
 	// 5 - Game settings
-	game.fps = 30;
+	game.fps = 28;
 	//game.scale = 1;
 	// 6 - Once Game finishes loading
   var hachiplayer = new Hachiplayer(1,4,scoreRewards,20000,playerData.settings.maxstage); //world 1-1, after level 4 world goes up
