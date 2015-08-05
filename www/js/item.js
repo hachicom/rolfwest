@@ -12,7 +12,7 @@ var Item = Class.create(Sprite, {
     this.ySpeed = ySpeed;
     this.xAccel = xAccel;
     this.yAccel = yAccel;
-    this.timeToDestroy = 150;
+    this.timeToDestroy = 5; //secs
     this.disappears = disappears;
     
     // Animate
@@ -26,26 +26,26 @@ var Item = Class.create(Sprite, {
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
-  update: function(){
+  update: function(evt){
     var game;
     game = Game.instance;
     
     if (!this.parentNode.parentNode.paused){//todo item deve pertencer ao grupo correspondente (Item Group)
       if (this.disappears){
-        this.timeToDestroy -= 1;
+        this.timeToDestroy -= evt.elapsed * 0.001;
         if (this.timeToDestroy <= 0) this.remove();
       }
       
       /*START MOVEMENT BLOCK*/
-      this.x += this.moveSpeed * Math.cos(this.direction);
-      this.y += this.moveSpeed * Math.sin(this.direction);
+      this.x += this.moveSpeed * Math.cos(this.direction) * evt.elapsed * 0.001;
+      this.y += this.moveSpeed * Math.sin(this.direction) * evt.elapsed * 0.001;
     
       if(this.y > game.height || this.x > game.width || this.x < -this.width){
         this.remove();
       }
-      this.ySpeed += this.yAccel;
+      this.ySpeed += this.yAccel * evt.elapsed * 0.001;
       //if (this.ySpeed <= 10) this.ySpeed = 10;
-      this.xSpeed += this.xAccel;
+      this.xSpeed += this.xAccel * evt.elapsed * 0.001;
       this.y += this.ySpeed;
       this.x += this.xSpeed;
       
@@ -56,7 +56,7 @@ var Item = Class.create(Sprite, {
       /*END MOVEMENT BLOCK*/
       
       /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -78,7 +78,7 @@ var Item = Class.create(Sprite, {
 var HatItem = Class.create(Item, {
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 0, 0, 0, true);
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 0, 0, 0, true);
     this.frame = 0;
     this.itemId = 'hat';
   },
@@ -96,7 +96,7 @@ var HatItem = Class.create(Item, {
 var CoinItem = Class.create(Item, {
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 1, 4, 0.25, true);
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 1, 4, 0.05, true);
     this.frame = 1;
     this.itemId = 'coin';
   },
@@ -113,7 +113,7 @@ var CoinItem = Class.create(Item, {
 var GoldCupItem = Class.create(Item, {
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 6, 6, 0, true);
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 6, 6, 0, true);
     this.frame = 6;
     this.itemId = 'cup';
   },
@@ -130,7 +130,7 @@ var GoldCupItem = Class.create(Item, {
 var GoldBarsItem = Class.create(Item, {
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 7, 7, 0, true);
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 7, 7, 0, true);
     this.frame = 7;
     this.itemId = 'bars';
   },
@@ -147,7 +147,7 @@ var GoldBarsItem = Class.create(Item, {
 var DiamondItem = Class.create(Item, {
   initialize: function(x, y){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 1, 8, 9, 0.1, true);
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 8, 9, 0.05, true);
     this.frame = 8;
     this.itemId = 'diamond';
   },
@@ -165,7 +165,7 @@ var SandubaItem = Class.create(Item, {
     frame = 5;
     if(level == 23) frame = 16;
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 1, -4, 0, 0.1, frame, frame, 0, false);
+    Item.call(this, x, y, 0, 0, 1, -4, 0, 5, frame, frame, 0, false);
     this.frame = frame;
     this.itemId = 'sanduba';
   },

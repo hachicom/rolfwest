@@ -17,8 +17,8 @@ var ScoreSprite = Class.create(Sprite, {
     
     this.x = x;
     this.y = y;
-    this.yUp = 20;
-    this.aboutToDieTime = 60;
+    this.yUp = 0.5;
+    this.aboutToDieTime = 1; //secs
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
   
@@ -30,10 +30,10 @@ var ScoreSprite = Class.create(Sprite, {
   update: function(evt) { 
     //this object must be added directly to the scene
     if (!this.parentNode.paused){
-      this.aboutToDieTime-=1;
+      this.aboutToDieTime-=evt.elapsed * 0.001;
       if(this.yUp>0) {
-        this.yUp-=1;
-        this.y-=1;
+        this.yUp-=evt.elapsed * 0.001;
+        this.y-= 40 * evt.elapsed * 0.001;
       }
       // if(this.aboutToDieTime%2==0){
         // this.visible=false;
@@ -97,16 +97,17 @@ var Melody = Class.create(Sprite, {
       this.iniFrame = 2;
       this.endFrame = 3;
       this.keepmove = false;
-      this.animationSpeed = 0.60;
+      this.animationSpeed = 0.333;
     }else{
       this.frame = 0;  
       this.iniFrame = 0;
       this.endFrame = 1;
       this.keepmove = true;
-      this.animationSpeed = 0.30;
+      this.animationSpeed = 0.125;
     }
     this.animationDuration = 0;
-    this.startTime = 30;
+    this.startTime = 1; //secs
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.x = x;
     this.y = y;
@@ -133,7 +134,7 @@ var Melody = Class.create(Sprite, {
     if (!this.parentNode.parentNode.paused){
       // Movement
       if(this.keepmove==true){
-        if (this.x > 224) this.x-=1;
+        if (this.x > 224) this.x-=40 * evt.elapsed * 0.001;
         else {
           this.x = 224;
           this.frame = 0;
@@ -142,16 +143,18 @@ var Melody = Class.create(Sprite, {
         }
       }
       if(this.mode == 'distress'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
         }
       }
       // Animation    
-      this.animationDuration += 0.05;
+      this.animationDuration += evt.elapsed * 0.001;
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -174,9 +177,10 @@ var MelodyKidnapped = Class.create(Sprite, {
     this.frame = 2;
     this.iniFrame = 2;
     this.endFrame = 3;
-    this.aboutToDisappear = 30;
+    this.aboutToDisappear = 1; //secs
+    this.vulnerableBlinkTime = 0.01; //secs
     this.disappear = false;
-    this.animationSpeed = 0.60;
+    this.animationSpeed = 0.333;
     this.animationDuration = 0;
     
     if(level!=24) this.visible = false;
@@ -187,10 +191,12 @@ var MelodyKidnapped = Class.create(Sprite, {
   update: function(evt) {
     if (!this.parentNode.paused){
       if(this.disappear==true){
-        this.aboutToDisappear-=1;
-        if(this.aboutToDisappear%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.aboutToDisappear-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         
         if(this.aboutToDisappear<=0){
           this.parentNode.removeChild(this);
@@ -198,7 +204,7 @@ var MelodyKidnapped = Class.create(Sprite, {
         }
       }
 
-      this.animationDuration += 0.05;
+      this.animationDuration += evt.elapsed * 0.001;
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;

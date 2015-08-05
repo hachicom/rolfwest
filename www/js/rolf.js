@@ -5,7 +5,7 @@ var Rolf = Class.create(Sprite, {
       // 1 - Call superclass constructor
       Sprite.apply(this,[24, 24]);
       this.image = Game.instance.assets['res/rolfSheet.png'];
-      this.movespeed = 7;
+      this.movespeed = 280;
       this.x = x;
       this.y = y;
       this.nextpos = x;
@@ -20,7 +20,8 @@ var Rolf = Class.create(Sprite, {
       this.healthMax = 6;
       //this.reload = false;
       this.reloadTime = 0;
-      this.vulnerableTime = 60;
+      this.vulnerableTime = 2; //secs
+      this.vulnerableBlinkTime = 0.01; //secs
       this.alive = true;
       this.winPose = false;
     
@@ -29,7 +30,7 @@ var Rolf = Class.create(Sprite, {
       this.iniFrame = 2 + this.health;
       this.endFrame = 2 + this.health;
       this.animationDuration = 0;
-      this.animationSpeed = 0.25;
+      this.animationSpeed = 0.1;
       this.shootTime=0;
       this.addEventListener(Event.ENTER_FRAME, this.updateAnimation);
   },
@@ -39,28 +40,28 @@ var Rolf = Class.create(Sprite, {
     if (!this.parentNode.paused){
       /*START RELOAD BULLETS BLOCK*/
       if(this.reloadTime>0) {
-        this.reloadTime-=1;
+        this.reloadTime-=evt.elapsed * 0.001;
         if(this.reloadTime<=0){
           this.bullets+=1;
           if(this.bullets>=6){
             //this.reload = false;
           }
           else{
-            this.reloadTime = 2;
+            this.reloadTime = 0.067;
           }
         }
       }
       /*END RELOAD BLOCK*/
       
       /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if(this.shootTime>0) {
         this.frame = 2 + this.health;
         this.iniFrame = 2 + this.health;
         this.endFrame = 2 + this.health;
-        this.shootTime-=1;
-        if(this.shootTime==0) {
-          this.animationDuration = 0;
+        this.shootTime-=evt.elapsed * 0.001;
+        if(this.shootTime<=0) {
+          this.animationDuration = this.animationSpeed;
           if(this.moving!=0){
             this.frame = 0 + this.health;
             this.iniFrame = 0 + this.health;
@@ -74,17 +75,21 @@ var Rolf = Class.create(Sprite, {
         this.animationDuration -= this.animationSpeed;
       }
       if(this.vulnerableTime > 0 && this.alive==true){
-        this.vulnerableTime-=1;
-        if(this.vulnerableTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.vulnerableTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.vulnerableTime<=0) this.visible=true;
       }
       if(this.alive==false){
-        this.vulnerableTime-=1;
-        if(this.vulnerableTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.vulnerableTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.vulnerableTime<=0) this.visible=false;
       }
       /*END ANIMATION BLOCK*/
@@ -92,13 +97,13 @@ var Rolf = Class.create(Sprite, {
       /*START MOVEMENT BLOCK*/
       if(this.alive==true && this.movable==false){
         if(this.x<this.nextpos) {
-          this.x+=this.movespeed;
+          this.x+=this.movespeed * evt.elapsed * 0.001;
           if(this.x>=this.nextpos) {
             this.x=this.nextpos;
             //this.stopMove();
           }
         }else if(this.x>this.nextpos){
-          this.x-=this.movespeed;
+          this.x-=this.movespeed * evt.elapsed * 0.001;
           if(this.x<=this.nextpos) {
             this.x=this.nextpos;
             //this.stopMove();
@@ -108,12 +113,12 @@ var Rolf = Class.create(Sprite, {
       //COMMENT NEXT 10 LINES TO ENABLE VIRTUAL DPAD MOVEMENT
       if(this.alive==true && this.winPose==false){
         if(this.moving == -1 && this.shootTime<=0) {
-          this.x-=this.movespeed;
+          this.x-=this.movespeed * evt.elapsed * 0.001;
           if (this.x<=0) this.x=0;
           //if (this.x<-24) this.x=game.width-1;
         }
         else if(this.moving == 1 && this.shootTime<=0) {
-          this.x+=this.movespeed;
+          this.x+=this.movespeed * evt.elapsed * 0.001;
           if (this.x>=game.width-24) this.x=game.width-24;
           //if (this.x>=game.width) this.x=-23;
         }
@@ -128,9 +133,9 @@ var Rolf = Class.create(Sprite, {
       if(this.moving==0){
         this.frame = 0 + this.health;
         this.animationDuration = 0;
-        this.iniFrame = 0 + this.health;
-        this.endFrame = 1 + this.health;
       }
+      this.iniFrame = 0 + this.health;
+      this.endFrame = 1 + this.health;
       this.scaleX = direction;
     }
     this.moving = direction;
@@ -159,7 +164,8 @@ var Rolf = Class.create(Sprite, {
   
   shoot: function(){
     if(this.bullets>0 && this.alive==true && this.winPose==false){
-      this.shootTime = 5;
+      this.shootTime = 0.1;
+      //this.moving = 0;
       this.animationDuration = 0;
       shotGroup = this.parentNode.shotGroup;
       //this.reload = false;
@@ -184,16 +190,16 @@ var Rolf = Class.create(Sprite, {
   reloadBullets: function(){
     if(this.bullets<6 && this.alive==true && this.winPose==false){
       //this.reload = true;
-      this.reloadTime=2;
+      this.reloadTime=0.067;
       this.parentNode.playSound("reload");
     }
   },
   
-  stopMove: function(){
+  stopMove: function(paused){
     this.moving = 0;
     this.nextpos = this.x;
     if(this.alive==true && this.winPose==false){
-      this.frame = 2 + this.health;
+      if(!paused) this.frame = 2 + this.health;
       this.iniFrame = 2 + this.health;
       this.endFrame = 2 + this.health;
       this.animationDuration = 0;
@@ -212,7 +218,7 @@ var Rolf = Class.create(Sprite, {
     this.health=playerObj.health;
     this.alive = true;
     this.winPose = false;
-    this.vulnerableTime = 60;
+    this.vulnerableTime = 2;
     this.bullets = 6;
     this.x = 145;
     this.nextpos = this.x;
@@ -227,7 +233,7 @@ var Rolf = Class.create(Sprite, {
       this.endFrame = 1 + this.health;
     }
     this.animationDuration = 0;
-    this.animationSpeed = 0.25;
+    this.animationSpeed = 0.1;
     //this.movespeed = 20;
   },
   
@@ -252,7 +258,7 @@ var Rolf = Class.create(Sprite, {
       }
       this.animationDuration = 0;
     }
-    this.vulnerableTime = 90;
+    this.vulnerableTime = 3;
     //console.log(this.x+' - '+this.lane+' '+lane);
   },
   
@@ -261,7 +267,7 @@ var Rolf = Class.create(Sprite, {
     if(this.health>this.healthMax) {
       this.health=this.healthMax;
     }else{
-      this.vulnerableTime = 30;
+      this.vulnerableTime = 1;
       if(this.moving == 0){
         this.frame = 2 + this.health;
         this.iniFrame = 2 + this.health;

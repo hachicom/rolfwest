@@ -17,9 +17,9 @@ var BatEnemy = Class.create(Sprite, {
     this.nextposY = yTarget;
     this.direction = findAngle(x,y,this.nextposX,this.nextposY);
     this.mode = 'start'; //start, idle, fly, hit
-    this.moveSpeed = 12;
+    this.moveSpeed = 480;
     this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.xAccel = 20;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
@@ -32,8 +32,7 @@ var BatEnemy = Class.create(Sprite, {
     this.iniFrame = 0;
     this.endFrame = 3;
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
-    this.idleTime=0;
+    this.animationSpeed = 0.08;
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -63,7 +62,7 @@ var BatEnemy = Class.create(Sprite, {
       this.parentNode.removeChild(this);
       delete this;
     }else{
-      this.gotHitTime = 10;
+      this.gotHitTime = 0.2;
       this.animationDuration = 0;
       this.frame = 4;
       this.iniFrame = 4;
@@ -102,7 +101,7 @@ var BatEnemy = Class.create(Sprite, {
     
     if (!this.parentNode.parentNode.paused){
       /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -112,13 +111,13 @@ var BatEnemy = Class.create(Sprite, {
       
       if(this.mode == 'start'){
         this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
-        this.x += this.moveSpeed * Math.cos(this.direction);
-        this.y += this.moveSpeed * Math.sin(this.direction);
+        this.x += this.moveSpeed * Math.cos(this.direction)*evt.elapsed * 0.001;
+        this.y += this.moveSpeed * Math.sin(this.direction)*evt.elapsed * 0.001;
         if(this.nextposY >= this.y){
           this.mode = 'idle';
-          this.shootTime = 5 + getRandom(0,5);
+          this.shootTime = 0.167 + (getRandom(0,5) * 0.3);
           this.bullets = getRandom(2,3);
-          this.moveSpeed = 2;
+          this.moveSpeed = 80;
           this.y = this.nextposY;
           this.x = this.nextposX;
         }
@@ -139,23 +138,23 @@ var BatEnemy = Class.create(Sprite, {
           if(this.x>=this.parentNode.parentNode.rolf.x + 24) this.horizontalDir=1;
         }
         if(this.horizontalDir==1){
-          this.xSpeed -= this.xAccel;
+          this.xSpeed -= this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed<=-7)this.xSpeed=-7;
         }else{
-          this.xSpeed += this.xAccel;
+          this.xSpeed += this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed>=7)this.xSpeed=7;
         }
         this.x += this.xSpeed;
-        this.y += this.moveSpeed;
+        this.y += this.moveSpeed * evt.elapsed * 0.001;
         if(this.y>=this.parentNode.parentNode.rolf.y){
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
           this.mode = 'retreat';
-          this.moveSpeed = 3;
+          this.moveSpeed = 120;
         }
         
         //shoot at player
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.bullets>0 && this.shootTime<=0){
           var shootdown = true;
           if(this.level>=3 || this.difficulty=='hard') shootdown = false;
@@ -163,7 +162,7 @@ var BatEnemy = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 5 + getRandom(0,5);          
+          this.shootTime = 0.167 + (getRandom(0,5) * 0.3);          
         }
         
         //keep control of position on troop
@@ -171,17 +170,17 @@ var BatEnemy = Class.create(Sprite, {
         else if(this.nextposX>game.width-this.width) {this.parentNode.parentNode.batGenerator.modeMove = 'desc'; }
       }      
       if(this.mode == 'retreat'){
-        this.y -= this.moveSpeed;
+        this.y -= this.moveSpeed * evt.elapsed * 0.001;
         if(this.y<=this.parentNode.parentNode.rolf.y-72){
           //this.y = -this.height;
           this.direction = findAngle(this.x,this.y,this.nextposX,this.nextposY);
           this.mode = 'start';
-          this.moveSpeed = 8;
+          this.moveSpeed = 320;
         }
       }
       
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           this.animationDuration = 0;
           this.frame = 0;
@@ -201,7 +200,8 @@ var BatKilled = Class.create(Sprite, {
     this.image  = Game.instance.assets['res/batSheet.png'];
     this.x = x;
     this.y = y;
-    this.aboutToDieTime = 10;
+    this.aboutToDieTime = 0.3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     // 3 - Animate
     this.frame = 4;
@@ -210,10 +210,12 @@ var BatKilled = Class.create(Sprite, {
   },
   
   update: function(evt) {
-    this.aboutToDieTime-=1;
-    if(this.aboutToDieTime%2==0){
-      this.visible=false;
-    }else this.visible=true;
+    this.aboutToDieTime-=evt.elapsed * 0.001;
+    this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+    if(this.vulnerableBlinkTime<=0){
+      this.visible=!this.visible;
+      this.vulnerableBlinkTime += 0.01;
+    }
     if(this.aboutToDieTime<=0){
       this.parentNode.removeChild(this);
       delete this;
@@ -236,7 +238,7 @@ var BatGenerator = Class.create(Sprite, {
     this.bats = [];
     this.createBatTime = 0;
     this.createBatSide = getRandom(0,1); //0=on the same position; 1=on the other side;
-    this.sendBatTime = 90 + (10 * getRandom(1,4));
+    this.sendBatTime = 3 + (0.1 * getRandom(1,4));
     this.batIdx = 0;
     this.batIdy = 0;
     this.level = level;
@@ -264,13 +266,13 @@ var BatGenerator = Class.create(Sprite, {
       //ENEMY CREATION PROCESS
       if (this.batIdy < this.batEnemyMap.length){
         if (this.batIdx < this.batEnemyMap[this.batIdy].length){
-          this.createBatTime -= 1;
+          this.createBatTime -= evt.elapsed * 0.001;
           if (this.createBatTime <= 0) {
             //console.log("creating bat");
             var bat = new BatEnemy(this.genpoint+this.createBatSide*(game.width+48),this.y,this.batIdx,this.batIdy,this.level,this.bats.length,this.difficulty);
             this.bats.push(bat);
             this.parentNode.batGroup.addChild(bat);
-            this.createBatTime = 8;
+            this.createBatTime = 0.267;
             this.createBatSide = getRandom(0,1);
             this.batIdx+=1;
             if(this.batIdx >= this.batEnemyMap[this.batIdy].length){
@@ -288,12 +290,12 @@ var BatGenerator = Class.create(Sprite, {
       
         //ENEMY SENDING PROCESS
         if(!this.parentNode.gotHit){
-          this.sendBatTime-=1;
+          this.sendBatTime-=evt.elapsed * 0.001;
           if(this.sendBatTime<=0 && this.bats.length>0){
             var idbat = getRandom(1,this.bats.length) - 1;
             if(this.bats[idbat].mode == 'idle') {
               this.bats[idbat].setTarget();
-              this.sendBatTime = 90 + (10 * getRandom(1,4));
+              this.sendBatTime = 3 + (0.1 * getRandom(1,4));
             }
           }
         }
@@ -322,7 +324,7 @@ var BatGenerator = Class.create(Sprite, {
     this.bats = [];
     this.createBatTime = 0;
     this.createBatSide = getRandom(0,1);
-    this.sendBatTime = 90 + (10 * getRandom(1,4));
+    this.sendBatTime = 3 + (0.1 * getRandom(1,4));
     this.batIdx = 0;
     this.batIdy = 0;
     this.level = level;

@@ -37,7 +37,9 @@ var BoxSprite = Class.create(Sprite, {
     
     // Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.vulnerableBlinkTime  = 0.033; //secs
+    this.vulnerableNormalTime = 0.133; //secs
+    this.animationSpeed = 0.133;
     this.idleTime=0;
     this.iniFrame = this.frame;
     this.endFrame = 4;
@@ -112,10 +114,17 @@ var BoxSprite = Class.create(Sprite, {
         // this.animationDuration -= this.animationSpeed;
       // }
       if(this.hp<=1){
-        this.animationDuration+=1;
-        if(this.animationDuration%5==0){
-          this.frame=this.endFrame;
-        }else this.frame=this.iniFrame;
+        this.animationDuration+=evt.elapsed * 0.001;
+        if(this.animationDuration>=this.animationSpeed){
+          this.animationDuration -= this.animationSpeed;
+          if(this.frame!=this.endFrame){
+            this.frame=this.endFrame;
+            this.animationSpeed = this.vulnerableBlinkTime;
+          }else {
+            this.frame=this.iniFrame;
+            this.animationSpeed = this.vulnerableNormalTime;
+          }
+        }
       }
       /*END ANIMATION BLOCK*/
     }
@@ -128,9 +137,9 @@ var BoxPiece = Class.create(Sprite, {
     // Call superclass constructor
     Sprite.apply(this,[16, 16]);
     this.image  = Game.instance.assets['res/boxPiece.png'];      
-    this.rotationSpeed = Math.random() * 100 - 50;
+    this.rotationSpeed = 120;
     this.ySpeed = -10;
-    this.yAccel = 1;
+    this.yAccel = 40;
     this.x = x;
     this.y = y;
     this.xSpeed = vx;
@@ -143,7 +152,7 @@ var BoxPiece = Class.create(Sprite, {
      
       game = Game.instance;
       
-      this.ySpeed += this.yAccel;
+      this.ySpeed += this.yAccel * evt.elapsed * 0.001;
       this.y += this.ySpeed;
       this.x += this.xSpeed;
       this.rotation += this.rotationSpeed * evt.elapsed * 0.001;           

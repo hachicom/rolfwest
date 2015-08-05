@@ -22,28 +22,29 @@ var BatSniperEnemy = Class.create(Sprite, {
     if(this.x< Game.instance.width/2)
       this.modeMove = 'desc';
     else this.modeMove = 'asc';
-    this.moveSpeed = 2;    
+    this.moveSpeed = 80;    
     this.moveLeftLimit = moveLimit[0];
     this.moveRightLimit = moveLimit[1];
     this.hideoutStart = moveHideout[0];
     this.hideoutEnd = moveHideout[1];
     this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.xAccel = 20;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.hp = 3; //goes crazy when hp = 0
     if(difficulty=='hard') this.hp = 5;
     this.gotHitTime = 0;
-    this.startTime = 30;
+    this.startTime = 1; //secs
     
     // 3 - Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.animationSpeed = 0.08;
     this.idleTime=0;
     this.frame = 0;
     this.iniFrame = 0;
     this.endFrame = 3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -76,7 +77,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.parentNode.removeChild(this);
         delete this;
       }else{
-        this.gotHitTime = 10;
+        this.gotHitTime = 0.2;
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
@@ -117,17 +118,17 @@ var BatSniperEnemy = Class.create(Sprite, {
     if(batqty <=6) addBullet = 1;
     //alert(addBullet);
     if(this.hp>1) {
-      this.shootTime = 10;
+      this.shootTime = 0.2;
       this.mode = 'shoot';
       this.bullets = 0 + addBullet;
       if(this.level>=5 || this.difficulty=='hard') this.bullets = 3 + addBullet;
     }else if(this.hp>0) {
-      this.shootTime = 5;
+      this.shootTime = 0.1;
       this.mode = 'shoot';
       this.bullets = 3 + addBullet*2;
       if(this.level>=5 || this.difficulty=='hard') this.bullets = 3 + addBullet * getRandom(3,6);
     }else if(this.hp<=0) {
-      this.startTime = 20;
+      this.startTime = 0.667;
       this.mode = 'hiding';
     }
     //this.moveSpeed = 6;
@@ -142,10 +143,12 @@ var BatSniperEnemy = Class.create(Sprite, {
     
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.mode = 'idle';
@@ -156,13 +159,13 @@ var BatSniperEnemy = Class.create(Sprite, {
       if(this.mode == 'idle'){
         //this.y = this.nextposY;
         if(this.modeMove == 'desc'){
-          this.x -= this.moveSpeed;
+          this.x -= this.moveSpeed * evt.elapsed * 0.001;
           if(this.x<this.moveLeftLimit) {
             this.x = this.moveLeftLimit;
             this.modeMove = 'asc';
           }
         }else{
-          this.x += this.moveSpeed;
+          this.x += this.moveSpeed * evt.elapsed * 0.001;
           if(this.x>this.moveRightLimit) {
             this.x = this.moveRightLimit;
             this.modeMove = 'desc';
@@ -171,7 +174,7 @@ var BatSniperEnemy = Class.create(Sprite, {
       }
       if(this.mode == 'shoot'){
         //shoot at player
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.bullets>=0 && this.shootTime<=0){
           //if(this.isHidden()) this.y=this.originY - 16;
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', false);
@@ -180,54 +183,56 @@ var BatSniperEnemy = Class.create(Sprite, {
           this.bullets-=1;
           if(this.bullets<=0){
             this.mode = 'offguard';
-            this.shootTime = 20; 
-          }else this.shootTime = 2;
+            this.shootTime = 0.667; 
+          }else this.shootTime = 0.05;
         }
       }
       if(this.mode == 'offguard'){
         //shoot at player
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.shootTime<=0){
          this.mode = 'idle';
          //if(this.isHidden()) this.y=this.originY;        
         }
       }      
       if(this.mode == 'hiding'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.bullets = 10;
-          this.shootTime = getRandom(5,10);
+          this.shootTime = getRandom(1,3)/30;
           this.y = 248;
           this.x = -32;
-          this.moveSpeed = 5;
+          this.moveSpeed = 200;
           this.mode = 'fly';
         }
       }
       if(this.mode == 'fly'){
         //movement
-        this.x += this.moveSpeed;
-        this.shootTime-=1;
+        this.x += this.moveSpeed * evt.elapsed * 0.001;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.bullets>=0 && this.shootTime<=0){
           var s = new EnemyShot(this.x+16, this.y+16, this.parentNode.parentNode.rolf, this.level, 'batsniper', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 10;
+          this.shootTime = 0.25;
         }
         if(this.x >= game.width){
-          this.startTime = 30;
-          this.moveSpeed = 2;
+          this.startTime = 1;
+          this.moveSpeed = 80;
           this.mode = 'start';
           this.x = this.originX;
           this.y = this.originY;
         }
       }
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           if(this.hp>0){
             this.animationDuration = 0;
@@ -244,7 +249,7 @@ var BatSniperEnemy = Class.create(Sprite, {
       }
       
       /*START ANIMATION BLOCK*/
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -263,7 +268,8 @@ var BatsniperKilled = Class.create(Sprite, {
     this.image  = Game.instance.assets['res/batsniperSheet.png'];
     this.x = x;
     this.y = y;
-    this.aboutToDieTime = 10;
+    this.aboutToDieTime = 0.3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     // 3 - Animate
     this.frame = 9;
@@ -272,10 +278,12 @@ var BatsniperKilled = Class.create(Sprite, {
   },
   
   update: function(evt) {
-    this.aboutToDieTime-=1;
-    if(this.aboutToDieTime%2==0){
-      this.visible=false;
-    }else this.visible=true;
+    this.aboutToDieTime-=evt.elapsed * 0.001;
+    this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+    if(this.vulnerableBlinkTime<=0){
+      this.visible=!this.visible;
+      this.vulnerableBlinkTime += 0.01;
+    }
     if(this.aboutToDieTime<=0){
       this.parentNode.removeChild(this);
       delete this;
@@ -296,9 +304,9 @@ var BatSniperGenerator = Class.create(Sprite, {
     this.y = y;
     //this.genpoint = x + (this.width/2);
     this.batsnipers = [];
-    this.createBatSniperTime = 10;
+    this.createBatSniperTime = 0.3;
     //this.createBatSniperSide = getRandom(0,1); //0=on the same position; 1=on the other side;
-    this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
+    this.sendBatSniperTime = 3 + (0.1 * getRandom(1,4));
     this.batsniperIdx = 0;
     //this.batsniperIdy = 0;
     this.level = level;
@@ -326,7 +334,7 @@ var BatSniperGenerator = Class.create(Sprite, {
     if (!this.parentNode.paused && this.modeStart && !this.defeated){
       //console.log(this.parentNode.batsniperGroup.childNodes.length);
       if (this.batsniperIdx < this.batsniperEnemyMap.length){
-        this.createBatSniperTime -= 1;
+        this.createBatSniperTime -= evt.elapsed * 0.001;
         if (this.createBatSniperTime <= 0) {
           //console.log("creating batsnipers");
           for(var j=0; j<this.batsniperEnemyMap.length; j++){
@@ -335,7 +343,7 @@ var BatSniperGenerator = Class.create(Sprite, {
             var batsniper = new BatSniperEnemy(this.x,this.y,this.batsniperIdx,this.level,this.batsnipers.length,this.moveLimit,this.moveHideout,this.difficulty);
             this.batsnipers.push(batsniper);
             this.parentNode.batsniperGroup.addChild(batsniper);
-            this.createBatSniperTime = 8;
+            this.createBatSniperTime = 0.267;
             this.createBatSniperSide = getRandom(0,1);
             this.batsniperIdx+=1;
             if(this.batsniperIdx >= this.batsniperEnemyMap.length){
@@ -346,12 +354,12 @@ var BatSniperGenerator = Class.create(Sprite, {
         }
       }else{
         if(!this.parentNode.gotHit){
-          this.sendBatSniperTime-=1;
+          this.sendBatSniperTime-=evt.elapsed * 0.001;
           if(this.sendBatSniperTime<=0 && this.batsnipers.length>0){
             var idbatsniper = getRandom(1,this.batsnipers.length) - 1;
             if(this.batsnipers[idbatsniper].mode == 'idle') {
               this.batsnipers[idbatsniper].setTarget(this.parentNode.batGenerator.bats.length);
-              this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
+              this.sendBatSniperTime = 3 + (0.1 * getRandom(1,4));
             }
           }
         }
@@ -371,7 +379,7 @@ var BatSniperGenerator = Class.create(Sprite, {
     //reseting vars
     this.batsnipers = [];
     this.createBatSniperTime = 0;
-    this.sendBatSniperTime = 90 + (10 * getRandom(1,4));
+    this.sendBatSniperTime = 3 + (0.1 * getRandom(1,4));
     this.batsniperIdx = 0;
     this.level = level;
     

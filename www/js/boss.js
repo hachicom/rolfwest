@@ -17,29 +17,30 @@ var MadBatBoss = Class.create(Sprite, {
     this.nextposY = y;
     this.direction = findAngle(x,y,this.nextposX,y);
     this.mode = 'start'; //start, fly, hit
-    this.moveSpeed = 2;
+    this.moveSpeed = 80;
     this.ySpeed = 0;
-    this.yAccel = 0.5;
+    this.yAccel = 20;
     this.shootTime = 0;
     this.bullets = 3;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
     this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
-    this.startTime = 30;
+    this.startTime = 1;
     
     if(difficulty=='hard') {
       this.hp = 36;
-      this.moveSpeed = 4;
+      this.moveSpeed = 160;
     }
     
     // 3 - Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.animationSpeed = 0.08;
     this.idleTime=0;
     this.frame = 0;
     this.iniFrame = 0;
     this.endFrame = 3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -62,7 +63,7 @@ var MadBatBoss = Class.create(Sprite, {
         this.parentNode.removeChild(this);
         delete this;
       }else{
-        this.gotHitTime = 10;
+        this.gotHitTime = 0.333;
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
@@ -89,10 +90,12 @@ var MadBatBoss = Class.create(Sprite, {
     //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.mode = 'fly';
@@ -108,28 +111,28 @@ var MadBatBoss = Class.create(Sprite, {
           if(this.y>=this.originY + 8) this.verticalDir=1;
         }
         if(this.verticalDir==1){ //up
-          this.ySpeed -= this.yAccel;
+          this.ySpeed -= this.yAccel * evt.elapsed * 0.001;
           if(this.ySpeed<=-7)this.ySpeed=-7;
         }else{ //down
-          this.ySpeed += this.yAccel;
+          this.ySpeed += this.yAccel * evt.elapsed * 0.001;
           if(this.ySpeed>=7)this.ySpeed=7;
         }
         this.y += this.ySpeed;
         if(this.horizontalDir==1){ //left
-          this.x -= this.moveSpeed;
+          this.x -= this.moveSpeed * evt.elapsed * 0.001;
           if (this.x < 0) {
             this.x = 0;
             this.horizontalDir = 2;
           }
         }else{ //right
-          this.x += this.moveSpeed;
+          this.x += this.moveSpeed * evt.elapsed * 0.001;
           if (this.x > game.width-this.width) {
             this.x = game.width-this.width;
             this.horizontalDir = 1;
           }
         }
         
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.shootTime<=0){
           if(this.level>=4){
             bulletId = 'boss3';
@@ -137,8 +140,8 @@ var MadBatBoss = Class.create(Sprite, {
             this.parentNode.parentNode.evilShotGroup.addChild(s);
             this.parentNode.parentNode.playSound("eshoot");
             //this.bullets-=1;
-            this.shootTime = 30;
-            if(this.difficulty=='hard') this.shootTime = 20;
+            this.shootTime = 1;
+            if(this.difficulty=='hard') this.shootTime = 0.667;
           }else{
             if(this.bullets > 0){
               var s1 = new EnemyShot(this.x+16, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss1', false);
@@ -149,18 +152,16 @@ var MadBatBoss = Class.create(Sprite, {
               this.bullets-=1;
             }else{
               this.bullets = 3;
-              this.shootTime = 30;
-              if(this.difficulty=='hard') this.shootTime = 20;
+              this.shootTime = 1;
+              if(this.difficulty=='hard') this.shootTime = 0.667;
             }
-          }          
-           
+          }
           
-          
-          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 30;
+          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 1; //???
         }
       }
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
@@ -177,7 +178,7 @@ var MadBatBoss = Class.create(Sprite, {
       }
       
       //START ANIMATION BLOCK//
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -206,29 +207,30 @@ var ChiefBoss = Class.create(Sprite, {
     this.nextposY = y;
     this.direction = findAngle(x,y,this.nextposX,y);
     this.mode = 'start'; //start, fly, hit
-    this.moveSpeed = 2;
+    this.moveSpeed = 80;
     this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.xAccel = 20;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
     this.hp = 30; //after 10 shots, goes crazy
     this.gotHitTime = 0;
-    this.startTime = 30;
+    this.startTime = 1; //secs
     
     if(difficulty=='hard') {
       this.hp = 38;
-      this.moveSpeed = 4;
+      this.moveSpeed = 160;
     }
     
     // 3 - Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.animationSpeed = 0.08;
     this.idleTime=0;
     this.frame = 0;
     this.iniFrame = 0;
     this.endFrame = 3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -251,7 +253,7 @@ var ChiefBoss = Class.create(Sprite, {
         this.parentNode.removeChild(this);
         delete this;
       }else{
-        this.gotHitTime = 10;
+        this.gotHitTime = 0.333;
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
@@ -267,10 +269,12 @@ var ChiefBoss = Class.create(Sprite, {
     //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.mode = 'fly';
@@ -286,15 +290,15 @@ var ChiefBoss = Class.create(Sprite, {
           if(this.x>=this.parentNode.parentNode.rolf.x + 24) this.horizontalDir=1;
         }
         if(this.horizontalDir==1){
-          this.xSpeed -= this.xAccel;
+          this.xSpeed -= this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed<=-7)this.xSpeed=-7;
         }else{
-          this.xSpeed += this.xAccel;
+          this.xSpeed += this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed>=7)this.xSpeed=7;
         }
         this.x += this.xSpeed;
         
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.shootTime<=0){
           var shootdown = true;
           if(this.level>=4 || this.difficulty=='hard') shootdown = false;
@@ -302,12 +306,12 @@ var ChiefBoss = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 25;
-          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 20;
+          this.shootTime = 0.833;
+          if(this.level>=4 || this.difficulty=='hard') this.shootTime = 0.667;
         }
       }
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
@@ -324,7 +328,7 @@ var ChiefBoss = Class.create(Sprite, {
       }
       
       //START ANIMATION BLOCK//
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -352,16 +356,16 @@ var BarthoBoss = Class.create(Sprite, {
     this.nextposY = y;
     this.direction = findAngle(x,y,this.nextposX,y);
     this.mode = 'start'; //start, fly, hit
-    this.moveSpeed = 2;
+    this.moveSpeed = 80;
     this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.xAccel = 20;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
     this.hp = 22; //after 10 shots, goes crazy
     this.gotHitTime = 0;
-    this.startTime = 30;
+    this.startTime = 1; //secs
     
     if(difficulty=='hard') {
       this.hp = 33;
@@ -370,11 +374,12 @@ var BarthoBoss = Class.create(Sprite, {
     
     // 3 - Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.animationSpeed = 0.08;
     this.idleTime=0;
     this.frame = 0;
     this.iniFrame = 0;
     this.endFrame = 1;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -396,7 +401,7 @@ var BarthoBoss = Class.create(Sprite, {
         this.parentNode.removeChild(this);
         delete this;
       }else{
-        this.gotHitTime = 10;
+        this.gotHitTime = 0.333;
         this.animationDuration = 0;
         this.frame = 2;
         this.iniFrame = 2;
@@ -412,10 +417,12 @@ var BarthoBoss = Class.create(Sprite, {
     //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.mode = 'idle';
@@ -424,22 +431,22 @@ var BarthoBoss = Class.create(Sprite, {
         }
       }
       if(this.mode == 'idle'){
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.hp<=18){
           this.mode = 'crazy';
           this.bullets = 3;
-          this.shootTime = 20;
+          this.shootTime = 0.667;
         }
         if(this.shootTime<=0){
           var s = new EnemyShot(this.parentNode.parentNode.rolf.x, -24, this.parentNode.parentNode.rolf, this.level, 'boss3', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("explode");
-          this.shootTime = 40;
-          if(this.difficulty=='hard') this.shootTime = 30;
+          this.shootTime = 1.333;
+          if(this.difficulty=='hard') this.shootTime = 1;
         }
       }
       if(this.mode == 'crazy'){
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.shootTime<=0){
           if(this.bullets > 0){
             var s1 = new EnemyShot(this.x+6, this.y+50, this.parentNode.parentNode.rolf, this.level, 'boss3-2', false);
@@ -452,13 +459,13 @@ var BarthoBoss = Class.create(Sprite, {
             this.bullets-=1;
           }else{
             this.bullets = 3;
-            this.shootTime = 30;
-            if(this.difficulty=='hard') this.shootTime = 20;
+            this.shootTime = 1;
+            if(this.difficulty=='hard') this.shootTime = 0.667;
           }
         }
       }
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
@@ -475,7 +482,7 @@ var BarthoBoss = Class.create(Sprite, {
       }
       
       //START ANIMATION BLOCK//
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -503,30 +510,33 @@ var AgileBoss = Class.create(Sprite, {
     this.nextposY = y;
     this.direction = findAngle(x,y,this.nextposX,y);
     this.mode = 'start'; //start, fly, hit
-    this.moveSpeed = 2;
+    this.moveSpeed = 80;
     this.xSpeed = 0;
-    this.xAccel = 0.5;
+    this.xAccel = 20;
+    this.ySpeed = 0;
+    this.yAccel = 20;
     this.shootTime = 0;
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.verticalDir = getRandom(1,2); //up/down
     this.hp = 40; //after 10 shots, goes crazy
     this.gotHitTime = 0;
-    this.startTime = 30;
-    this.modeTime = 90;
+    this.startTime = 1;
+    this.modeTime = 3;
     
     if(difficulty=='hard') {
       this.hp = 60;
-      this.moveSpeed = 4;
+      this.moveSpeed = 160;
     }
     
     // 3 - Animate
     this.animationDuration = 0;
-    this.animationSpeed = 0.20;
+    this.animationSpeed = 0.08;
     this.idleTime=0;
     this.frame = 0;
     this.iniFrame = 0;
     this.endFrame = 3;
+    this.vulnerableBlinkTime = 0.01; //secs
     
     this.addEventListener(Event.ENTER_FRAME, this.update);
   },
@@ -547,7 +557,7 @@ var AgileBoss = Class.create(Sprite, {
         this.parentNode.removeChild(this);
         delete this;
       }else{
-        this.gotHitTime = 10;
+        this.gotHitTime = 0.333;
         this.animationDuration = 0;
         this.frame = 4;
         this.iniFrame = 4;
@@ -563,10 +573,12 @@ var AgileBoss = Class.create(Sprite, {
     //IMKORTANTE: É preciso que este objeto seja parte de um grupo filho da scene! Do contrário causará erro!    
     if (!this.parentNode.parentNode.paused){
       if(this.mode == 'start'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.mode = 'fly';
@@ -576,39 +588,55 @@ var AgileBoss = Class.create(Sprite, {
       }
       if(this.mode == 'fly'){
         //movement
+        if(this.y <= this.originY){
+          if(this.y<=this.originY - 8) this.verticalDir=2;
+        } else {
+          if(this.y>=this.originY + 8) this.verticalDir=1;
+        }
+        if(this.verticalDir==1){ //up
+          this.ySpeed -= this.yAccel * evt.elapsed * 0.001;
+          if(this.ySpeed<=-7)this.ySpeed=-7;
+        }else{ //down
+          this.ySpeed += this.yAccel * evt.elapsed * 0.001;
+          if(this.ySpeed>=7)this.ySpeed=7;
+        }
+        this.y += this.ySpeed;
+        
         if(this.x <= this.parentNode.parentNode.rolf.x){
           if(this.x<=this.parentNode.parentNode.rolf.x - 24) this.horizontalDir=2;
         } else {
           if(this.x>=this.parentNode.parentNode.rolf.x + 24) this.horizontalDir=1;
         }
         if(this.horizontalDir==1){
-          this.xSpeed -= this.xAccel;
+          this.xSpeed -= this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed<=-7)this.xSpeed=-7;
         }else{
-          this.xSpeed += this.xAccel;
+          this.xSpeed += this.xAccel * evt.elapsed * 0.001;
           if(this.xSpeed>=7)this.xSpeed=7;
         }
         this.x += this.xSpeed;
         //if(this.x <= 0) this.x = 0;
         //else if(this.x >= 296) this.x = 296;
         
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.shootTime<=0){
           var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 10;
-          if(this.difficulty=='hard') this.shootTime = 8;
+          this.shootTime = 0.333;
+          if(this.difficulty=='hard') this.shootTime = 0.267;
         }
-        this.modeTime -= 1;
-        if(this.modeTime<=0) {this.mode = 'hide'; this.modeTime = 30;}
+        this.modeTime -= evt.elapsed * 0.001;
+        if(this.modeTime<=0) {this.mode = 'hide'; this.modeTime = 1;}
       }            
       if(this.mode == 'hide'){
-        this.modeTime-=1;
-        if(this.modeTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.modeTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.modeTime<=0){
           this.visible = true;
           this.bullets = 6;
@@ -620,7 +648,7 @@ var AgileBoss = Class.create(Sprite, {
         }
       }
       if(this.mode == 'surprise'){
-        this.shootTime-=1;
+        this.shootTime-=evt.elapsed * 0.001;
         if(this.bullets>=0 && this.shootTime<=0){
           var s = new EnemyShot(this.x, this.y+24, this.parentNode.parentNode.rolf, this.level, 'boss4', true);
           this.parentNode.parentNode.evilShotGroup.addChild(s);
@@ -629,39 +657,41 @@ var AgileBoss = Class.create(Sprite, {
           if(this.bullets<=0){
             this.mode = 'retreat';
           }
-          this.shootTime = 10;
-          if(this.difficulty=='hard') this.shootTime = 5;
+          this.shootTime = 0.333;
+          if(this.difficulty=='hard') this.shootTime = 0.167;
         }
       }
       if(this.mode == 'retreat'){
         if(this.x<=(game.width/2)-12){
-          this.x -= 3;
+          this.x -= 120 * evt.elapsed * 0.001;
           if(this.x<=-24){
             this.mode = 'restart';
           }
         }else{
-          this.x += 3;
+          this.x += 120 * evt.elapsed * 0.001;
           if(this.x>=game.width){
             this.mode = 'restart';
           }
         }
       }
       if(this.mode == 'restart'){
-        this.startTime-=1;
-        if(this.startTime%2==0){
-          this.visible=false;
-        }else this.visible=true;
+        this.startTime-=evt.elapsed * 0.001;
+        this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+        if(this.vulnerableBlinkTime<=0){
+          this.visible=!this.visible;
+          this.vulnerableBlinkTime += 0.01;
+        }
         if(this.startTime<=0){
           this.visible = true;
           this.y = this.originY;
           this.x = this.originX;
-          this.modeTime = 90;
-          this.startTime = 30;
+          this.modeTime = 3;
+          this.startTime = 1;
           this.mode = 'start';
         }
       }
       if(this.gotHitTime>0){
-        this.gotHitTime-=1;
+        this.gotHitTime-=evt.elapsed * 0.001;
         if(this.gotHitTime<=0) {
           if(this.hp>2){
             this.animationDuration = 0;
@@ -678,7 +708,7 @@ var AgileBoss = Class.create(Sprite, {
       }
       
       //START ANIMATION BLOCK//
-      this.animationDuration += 0.05;    
+      this.animationDuration += evt.elapsed * 0.001;    
       if (this.animationDuration >= this.animationSpeed) {
         if(this.frame<this.endFrame) this.frame ++;
         else this.frame = this.iniFrame;
@@ -698,7 +728,9 @@ var BossKilled = Class.create(Sprite, {
     this.x = x;
     this.y = y;
     this.id = enemy;
-    this.aboutToDieTime = 90;
+    this.aboutToDieTime = 3;
+    this.vulnerableBlinkTime = 0.01; //secs
+    this.createExplosionTime = 0.125; //secs
     
     // 3 - Animate
     switch(enemy){ //madbat, chief, bartho, agile
@@ -716,14 +748,20 @@ var BossKilled = Class.create(Sprite, {
   
   update: function(evt) {
     if (!this.parentNode.paused){
-      this.aboutToDieTime-=1;
-      if(this.aboutToDieTime%2==0){
-        this.visible=false;
-      }else this.visible=true;
-      if(this.aboutToDieTime%5==0){
-        var explosion = new Explosion(getRandom(this.x-12,this.x+this.width),getRandom(this.y-12,this.y+this.height),false);
+      this.aboutToDieTime-=evt.elapsed * 0.001;
+      this.vulnerableBlinkTime -= evt.elapsed * 0.001;
+      this.createExplosionTime -= evt.elapsed * 0.001;
+      if(this.vulnerableBlinkTime<=0){
+        this.visible=!this.visible;
+        this.vulnerableBlinkTime += 0.01;
+      }
+      if(this.createExplosionTime<=0){
+        var correction = 0;
+        if(this.id=='agile') correction = 32;
+        var explosion = new Explosion(getRandom(this.x-12-correction,this.x+this.width-correction),getRandom(this.y-12-correction,this.y+this.height-correction),false);
         this.parentNode.addChild(explosion);
         this.parentNode.playSound("explode");
+        this.createExplosionTime += 0.125;
       }
       if(this.aboutToDieTime<=0){
         this.parentNode.checkLevelComplete();
@@ -745,9 +783,8 @@ var BossGenerator = Class.create(Sprite, {
     //controle vars
     this.x = x;
     this.y = y;
-    this.createBossTime = 10;
-    this.sendBossTime = 90 + (10 * getRandom(1,4));
-    this.batsniperIdx = 0;
+    //this.createBossTime = 0.333;
+    //this.sendBossTime = 3 + (0.3 * getRandom(1,4));
     this.world = world;
     this.round = round;
     this.defeated = false;
