@@ -76,10 +76,12 @@ var Item = Class.create(Sprite, {
 
 // HatItem class
 var HatItem = Class.create(Item, {
-  initialize: function(x, y){
+  initialize: function(x, y, health){
     //x, y, direction, movespeed, xSpeed, ySpeed, xAccel, yAccel, iniframe, endframe, animationSpeed, disappears
-    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, 0, 0, 0, true);
-    this.frame = 0;
+    var frame = 0;
+    if(health>=3) frame = 10
+    Item.call(this, x, y, 0, 0, 0, -10, 0, 40, frame, frame, 0, true);
+    this.frame = frame;
     this.itemId = 'hat';
   },
   

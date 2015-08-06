@@ -227,15 +227,15 @@ window.onload = function() {
       }
 
       document.addEventListener("backbutton", onBackKeyDown, false);
-            
+
       function onBackKeyDown(){
-          game.stop();
-	      navigator.notification.confirm(
-	        'Sair/Quit?', // message
-	        onConfirm, // callback to invoke with index of button pressed
-	        'Exit', // title
-	        ['Cancel','Ok'] // buttonLabels
-	      );
+        // game.stop();
+	      // navigator.notification.confirm(
+	        // 'Sair/Quit?', // message
+	        // onConfirm, // callback to invoke with index of button pressed
+	        // 'Exit', // title
+	        // ['Cancel','Ok'] // buttonLabels
+	      // );
 	      e.preventDefault();
 	    }
 	
@@ -1349,8 +1349,6 @@ window.onload = function() {
     
     update: function(evt) {
       this.sceneAnimationTime += evt.elapsed * 0.001;
-      //this.sceneAnimationDiff   = 1; //sec
-      //this.sceneAnimationTarget = 2; //sec
       if(this.sceneAnimationTime<=16){
         if(this.sceneAnimationTime >= this.sceneAnimationTarget) {
           this.changePage(this.sceneAnimationPage);
@@ -1643,23 +1641,11 @@ window.onload = function() {
       Scene.apply(this);      
       this.backgroundColor = globalBgColor['bg3'];
       
-      /**
-       * SCENE ANIMATION
-       * pg0 (10 frames)  - finger moves up, next to dpad
-       * pg1 (30 frames)  - finger moves left, and rolf moves along
-       * pg2 (60 frames)  - finger moves right, and rolf moves along
-       * pg3 (90 frames)  - finger stops, and rolf stops as well
-       * pg4 (110 frames) - finger press right side above dpad, rolf shoots
-       * pg5 (130 frames) - finger goes up
-       * pg6 (160 frames) - finger press right side above dpad, rolf shoots and reload message blinks
-       * pg7 (180 frames) - finger goes up
-       * pg8 (220 frames) - finger press left side above dpad, reload message disappears
-       * pg9 (280 frames) - animation ended, go to next screen
-       */
+      this.sceneAnimationTime = 0;      
+      this.sceneAnimationDiff = [0.667,0.667,1,1,0.667,0.667,0.667,0.667,2,2,2];
+      this.sceneAnimationTarget   = 0.667; //sec
+      this.sceneAnimationPage   = 0;
       
-      this.sceneAnimationTime = 0;
-      // this.page = 0;
-      // this.textbook = [glossary.text.tutorialPg1[language],glossary.text.tutorialPg2[language],glossary.text.tutorialPg3[language]];
       this.spritesArr = [];
       dpad = new Sprite(200,128);
       dpad.x = 0;
@@ -1762,6 +1748,7 @@ window.onload = function() {
         case 6: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.createShot(); break;
         case 7: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 0; break;
         case 8: this.fingerAddX = 0; this.fingerAddY = 0; this.finger.frame = 1; this.bullets=6; this.finger.x = this.reloadBtn.x + 20; ; this.finger.y = this.reloadBtn.y + 32; break;
+        default: break;
       }
     },
     
@@ -1774,26 +1761,21 @@ window.onload = function() {
     },
     
     update: function(evt) {
-      this.sceneAnimationTime += 1;
-      switch(this.sceneAnimationTime){
-        case 10:  this.changePage(0); break;
-        case 30:  this.changePage(1); break;
-        case 60:  this.changePage(2); break; 
-        case 90:  this.changePage(3); break; 
-        case 110: this.changePage(4); break;
-        case 130: this.changePage(5); break;
-        case 150: this.changePage(6); break;
-        case 170: this.changePage(7); break;
-        case 220: this.changePage(8); break;
-        case 280: 
-          if( isAndroid ) {
-            //if(soundOn && endingstatus==2)//ending.stop();
-            if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
-          }
-          game.replaceScene(new SceneInterlude());
-        break;
+      this.sceneAnimationTime += evt.elapsed * 0.001;
+      if(this.sceneAnimationTime >= this.sceneAnimationTarget) {
+        //alert(this.sceneAnimationPage+' - '+this.sceneAnimationTarget);
+        this.changePage(this.sceneAnimationPage);
+        this.sceneAnimationPage++;
+        this.sceneAnimationTarget += this.sceneAnimationDiff[this.sceneAnimationPage];
       }
-      
+      if(this.sceneAnimationPage>9){
+        if( isAndroid ) {
+          //if(soundOn && endingstatus==2)//ending.stop();
+          if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
+        }
+        game.replaceScene(new SceneInterlude());
+      }
+            
       this.ammoLabel.text = glossary.text.municao[language]+'_' + this.bullets + '/6';
       
       //movement update

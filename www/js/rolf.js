@@ -239,6 +239,7 @@ var Rolf = Class.create(Sprite, {
   
   gotHit: function(playerObj){
     this.health-=this.healthStartFrame;
+    if(playerObj.difficulty=='hard') this.health=-3;
     playerObj.health = this.health;
     if(this.health<0) {
       this.alive = false;
@@ -266,6 +267,7 @@ var Rolf = Class.create(Sprite, {
     this.health += this.healthStartFrame;
     if(this.health>this.healthMax) {
       this.health=this.healthMax;
+      if(playerObj.difficulty=='hard') playerObj.lives++;
     }else{
       this.vulnerableTime = 1;
       if(this.moving == 0){

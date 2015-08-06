@@ -24,7 +24,7 @@ var BatEnemy = Class.create(Sprite, {
     this.bullets = 0;
     this.horizontalDir = getRandom(1,2); //left/right
     this.hp = 0;
-    if(difficulty=='hard') this.hp = 1;
+    //if(difficulty=='hard') this.hp = 1;
     this.gotHitTime = 0;
     
     // 3 - Animate
@@ -115,7 +115,7 @@ var BatEnemy = Class.create(Sprite, {
         this.y += this.moveSpeed * Math.sin(this.direction)*evt.elapsed * 0.001;
         if(this.nextposY >= this.y){
           this.mode = 'idle';
-          this.shootTime = 0.167 + (getRandom(0,5) * 0.3);
+          this.shootTime = 0.067 + (getRandom(0,5) * 0.03);
           this.bullets = getRandom(2,3);
           this.moveSpeed = 80;
           this.y = this.nextposY;
@@ -162,7 +162,7 @@ var BatEnemy = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 0.167 + (getRandom(0,5) * 0.3);          
+          this.shootTime = 0.067 + (getRandom(0,5) * 0.067);
         }
         
         //keep control of position on troop

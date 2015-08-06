@@ -84,7 +84,7 @@ var BatSniperEnemy = Class.create(Sprite, {
         this.endFrame = 4;
         
         if(this.hp == 0 && this.mode != 'idle'){
-          var hat = new HatItem(this.x,this.y);
+          var hat = new HatItem(this.x,this.y,playerObj.health);
           this.parentNode.parentNode.itemGroup.addChild(hat);
         }
       }
@@ -104,7 +104,7 @@ var BatSniperEnemy = Class.create(Sprite, {
     }else{
       var coinchance = getRandom(1,3);
       if(coinchance == 2){
-        var hat = new HatItem(this.x,this.y);
+        var hat = new HatItem(this.x,this.y,playerObj.health);
         this.parentNode.parentNode.itemGroup.addChild(hat);
       }
     } */

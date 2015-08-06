@@ -91,7 +91,7 @@ var BoxSprite = Class.create(Sprite, {
         this.parentNode.parentNode.playSound("explode");
       }
       if(this.mode == 3){
-        var hat = new HatItem(this.x,this.y);
+        var hat = new HatItem(this.x,this.y,playerObj.health);
         this.parentNode.parentNode.itemGroup.addChild(hat);
       }
         this.parentNode.parentNode.playSound("crash");
@@ -137,7 +137,7 @@ var BoxPiece = Class.create(Sprite, {
     // Call superclass constructor
     Sprite.apply(this,[16, 16]);
     this.image  = Game.instance.assets['res/boxPiece.png'];      
-    this.rotationSpeed = 120;
+    this.rotationSpeed = 600;
     this.ySpeed = -10;
     this.yAccel = 40;
     this.x = x;

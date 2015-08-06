@@ -59,13 +59,13 @@ var EnemyShot = Class.create(Shot, {
     if(!shootdown)this.angle = findAngle(x,y,playerSprite.x+playerRadius,playerSprite.y+playerRadius); //shooting towards player
     else this.angle = Math.atan2(1, 0); //shooting up
     switch(author){
-      case 'bat': frame = [1,1,4]; moveSpeed = 120 + level*20; this.size = 1; break;
-      case 'batkid': frame = [2,2,4]; moveSpeed = 160 + level*20; this.size = 1; break;
-      case 'batsniper': frame = [3,3,4]; moveSpeed = 200 + level*20; this.size = 1; break;
-      case 'boss1': frame = [1,2,3,4]; moveSpeed = 240 + level*20; this.size = 2; break;
-      case 'boss2': frame = 1; moveSpeed = 320 + level*20; this.size = 3; break;
-      case 'boss3': frame = 2; moveSpeed = 400 + level*20; this.size = 3; break;
-      case 'boss3-2': frame = [0,3,3,4]; moveSpeed = 480 + level*20; this.size = 2; break;
+      case 'bat': frame = [1,1,4]; moveSpeed = 120 + level*40; this.size = 1; break;
+      case 'batkid': frame = [2,2,4]; moveSpeed = 160 + level*40; this.size = 1; break;
+      case 'batsniper': frame = [3,3,4]; moveSpeed = 200 + level*40; this.size = 1; break;
+      case 'boss1': frame = [1,2,3,4]; moveSpeed = 240 + level*40; this.size = 2; break;
+      case 'boss2': frame = 1; moveSpeed = 320 + level*10; this.size = 3; break;
+      case 'boss3': frame = 2; moveSpeed = 400 + level*10; this.size = 3; break;
+      case 'boss3-2': frame = [0,3,3,4]; moveSpeed = 480 + level*10; this.size = 2; break;
       case 'boss4': frame = [0,0,4]; moveSpeed = 640; this.size = 2; break;
       default: frame = 1; moveSpeed = 80 + level; this.size = 1; break;
     }
