@@ -219,10 +219,10 @@ window.onload = function() {
         
       function onVisibilityChange(event) {
         if (event.target.webkitHidden) {
-          window.plugins.LowLatencyAudio.stop(currentBGM);
+          if(soundOn) window.plugins.LowLatencyAudio.stop(currentBGM);
         }
         else {
-          window.plugins.LowLatencyAudio.play(currentBGM);
+          if(soundOn) window.plugins.LowLatencyAudio.play(currentBGM);
         }
       }
 
@@ -540,7 +540,7 @@ window.onload = function() {
       this.addChild(shootBtn);
       //this.addChild(reloadBtn);
       this.addChild(pauseBtn);
-      this.addChild(fpslabel);
+      //this.addChild(fpslabel);
       this.addChild(pausewin);
             
       this.addEventListener(Event.TOUCH_START,this.handleTouchReloadControl);
@@ -761,13 +761,13 @@ window.onload = function() {
     },
     
     update: function(evt) {
-      fpscount++;
-      var newTime = new Date();
-      if(newTime.getTime() - oldTime.getTime() >= 1000){
-        this.fpslabel.text = fpscount + "fps";
-        fpscount = 0;
-        oldTime = newTime;
-      }
+      // fpscount++;
+      // var newTime = new Date();
+      // if(newTime.getTime() - oldTime.getTime() >= 1000){
+        // this.fpslabel.text = fpscount + "fps";
+        // fpscount = 0;
+        // oldTime = newTime;
+      // }
         
       if(!this.paused){
         //coinstr = '';
@@ -2234,7 +2234,7 @@ window.onload = function() {
       this.addChild(title);
       //this.addChild(map);
       this.addChild(copyright);
-      this.addChild(TitleLabel); 
+      //this.addChild(TitleLabel); 
       this.addChild(PressStart);
       //this.addChild(tutorialLabel);
       this.addChild(optionLabel);
