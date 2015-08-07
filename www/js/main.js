@@ -123,7 +123,7 @@ window.onload = function() {
                );
   
 	// 5 - Game settings
-	game.fps = 24;
+	game.fps = 28;
 	//game.scale = 1;
 	// 6 - Once Game finishes loading
   var hachiplayer = new Hachiplayer(1,4,scoreRewards,20000,playerData.settings.maxstage); //world 1-1, after level 4 world goes up
@@ -154,7 +154,11 @@ window.onload = function() {
     if(playerData.settings.language!=null) language = playerData.settings.language;
     
     //if save file found is older than the new version
-    if (playerData.savedata.version<playerDataDefault.savedata.version){
+    if (playerData.savedata==null){ 
+      playerData = playerDataDefault;
+      //convert old save file to match new structure
+      localStorage["com.hachicom.rolfwest.playerData"] = JSON.encode(playerData);
+    }else if(playerData.savedata.version<playerDataDefault.savedata.version){
       playerData.settings.difficulty = playerDataDefault.settings.difficulty;
       playerData.savedata.firstrun = playerDataDefault.savedata.firstrun;
       playerData.settings.maxstage = playerDataDefault.settings.maxstage;
@@ -1424,7 +1428,7 @@ window.onload = function() {
         label.text = glossary.text.finalstageMsg[language];
         animationSpr.visible = false;
         this.backgroundColor = globalBgColor['stage3'];
-        this.timeToStart = 300;
+        this.timeToStart = 10;
       }else{
         if( isAndroid ) {
           if(soundOn) //this.parentNode.bgm.play();
@@ -1588,7 +1592,7 @@ window.onload = function() {
       Scene.apply(this);     
       this.backgroundColor = globalBgColor['bg4'];
       
-      label = new FontSprite('sega24', 320, 984, '');
+      label = new FontSprite('sega24', 320, 1100, '');
       label.x = 0;
       label.y = game.height;
       this.label = label;
@@ -1603,13 +1607,13 @@ window.onload = function() {
                   +'Chipset Sunset_(STROBE)__'
                   +'One Way Heart_(Joule & Malmen)___'
                   +'THESE TRACKS ARE_PRESUMED TO BE FREE_OR PUBLIC DOMAIN__'
-                  +'IF YOUR MUSIC IS HERE_AND WANT IT REMOVED,_PLEASE CONTACT ME_____'
+                  +'IF YOUR MUSIC IS HERE_AND WANT IT REMOVED,_PLEASE CONTACT ME!_____'
                   +'BMFONT PLUGIN__'
                   +'COFFEE DOG GAMES_____'
                   +'SOUND EFFECTS__'
                   +'CREATED IN BFXR.NET_____'
                   +'8BIT JINGLES__'
-                  +'Little Robot Sound_Factory (.com)_____'
+                  +'Little Robot Sound_Factory (.com)_____=======================__'
       
       if(hachiplayer.maxstage==48) label.text += glossary.text.wingame3[language];
       else if(hachiplayer.maxstage>=25) label.text += glossary.text.wingame2[language];

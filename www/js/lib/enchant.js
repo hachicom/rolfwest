@@ -510,8 +510,8 @@ enchant.Event = enchant.Class.create({
     },
     _initPosition: function(pageX, pageY) {
         var core = enchant.Core.instance;
-        this.x = this.localX = (pageX - core._pageX) / core.scale;
-        this.y = this.localY = (pageY - core._pageY) / core.scale;
+        this.x = this.localX = (pageX - core._element.offsetLeft) / core.scale;
+        this.y = this.localY = (pageY - core._element.offsetTop) / core.scale;
     }
 });
 

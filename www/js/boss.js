@@ -624,8 +624,8 @@ var AgileBoss = Class.create(Sprite, {
           this.parentNode.parentNode.evilShotGroup.addChild(s);
           this.parentNode.parentNode.playSound("eshoot");
           this.bullets-=1;
-          this.shootTime = 0.333;
-          if(this.difficulty=='hard') this.shootTime = 0.267;
+          this.shootTime = 0.267;
+          if(this.difficulty=='hard') this.shootTime = 0.133;
         }
         this.modeTime -= evt.elapsed * 0.001;
         if(this.modeTime<=0) {this.mode = 'hide'; this.modeTime = 1;}
@@ -657,8 +657,8 @@ var AgileBoss = Class.create(Sprite, {
           if(this.bullets<=0){
             this.mode = 'retreat';
           }
-          this.shootTime = 0.333;
-          if(this.difficulty=='hard') this.shootTime = 0.167;
+          this.shootTime = 0.133;
+          if(this.difficulty=='hard') this.shootTime = 0.067;
         }
       }
       if(this.mode == 'retreat'){
