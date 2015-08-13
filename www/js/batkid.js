@@ -292,7 +292,7 @@ var BatKidGenerator = Class.create(Sprite, {
           var batkid = new BatKidEnemy(this.genpoint+this.createBatKidSide*(game.width+64),this.y,this.batkidIdx,this.level,this.batkids.length,this.moveLimit,this.difficulty);
           this.batkids.push(batkid);
           this.parentNode.batkidGroup.addChild(batkid);
-          this.createBatKidTime = 0.267;
+          this.createBatKidTime = 0.167;
           this.createBatKidSide = getRandom(0,1);
           this.batkidIdx+=1;
           if(this.batkidIdx >= this.batkidEnemyMap.length){
@@ -327,7 +327,7 @@ var BatKidGenerator = Class.create(Sprite, {
   
   rearrangeBatKids: function(batkidGenKey) {
     this.batkids.splice(batkidGenKey,1);
-    if(this.batkids.length<=0) this.defeated = true;
+    if(this.batkids.length<=0 && this.readyToFight == true) this.defeated = true;
     for(var i=batkidGenKey; i<this.batkids.length; i++){
       this.batkids[i].batkidGenKey-=1;
     }

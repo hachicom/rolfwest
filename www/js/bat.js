@@ -272,7 +272,7 @@ var BatGenerator = Class.create(Sprite, {
             var bat = new BatEnemy(this.genpoint+this.createBatSide*(game.width+48),this.y,this.batIdx,this.batIdy,this.level,this.bats.length,this.difficulty);
             this.bats.push(bat);
             this.parentNode.batGroup.addChild(bat);
-            this.createBatTime = 0.267;
+            this.createBatTime = 0.167;
             this.createBatSide = getRandom(0,1);
             this.batIdx+=1;
             if(this.batIdx >= this.batEnemyMap[this.batIdy].length){
@@ -313,7 +313,7 @@ var BatGenerator = Class.create(Sprite, {
   
   rearrangeBats: function(batGenKey) {
     this.bats.splice(batGenKey,1);
-    if(this.bats.length<=0) this.defeated = true;
+    if(this.bats.length<=0 && this.readyToFight==true) this.defeated = true;
     for(var i=batGenKey; i<this.bats.length; i++){
       this.bats[i].batGenKey-=1;
     }
